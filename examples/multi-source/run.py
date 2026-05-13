@@ -5,6 +5,7 @@ Multi-Source Monitoring — run with: python examples/multi-source/run.py
 Before: ~30 lines of manual config + trigger YAML + token allocation.
 After:  4 lines with preset.
 """
+
 from toonic.server.quick import full_stack
 from examples._helpers import print_config_summary, print_to_run_hint
 

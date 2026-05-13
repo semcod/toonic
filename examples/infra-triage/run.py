@@ -2,6 +2,7 @@
 """
 Infra triage recipes — run with: python examples/infra-triage/run.py
 """
+
 from toonic.server.quick import watch
 from examples._helpers import print_config_summary
 
@@ -16,7 +17,9 @@ if __name__ == "__main__":
             "dir:./examples/",
             "log:./docker/test-data/sample.logfile",
         )
-        .goal("triage infra signals across container, network, process, directory and logs")
+        .goal(
+            "triage infra signals across container, network, process, directory and logs"
+        )
         .interval(30)
         .build_config()
     )

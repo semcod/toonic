@@ -5,6 +5,7 @@ CCTV/Video Monitoring — run with: python examples/video-monitoring/run.py
 Before: ~25 lines of manual StreamWatcher config + YOLO options.
 After:  2 lines with preset.
 """
+
 from toonic.server.quick import cctv_monitor
 from examples._helpers import print_config_summary, print_to_run_hint
 

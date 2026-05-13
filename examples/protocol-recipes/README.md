@@ -2,8 +2,6 @@
 
 This example collects ready-to-run command recipes for multiple source protocols.
 
-## Python Quick API (recommended)
-
 ### 1) HTTP + network + process checks
 
 ```python
@@ -61,8 +59,6 @@ server = (
     .build()
 )
 ```
-
-## CLI Recipes
 
 ### 1) HTTP endpoint monitor
 

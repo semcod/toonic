@@ -9,15 +9,18 @@ Into structured TriggerConfig YAML.
 
 from __future__ import annotations
 
-import json
 import logging
 import os
 import re
-from typing import Any, Dict, Optional
+from typing import Optional
 
 from toonic.server.triggers.dsl import (
-    TriggerConfig, TriggerRule, EventCondition, FallbackConfig,
-    load_triggers, dump_triggers,
+    TriggerConfig,
+    TriggerRule,
+    EventCondition,
+    FallbackConfig,
+    load_triggers,
+    dump_triggers,
 )
 
 logger = logging.getLogger("toonic.triggers.nlp2yaml")
@@ -26,7 +29,7 @@ logger = logging.getLogger("toonic.triggers.nlp2yaml")
 # Schema reference for the LLM
 # ═══════════════════════════════════════════════════════════════
 
-YAML_SCHEMA_PROMPT = '''You are a YAML trigger configuration generator for Toonic Server.
+YAML_SCHEMA_PROMPT = """You are a YAML trigger configuration generator for Toonic Server.
 Convert the user's natural language description into a valid YAML trigger config.
 
 YAML DSL schema:
@@ -76,18 +79,23 @@ Rules:
 - For "when X happens": use on_event mode
 - For "when X happens or every N seconds": use hybrid mode or on_event with fallback
 - Keep names descriptive and lowercase with hyphens
-'''
+"""
 
 
 class NLP2YAML:
     """Converts natural language to YAML trigger configuration via LLM."""
 
     def __init__(self, model: str = "", api_key: str = ""):
-        self.model = model or os.environ.get("LLM_MODEL", "google/gemini-3-flash-preview")
-        self.api_key = api_key or os.environ.get("LLM_API_KEY",
-                       os.environ.get("OPENROUTER_API_KEY", ""))
+        self.model = model or os.environ.get(
+            "LLM_MODEL", "google/gemini-3-flash-preview"
+        )
+        self.api_key = api_key or os.environ.get(
+            "LLM_API_KEY", os.environ.get("OPENROUTER_API_KEY", "")
+        )
 
-    async def generate(self, description: str, source: str = "", goal: str = "") -> TriggerConfig:
+    async def generate(
+        self, description: str, source: str = "", goal: str = ""
+    ) -> TriggerConfig:
         """Generate TriggerConfig from natural language description."""
         # Try local parsing first (for simple cases)
         config = self._try_local_parse(description, source, goal)
@@ -105,16 +113,26 @@ class NLP2YAML:
                     for t in config.triggers:
                         if not t.goal:
                             t.goal = goal
-                logger.info(f"NLP2YAML: LLM generated {len(config.triggers)} trigger(s)")
+                logger.info(
+                    f"NLP2YAML: LLM generated {len(config.triggers)} trigger(s)"
+                )
                 return config
             except Exception as e:
                 logger.error(f"NLP2YAML: failed to parse LLM output: {e}")
 
         # Fallback: create simple periodic trigger
         logger.warning("NLP2YAML: falling back to default periodic trigger")
-        return TriggerConfig(triggers=[
-            TriggerRule(name="default", mode="periodic", interval_s=30.0, goal=goal, source=source),
-        ])
+        return TriggerConfig(
+            triggers=[
+                TriggerRule(
+                    name="default",
+                    mode="periodic",
+                    interval_s=30.0,
+                    goal=goal,
+                    source=source,
+                ),
+            ]
+        )
 
     def generate_yaml(self, description: str, source: str = "", goal: str = "") -> str:
         """Synchronous YAML generation (local parse only, no LLM)."""
@@ -125,16 +143,27 @@ class NLP2YAML:
 
     # ── Local parser (handles common patterns without LLM) ────
 
-    def _try_local_parse(self, desc: str, source: str = "", goal: str = "") -> Optional[TriggerConfig]:
+    def _try_local_parse(
+        self, desc: str, source: str = "", goal: str = ""
+    ) -> Optional[TriggerConfig]:
         """Parse common natural language patterns locally."""
         d = desc.lower().strip()
         rules = []
         events = []
 
         # Extract time values
-        periodic_s = self._extract_time(d, r'(?:every|each|co)\s+(\d+(?:\.\d+)?)\s*(s(?:ec(?:ond)?s?)?|m(?:in(?:ute)?s?)?|h(?:ours?)?)')
-        fallback_s = self._extract_time(d, r'(?:otherwise|else|if\s+not|at\s+(?:least|minimum)|min\.?)\s+(?:every\s+)?(\d+(?:\.\d+)?)\s*(s(?:ec(?:ond)?s?)?|m(?:in(?:ute)?s?)?)')
-        duration_s = self._extract_time(d, r'(?:for|during|lasting)\s+(\d+(?:\.\d+)?)\s*(s(?:ec(?:ond)?s?)?|m(?:in(?:ute)?s?)?)')
+        periodic_s = self._extract_time(
+            d,
+            r"(?:every|each|co)\s+(\d+(?:\.\d+)?)\s*(s(?:ec(?:ond)?s?)?|m(?:in(?:ute)?s?)?|h(?:ours?)?)",
+        )
+        fallback_s = self._extract_time(
+            d,
+            r"(?:otherwise|else|if\s+not|at\s+(?:least|minimum)|min\.?)\s+(?:every\s+)?(\d+(?:\.\d+)?)\s*(s(?:ec(?:ond)?s?)?|m(?:in(?:ute)?s?)?)",
+        )
+        duration_s = self._extract_time(
+            d,
+            r"(?:for|during|lasting)\s+(\d+(?:\.\d+)?)\s*(s(?:ec(?:ond)?s?)?|m(?:in(?:ute)?s?)?)",
+        )
 
         mode = "periodic"
 
@@ -170,24 +199,30 @@ class NLP2YAML:
 
         # Build rule
         if events or periodic_s:
-            rule = self._build_trigger_rule(events, mode, source, goal, periodic_s, fallback_s, duration_s)
+            rule = self._build_trigger_rule(
+                events, mode, source, goal, periodic_s, fallback_s, duration_s
+            )
             rules.append(rule)
 
         if rules:
             return TriggerConfig(triggers=rules)
         return None
 
-    def _parse_object_condition(self, d: str, duration_s: float) -> Optional[EventCondition]:
+    def _parse_object_condition(
+        self, d: str, duration_s: float
+    ) -> Optional[EventCondition]:
         """Parse object detection condition from description."""
         # First try: "object <noun>" pattern
-        obj_match = re.search(r'\bobject\s+(\w+)', d)
+        obj_match = re.search(r"\bobject\s+(\w+)", d)
         if obj_match:
             label = obj_match.group(1).rstrip("s")
             if label in ("people",):
                 label = "person"
         else:
             # Standalone object nouns
-            obj_match = re.search(r'\b(person|people|car|vehicle|animal|fire|smoke|face)\w*\b', d)
+            obj_match = re.search(
+                r"\b(person|people|car|vehicle|animal|fire|smoke|face)\w*\b", d
+            )
             if obj_match:
                 label = obj_match.group(1).rstrip("s")
                 if label in ("people",):
@@ -199,61 +234,101 @@ class NLP2YAML:
 
         if obj_match and label:
             return EventCondition(
-                type="object", label=label, threshold=0.3,
+                type="object",
+                label=label,
+                threshold=0.3,
                 min_duration_s=duration_s if duration_s else 0.0,
             )
         return None
 
-    def _parse_motion_condition(self, d: str, duration_s: float) -> Optional[EventCondition]:
+    def _parse_motion_condition(
+        self, d: str, duration_s: float
+    ) -> Optional[EventCondition]:
         """Parse motion detection condition from description."""
-        if re.search(r'\bmotion\b|\bmovement\b|\bmoving\b', d):
-            threshold = self._extract_float(d, r'motion\w*\s+(?:>|above|threshold)?\s*(\d+(?:\.\d+)?)', 0.15)
-            return EventCondition(type="motion", threshold=threshold,
-                                 min_duration_s=duration_s or 0.0)
+        if re.search(r"\bmotion\b|\bmovement\b|\bmoving\b", d):
+            threshold = self._extract_float(
+                d, r"motion\w*\s+(?:>|above|threshold)?\s*(\d+(?:\.\d+)?)", 0.15
+            )
+            return EventCondition(
+                type="motion", threshold=threshold, min_duration_s=duration_s or 0.0
+            )
         return None
 
     def _parse_scene_change_condition(self, d: str) -> Optional[EventCondition]:
         """Parse scene change condition from description."""
-        if re.search(r'scene\s*change|big\s*change|significant\s*change', d):
-            threshold = self._extract_float(d, r'change\w*\s+(?:>|above|threshold)?\s*(\d+(?:\.\d+)?)', 0.4)
+        if re.search(r"scene\s*change|big\s*change|significant\s*change", d):
+            threshold = self._extract_float(
+                d, r"change\w*\s+(?:>|above|threshold)?\s*(\d+(?:\.\d+)?)", 0.4
+            )
             return EventCondition(type="scene_change", threshold=threshold)
         return None
 
-    def _parse_pattern_condition(self, d: str, source: str) -> tuple[Optional[EventCondition], str]:
+    def _parse_pattern_condition(
+        self, d: str, source: str
+    ) -> tuple[Optional[EventCondition], str]:
         """Parse pattern/error condition from description. Returns (event, updated_source)."""
-        pattern_match = re.search(r'(?:pattern|error|warning|critical|exception|regex)\s*[:\s]*["\']?([^"\']+)["\']?', d)
-        if pattern_match and any(w in d for w in ["error", "warning", "critical", "pattern", "regex", "exception"]):
+        pattern_match = re.search(
+            r'(?:pattern|error|warning|critical|exception|regex)\s*[:\s]*["\']?([^"\']+)["\']?',
+            d,
+        )
+        if pattern_match and any(
+            w in d
+            for w in ["error", "warning", "critical", "pattern", "regex", "exception"]
+        ):
             regex = pattern_match.group(1).strip()
             if regex in ("error", "warning", "critical", "exception"):
                 regex = "ERROR|CRITICAL|EXCEPTION"
-            count = int(self._extract_float(d, r'(\d+)\s+(?:times|occurrences|errors)', 1))
-            window = self._extract_time(d, r'(?:in|within)\s+(\d+(?:\.\d+)?)\s*(s(?:ec)?|m(?:in)?|h)')
-            event = EventCondition(type="pattern", regex=regex,
-                                   count_threshold=max(count, 1), window_s=window or 60.0)
+            count = int(
+                self._extract_float(d, r"(\d+)\s+(?:times|occurrences|errors)", 1)
+            )
+            window = self._extract_time(
+                d, r"(?:in|within)\s+(\d+(?:\.\d+)?)\s*(s(?:ec)?|m(?:in)?|h)"
+            )
+            event = EventCondition(
+                type="pattern",
+                regex=regex,
+                count_threshold=max(count, 1),
+                window_s=window or 60.0,
+            )
             if not source:
                 source = "logs"
             return event, source
         return None, source
 
-    def _parse_audio_conditions(self, d: str, source: str, duration_s: float) -> tuple[list[EventCondition], str]:
+    def _parse_audio_conditions(
+        self, d: str, source: str, duration_s: float
+    ) -> tuple[list[EventCondition], str]:
         """Parse audio conditions from description. Returns (events, updated_source)."""
         events = []
-        if re.search(r'\bspeech\b|\bvoice\b|\btalking\b|\bspoken\b', d):
-            events.append(EventCondition(type="speech", threshold=0.5,
-                                         min_duration_s=duration_s or 0.5))
+        if re.search(r"\bspeech\b|\bvoice\b|\btalking\b|\bspoken\b", d):
+            events.append(
+                EventCondition(
+                    type="speech", threshold=0.5, min_duration_s=duration_s or 0.5
+                )
+            )
             if not source:
                 source = "audio"
 
-        if re.search(r'\bloud\b|\bnoise\b|\bsound\s*level\b|\baudio\s*level\b', d):
-            threshold = self._extract_float(d, r'(?:level|above|threshold)\s*(\d+(?:\.\d+)?)', 0.3)
+        if re.search(r"\bloud\b|\bnoise\b|\bsound\s*level\b|\baudio\s*level\b", d):
+            threshold = self._extract_float(
+                d, r"(?:level|above|threshold)\s*(\d+(?:\.\d+)?)", 0.3
+            )
             events.append(EventCondition(type="audio_level", threshold=threshold))
             if not source:
                 source = "audio"
 
         return events, source
 
-    def _build_trigger_rule(self, events: list, mode: str, source: str, goal: str,
-                            periodic_s: float, fallback_s: float, duration_s: float) -> TriggerRule:
+    def _build_trigger_rule(
+        self,
+        events: list,
+        mode: str,
+        source: str,
+        goal: str,
+        periodic_s: float,
+        fallback_s: float,
+        duration_s: float,
+    ) -> TriggerRule:
         """Build a TriggerRule from parsed components."""
         name_parts = []
         if events:
@@ -268,8 +343,12 @@ class NLP2YAML:
             source=source,
             mode=mode,
             events=events,
-            interval_s=periodic_s if periodic_s else (fallback_s if fallback_s else 30.0),
-            fallback=FallbackConfig(periodic_s=fallback_s) if fallback_s else FallbackConfig(),
+            interval_s=periodic_s
+            if periodic_s
+            else (fallback_s if fallback_s else 30.0),
+            fallback=FallbackConfig(periodic_s=fallback_s)
+            if fallback_s
+            else FallbackConfig(),
             goal=goal,
             cooldown_s=min(duration_s or 2.0, 10.0),
         )
@@ -297,7 +376,7 @@ class NLP2YAML:
 
             # Extract YAML from markdown code block
             if "```" in text:
-                m = re.search(r'```(?:yaml)?\s*\n?(.*?)\n?```', text, re.DOTALL)
+                m = re.search(r"```(?:yaml)?\s*\n?(.*?)\n?```", text, re.DOTALL)
                 if m:
                     text = m.group(1).strip()
 

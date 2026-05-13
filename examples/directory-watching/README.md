@@ -14,9 +14,6 @@ from toonic.server.quick import run
 run("dir:./deploy/", goal="monitor deployment directory for changes")
 ```
 
-## Quick Start (CLI)
-
-```bash
 # Watch a deployment directory
 python -m toonic.server \
   --source dir:./deploy/ \

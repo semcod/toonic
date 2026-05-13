@@ -1,4 +1,5 @@
 """Event detection and emission logic for stream watcher."""
+
 from __future__ import annotations
 
 import base64
@@ -27,7 +28,10 @@ async def check_event_and_emit(watcher: "StreamWatcher", cv2, np) -> None:
         return
     # Cooldown: don't re-emit the same event too quickly
     now = time.time()
-    if watcher._last_emit_time > 0 and (now - watcher._last_emit_time) < watcher.min_event_duration_s:
+    if (
+        watcher._last_emit_time > 0
+        and (now - watcher._last_emit_time) < watcher.min_event_duration_s
+    ):
         return
 
     watcher._event_count += 1
@@ -47,16 +51,20 @@ async def check_event_and_emit(watcher: "StreamWatcher", cv2, np) -> None:
     for d in all_dets:
         det_summary[d.label] = det_summary.get(d.label, 0) + 1
     detected_objects = [
-        {"label": k, "count": v, "confidence": max(
-            d.confidence for d in all_dets if d.label == k
-        )} for k, v in det_summary.items()
+        {
+            "label": k,
+            "count": v,
+            "confidence": max(d.confidence for d in all_dets if d.label == k),
+        }
+        for k, v in det_summary.items()
     ]
 
     # Encode selected frames as JPEG
     frame_images = []
     for fr in selected:
         _, buf = cv2.imencode(
-            ".jpg", fr.small, [cv2.IMWRITE_JPEG_QUALITY, watcher.send_quality])
+            ".jpg", fr.small, [cv2.IMWRITE_JPEG_QUALITY, watcher.send_quality]
+        )
         frame_images.append(buf.tobytes())
 
     # Extract ROI crops around detections (from high-res frames)
@@ -74,7 +82,8 @@ async def check_event_and_emit(watcher: "StreamWatcher", cv2, np) -> None:
         diff_color[:, :, 1] = 0  # zero green → red only
         diff_vis = cv2.addWeighted(diff_vis, 0.7, diff_color, 0.3, 0)
         _, diff_buf = cv2.imencode(
-            ".jpg", diff_vis, [cv2.IMWRITE_JPEG_QUALITY, watcher.send_quality])
+            ".jpg", diff_vis, [cv2.IMWRITE_JPEG_QUALITY, watcher.send_quality]
+        )
         diff_image = diff_buf.tobytes()
 
     # Build TOON spec with event summary
@@ -97,32 +106,34 @@ async def check_event_and_emit(watcher: "StreamWatcher", cv2, np) -> None:
     # Encode extra images as base64 list in metadata
     extra_images_b64 = [base64.b64encode(img).decode() for img in all_images[1:]]
 
-    await watcher.emit(ContextChunk(
-        source_id=watcher.source_id,
-        category=SourceCategory.VIDEO,
-        toon_spec=toon,
-        raw_data=primary_raw,
-        raw_encoding="base64_jpeg",
-        is_delta=True,
-        content_type=ContentType.VIDEO_EVENT,
-        priority=0.9,
-        metadata={
-            "frame": selected[-1].frame_idx,
-            "keyframe": watcher._keyframe_count,
-            "event_id": watcher._event_count,
-            "scene_score": round(selected[-1].scene_score, 3),
-            "reason": "detection_event",
-            "detected_objects": detected_objects,
-            "detection_summary": det_summary,
-            "event_duration_s": round(duration, 2),
-            "event_frames": len(selected),
-            "roi_crops_count": len(roi_crops),
-            "has_diff_image": diff_image is not None,
-            "extra_images_b64": extra_images_b64,
-            "total_images": len(all_images),
-            "size_bytes": sum(len(img) for img in all_images),
-        },
-    ))
+    await watcher.emit(
+        ContextChunk(
+            source_id=watcher.source_id,
+            category=SourceCategory.VIDEO,
+            toon_spec=toon,
+            raw_data=primary_raw,
+            raw_encoding="base64_jpeg",
+            is_delta=True,
+            content_type=ContentType.VIDEO_EVENT,
+            priority=0.9,
+            metadata={
+                "frame": selected[-1].frame_idx,
+                "keyframe": watcher._keyframe_count,
+                "event_id": watcher._event_count,
+                "scene_score": round(selected[-1].scene_score, 3),
+                "reason": "detection_event",
+                "detected_objects": detected_objects,
+                "detection_summary": det_summary,
+                "event_duration_s": round(duration, 2),
+                "event_frames": len(selected),
+                "roi_crops_count": len(roi_crops),
+                "has_diff_image": diff_image is not None,
+                "extra_images_b64": extra_images_b64,
+                "total_images": len(all_images),
+                "size_bytes": sum(len(img) for img in all_images),
+            },
+        )
+    )
     logger.info(
         f"[{watcher.source_id}] Event #{watcher._event_count}: "
         f"{det_labels} | {len(selected)} frames/{duration:.1f}s | "
@@ -132,7 +143,9 @@ async def check_event_and_emit(watcher: "StreamWatcher", cv2, np) -> None:
     watcher._frame_buffer.clear()
 
 
-def _select_event_frames(watcher: "StreamWatcher", frames: List[FrameRecord]) -> List[FrameRecord]:
+def _select_event_frames(
+    watcher: "StreamWatcher", frames: List[FrameRecord]
+) -> List[FrameRecord]:
     """Select representative frames from detection window (first, mid, last)."""
     if len(frames) <= 3:
         return list(frames)
@@ -141,7 +154,9 @@ def _select_event_frames(watcher: "StreamWatcher", frames: List[FrameRecord]) ->
     return [frames[i] for i in indices]
 
 
-def _extract_roi_crops(watcher: "StreamWatcher", cv2, frames: List[FrameRecord]) -> List[bytes]:
+def _extract_roi_crops(
+    watcher: "StreamWatcher", cv2, frames: List[FrameRecord]
+) -> List[bytes]:
     """Extract ROI crops around detected objects from high-res frames."""
     crops = []
     seen_labels = set()
@@ -168,39 +183,45 @@ def _extract_roi_crops(watcher: "StreamWatcher", cv2, frames: List[FrameRecord])
             crop_h = int(crop_w * crop.shape[0] / crop.shape[1])
             crop = cv2.resize(crop, (crop_w, crop_h))
             _, buf = cv2.imencode(
-                ".jpg", crop, [cv2.IMWRITE_JPEG_QUALITY, watcher.send_quality])
+                ".jpg", crop, [cv2.IMWRITE_JPEG_QUALITY, watcher.send_quality]
+            )
             crops.append(buf.tobytes())
             if len(crops) >= watcher.roi_max_crops:
                 return crops
     return crops
 
 
-async def emit_heartbeat(watcher: "StreamWatcher", cv2, small, scene_score: float) -> None:
+async def emit_heartbeat(
+    watcher: "StreamWatcher", cv2, small, scene_score: float
+) -> None:
     """Emit a heartbeat frame when no events detected for max_silent_s."""
     watcher._keyframe_count += 1
     watcher._last_emit_time = time.time()
     _, buf = cv2.imencode(
-        ".jpg", small, [cv2.IMWRITE_JPEG_QUALITY, watcher.send_quality])
+        ".jpg", small, [cv2.IMWRITE_JPEG_QUALITY, watcher.send_quality]
+    )
     h, w = small.shape[:2]
     toon = (
         f"# {watcher.source_id} | video-frame | "
         f"kf:{watcher._keyframe_count} | scene:{scene_score:.3f} | "
         f"heartbeat | {w}x{h} Q={watcher.send_quality}"
     )
-    await watcher.emit(ContextChunk(
-        source_id=watcher.source_id,
-        category=SourceCategory.VIDEO,
-        toon_spec=toon,
-        raw_data=buf.tobytes(),
-        raw_encoding="base64_jpeg",
-        is_delta=True,
-        content_type=ContentType.VIDEO_HEARTBEAT,
-        priority=0.2,
-        metadata={
-            "frame": watcher._frame_count,
-            "keyframe": watcher._keyframe_count,
-            "scene_score": round(scene_score, 3),
-            "reason": "heartbeat",
-            "size_bytes": len(buf),
-        },
-    ))
+    await watcher.emit(
+        ContextChunk(
+            source_id=watcher.source_id,
+            category=SourceCategory.VIDEO,
+            toon_spec=toon,
+            raw_data=buf.tobytes(),
+            raw_encoding="base64_jpeg",
+            is_delta=True,
+            content_type=ContentType.VIDEO_HEARTBEAT,
+            priority=0.2,
+            metadata={
+                "frame": watcher._frame_count,
+                "keyframe": watcher._keyframe_count,
+                "scene_score": round(scene_score, 3),
+                "reason": "heartbeat",
+                "size_bytes": len(buf),
+            },
+        )
+    )

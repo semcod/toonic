@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import json
 import logging
 import time
@@ -30,9 +29,15 @@ def register(app: FastAPI, server, ws_clients: set) -> None:
                         goal=msg.get("goal", ""),
                         model=msg.get("model", ""),
                     )
-                    await websocket.send_text(json.dumps({
-                        "event": "action", "data": action.to_dict(), "timestamp": time.time()
-                    }))
+                    await websocket.send_text(
+                        json.dumps(
+                            {
+                                "event": "action",
+                                "data": action.to_dict(),
+                                "timestamp": time.time(),
+                            }
+                        )
+                    )
         except WebSocketDisconnect:
             logger.info("WebSocket disconnect: /ws")
             pass

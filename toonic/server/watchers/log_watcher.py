@@ -6,10 +6,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import os
-import time
 from pathlib import Path
-from typing import Dict
 
 from toonic.server.models import ContextChunk, ContentType, SourceCategory
 from toonic.server.watchers.base import BaseWatcher, WatcherRegistry
@@ -74,21 +71,27 @@ class LogWatcher(BaseWatcher):
         try:
             content = path.read_text(errors="replace")
             lines = content.strip().split("\n")
-            tail = lines[-self.max_lines:]
+            tail = lines[-self.max_lines :]
             self._last_pos = path.stat().st_size
             self._last_size = self._last_pos
 
             toon = self._to_toon(tail, path.name)
             max_sev = _detect_max_severity(tail)
-            await self.emit(ContextChunk(
-                source_id=self.source_id,
-                category=SourceCategory.LOGS,
-                toon_spec=toon,
-                is_delta=False,
-                content_type=ContentType.LOG_ENTRIES,
-                priority=SEVERITY_PRIORITY.get(max_sev, 0.3),
-                metadata={"path": str(path), "lines": len(tail), "max_severity": max_sev},
-            ))
+            await self.emit(
+                ContextChunk(
+                    source_id=self.source_id,
+                    category=SourceCategory.LOGS,
+                    toon_spec=toon,
+                    is_delta=False,
+                    content_type=ContentType.LOG_ENTRIES,
+                    priority=SEVERITY_PRIORITY.get(max_sev, 0.3),
+                    metadata={
+                        "path": str(path),
+                        "lines": len(tail),
+                        "max_severity": max_sev,
+                    },
+                )
+            )
             logger.info(f"[{self.source_id}] Initial tail: {len(tail)} lines")
         except Exception as e:
             logger.error(f"[{self.source_id}] Error reading log: {e}")
@@ -128,22 +131,32 @@ class LogWatcher(BaseWatcher):
                 new_lines = new_content.strip().split("\n")
                 toon = self._to_toon(new_lines, path.name, delta=True)
                 max_sev = _detect_max_severity(new_lines)
-                await self.emit(ContextChunk(
-                    source_id=self.source_id,
-                    category=SourceCategory.LOGS,
-                    toon_spec=toon,
-                    is_delta=True,
-                    content_type=ContentType.LOG_ENTRIES,
-                    priority=SEVERITY_PRIORITY.get(max_sev, 0.3),
-                    metadata={"path": str(path), "new_lines": len(new_lines), "max_severity": max_sev},
-                ))
+                await self.emit(
+                    ContextChunk(
+                        source_id=self.source_id,
+                        category=SourceCategory.LOGS,
+                        toon_spec=toon,
+                        is_delta=True,
+                        content_type=ContentType.LOG_ENTRIES,
+                        priority=SEVERITY_PRIORITY.get(max_sev, 0.3),
+                        metadata={
+                            "path": str(path),
+                            "new_lines": len(new_lines),
+                            "max_severity": max_sev,
+                        },
+                    )
+                )
         except Exception as e:
             logger.error(f"[{self.source_id}] Read error: {e}")
 
     def _to_toon(self, lines: list, filename: str, delta: bool = False) -> str:
         """Convert log lines to TOON format."""
         # Categorize log lines
-        errors = [l for l in lines if any(x in l.upper() for x in ["ERROR", "FATAL", "CRITICAL"])]
+        errors = [
+            l
+            for l in lines
+            if any(x in l.upper() for x in ["ERROR", "FATAL", "CRITICAL"])
+        ]
         warnings = [l for l in lines if "WARN" in l.upper()]
         info_count = len(lines) - len(errors) - len(warnings)
 

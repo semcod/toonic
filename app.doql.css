@@ -1,0 +1,219 @@
+app {
+  name: "toonic";
+  version: "1.0.15";
+}
+
+database[name="main"] {
+  type: "sqlite";
+  url: env.TOONIC_DB_PATH;
+}
+
+interface[type="api"] {
+  type: rest;
+  framework: fastapi;
+}
+
+interface[type="cli"] {
+  framework: argparse;
+}
+interface[type="cli"] page[name="toonic"] {
+
+}
+
+workflow[name="venv"] {
+  trigger: "manual";
+  step-1: run cmd=python3 -m venv .venv;
+  step-2: run cmd=$(PIP) install --upgrade pip;
+}
+
+workflow[name="install"] {
+  trigger: "manual";
+  step-1: run cmd=$(PIP) install -e .;
+}
+
+workflow[name="install-dev"] {
+  trigger: "manual";
+  step-1: run cmd=$(PIP) install -e ".[dev,server]";
+}
+
+workflow[name="install-all"] {
+  trigger: "manual";
+  step-1: run cmd=$(PIP) install -e ".[all]";
+}
+
+workflow[name="install-llm"] {
+  trigger: "manual";
+  step-1: run cmd=$(PIP) install litellm;
+}
+
+workflow[name="test"] {
+  trigger: "manual";
+  step-1: run cmd=$(PYTEST) tests/ -v;
+}
+
+workflow[name="test-server"] {
+  trigger: "manual";
+  step-1: run cmd=$(PYTEST) tests/test_server.py -v;
+}
+
+workflow[name="test-cov"] {
+  trigger: "manual";
+  step-1: run cmd=$(PYTEST) tests/ -v --cov=toonic --cov-report=html;
+}
+
+workflow[name="server"] {
+  trigger: "manual";
+  step-1: run cmd=$(PYTHON) -m toonic.server --port $(PORT);
+}
+
+workflow[name="server-code"] {
+  trigger: "manual";
+  step-1: run cmd=$(PYTHON) -m toonic.server \;
+  step-2: run cmd=--source file:./examples/code-analysis/sample-project/ \;
+  step-3: run cmd=--port $(PORT) \;
+  step-4: run cmd=--goal "find bugs, security issues, suggest improvements" \;
+  step-5: run cmd=--interval 0;
+}
+
+workflow[name="server-logs"] {
+  trigger: "manual";
+  step-1: run cmd=$(PYTHON) -m toonic.server \;
+  step-2: run cmd=--source log:./docker/test-data/sample.logfile \;
+  step-3: run cmd=--port $(PORT) \;
+  step-4: run cmd=--goal "monitor logs, detect errors" \;
+  step-5: run cmd=--interval 10;
+}
+
+workflow[name="server-camera"] {
+  trigger: "manual";
+  step-1: run cmd=$(PYTHON) -m toonic.server \;
+  step-2: run cmd=--source "rtsp://admin:123456@192.168.188.146:554/h264Preview_01_main" \;
+  step-3: run cmd=--port $(PORT) \;
+  step-4: run cmd=--goal "monitor video stream, detect changes" \;
+  step-5: run cmd=--interval 15;
+}
+
+workflow[name="server-multi"] {
+  trigger: "manual";
+  step-1: run cmd=$(PYTHON) -m toonic.server \;
+  step-2: run cmd=--source file:./examples/code-analysis/sample-project/ \;
+  step-3: run cmd=--source log:./docker/test-data/sample.logfile \;
+  step-4: run cmd=--source "rtsp://admin:123456@192.168.188.146:554/h264Preview_01_main" \;
+  step-5: run cmd=--port $(PORT) \;
+  step-6: run cmd=--goal "comprehensive analysis: code + logs + video" \;
+  step-7: run cmd=--interval 30;
+}
+
+workflow[name="client"] {
+  trigger: "manual";
+  step-1: run cmd=$(PYTHON) -m toonic.server.client;
+}
+
+workflow[name="status"] {
+  trigger: "manual";
+  step-1: run cmd=$(PYTHON) -m toonic.server.client --status;
+}
+
+workflow[name="docker-build"] {
+  trigger: "manual";
+  step-1: run cmd=docker compose -f docker/docker-compose.yml build;
+}
+
+workflow[name="docker-up"] {
+  trigger: "manual";
+  step-1: run cmd=docker compose -f docker/docker-compose.yml up -d;
+}
+
+workflow[name="docker-down"] {
+  trigger: "manual";
+  step-1: run cmd=docker compose -f docker/docker-compose.yml down;
+}
+
+workflow[name="docker-logs"] {
+  trigger: "manual";
+  step-1: run cmd=docker compose -f docker/docker-compose.yml logs -f toonic-server;
+}
+
+workflow[name="docker-streams"] {
+  trigger: "manual";
+  step-1: run cmd=docker compose -f docker/docker-compose.yml up -d rtsp-server test-stream-video test-stream-cam2 test-stream-audio;
+}
+
+workflow[name="convert"] {
+  trigger: "manual";
+  step-1: run cmd=$(PYTHON) -m toonic spec $(FILE) --format $(FMT);
+}
+
+workflow[name="batch"] {
+  trigger: "manual";
+  step-1: run cmd=$(PYTHON) -m toonic batch $(DIR);
+}
+
+workflow[name="clean"] {
+  trigger: "manual";
+  step-1: run cmd=rm -rf build/ dist/ *.egg-info .pytest_cache htmlcov .coverage;
+  step-2: run cmd=find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true;
+}
+
+workflow[name="clean-docker"] {
+  trigger: "manual";
+  step-1: run cmd=docker compose -f docker/docker-compose.yml down -v --rmi local;
+}
+
+workflow[name="build"] {
+  trigger: "manual";
+  step-1: run cmd=python -m build;
+}
+
+workflow[name="health"] {
+  trigger: "manual";
+  step-1: run cmd=docker compose ps;
+  step-2: run cmd=docker compose exec app echo "Health check passed";
+}
+
+workflow[name="import-makefile-hint"] {
+  trigger: "manual";
+  step-1: run cmd=echo 'Run: taskfile import Makefile to import existing targets.';
+}
+
+workflow[name="help"] {
+  trigger: "manual";
+  step-1: run cmd=grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \;
+  step-2: run cmd=awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}';
+  step-3: run cmd=##; 
+  step-4: run cmd=Show;
+  step-5: run cmd=this;
+  step-6: run cmd=help;
+}
+
+deploy {
+  target: docker-compose;
+  compose_file: docker/docker-compose.yml;
+}
+
+environment[name="local"] {
+  runtime: docker-compose;
+  env_file: ".env";
+}
+
+workflow[name="all"] {
+  trigger: "manual";
+  step-1: run cmd=taskfile run install;
+  step-2: run cmd=taskfile run lint;
+  step-3: run cmd=taskfile run test;
+}
+
+workflow[name="lint"] {
+  trigger: "manual";
+  step-1: run cmd=ruff check .;
+}
+
+workflow[name="fmt"] {
+  trigger: "manual";
+  step-1: run cmd=ruff format .;
+}
+
+workflow[name="format"] {
+  trigger: "manual";
+  step-1: run cmd=ruff format .;
+}

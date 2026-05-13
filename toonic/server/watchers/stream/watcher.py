@@ -12,7 +12,7 @@ and ``detect_objects=True`` (default). Falls back to basic mode otherwise.
 
 This module is the main entry point - the implementation is split across:
 - models.py: Detection, FrameRecord dataclasses
-- capture.py: OpenCV and mock capture implementations  
+- capture.py: OpenCV and mock capture implementations
 - detection.py: YOLO initialization and inference
 - events.py: Event confirmation and emission logic
 """
@@ -27,7 +27,6 @@ from toonic.server.models import SourceCategory
 from toonic.server.watchers.base import BaseWatcher, WatcherRegistry
 
 # Import implementations from submodules
-from toonic.server.watchers.stream.models import Detection, FrameRecord
 from toonic.server.watchers.stream.capture import capture_opencv, capture_mock
 
 logger = logging.getLogger("toonic.watcher.stream")
@@ -75,8 +74,11 @@ class StreamWatcher(BaseWatcher):
         self.detect_objects = _bool(options.get("detect_objects", True))
         self.detect_model = str(options.get("detect_model", "yolov8n.pt"))
         self.detect_conf = float(options.get("detect_conf", 0.4))
-        self.detect_classes_str = str(options.get(
-            "detect_classes", "person,car,truck,bicycle,motorcycle,bus,dog,cat"))
+        self.detect_classes_str = str(
+            options.get(
+                "detect_classes", "person,car,truck,bicycle,motorcycle,bus,dog,cat"
+            )
+        )
         self.detect_resolution = int(options.get("detect_resolution", 640))
         # Event confirmation
         self.min_event_frames = int(options.get("min_event_frames", 2))
@@ -121,7 +123,9 @@ class StreamWatcher(BaseWatcher):
         try:
             await capture_opencv(self)
         except ImportError:
-            logger.warning(f"[{self.source_id}] OpenCV not available, using mock stream")
+            logger.warning(
+                f"[{self.source_id}] OpenCV not available, using mock stream"
+            )
             await capture_mock(self)
         except Exception as e:
             logger.error(f"[{self.source_id}] Capture error: {e}")

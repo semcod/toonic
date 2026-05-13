@@ -33,9 +33,6 @@ Detection mode activates automatically when `ultralytics` is installed.
 
 ---
 
-## Installation
-
-```bash
 # Full CCTV setup (recommended)
 pip install toonic[cctv]
 
@@ -70,8 +67,6 @@ server = (
     .build()
 )
 ```
-
-## Quick Start Examples (CLI)
 
 ### 1. Basic intrusion detection (person + vehicle)
 
@@ -150,9 +145,6 @@ sources:
       max_silent_s: 120                # heartbeat every 2min
 ```
 
-### 6. Raspberry Pi / edge deployment (NCNN optimized)
-
-```bash
 # Export model for NCNN (one-time)
 python -c "from ultralytics import YOLO; YOLO('yolov8n.pt').export(format='ncnn')"
 
@@ -202,8 +194,6 @@ sources:
 ```
 
 ---
-
-## How It Works
 
 ### Detection Mode (with YOLO)
 
@@ -271,8 +261,6 @@ The LLM prompt instructs event-focused analysis:
 | `max_silent_s` | `60.0` | Max seconds without emission (heartbeat interval) |
 
 ---
-
-## Tips for Effective CCTV Monitoring
 
 ### Writing good `--goal` prompts
 

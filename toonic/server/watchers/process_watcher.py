@@ -10,10 +10,9 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
-import re
 import socket
 import time
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 from toonic.server.models import ContextChunk, SourceCategory
 from toonic.server.watchers.base import BaseWatcher, WatcherRegistry
@@ -128,13 +127,15 @@ class ProcessWatcher(BaseWatcher):
         )
 
         if should_emit:
-            await self.emit(ContextChunk(
-                source_id=self.source_id,
-                category=SourceCategory.PROCESS,
-                toon_spec=toon,
-                is_delta=is_delta,
-                metadata=result,
-            ))
+            await self.emit(
+                ContextChunk(
+                    source_id=self.source_id,
+                    category=SourceCategory.PROCESS,
+                    toon_spec=toon,
+                    is_delta=is_delta,
+                    metadata=result,
+                )
+            )
 
     async def _check_process_name(self, result: Dict[str, Any]) -> None:
         """Check if a process with given name is running."""
@@ -195,7 +196,9 @@ class ProcessWatcher(BaseWatcher):
         service_name = self._target_value
         try:
             proc = await asyncio.create_subprocess_exec(
-                "systemctl", "is-active", service_name,
+                "systemctl",
+                "is-active",
+                service_name,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -216,6 +219,7 @@ class ProcessWatcher(BaseWatcher):
         """HTTP health check."""
         try:
             import httpx
+
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 start = time.monotonic()
                 resp = await client.get(self.health_url)
@@ -268,7 +272,8 @@ class ProcessWatcher(BaseWatcher):
         # Fallback: ps command
         try:
             proc = await asyncio.create_subprocess_exec(
-                "ps", "aux",
+                "ps",
+                "aux",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -277,12 +282,14 @@ class ProcessWatcher(BaseWatcher):
                 if name.lower() in line.lower():
                     parts = line.split(None, 10)
                     if len(parts) >= 11:
-                        procs.append({
-                            "pid": int(parts[1]),
-                            "cpu": float(parts[2]),
-                            "mem": float(parts[3]),
-                            "cmdline": parts[10][:200],
-                        })
+                        procs.append(
+                            {
+                                "pid": int(parts[1]),
+                                "cpu": float(parts[2]),
+                                "mem": float(parts[3]),
+                                "cmdline": parts[10][:200],
+                            }
+                        )
         except Exception:
             pass
 

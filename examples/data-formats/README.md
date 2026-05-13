@@ -34,10 +34,6 @@ from toonic.server.quick import unpack_archive, watch_archive
 extracted = unpack_archive("./bundle.tar.gz")
 server = watch_archive("./bundle.zip", include_files_as_sources=True)
 
-# Or explicitly:
-# server = watch(f"dir:{extracted}").goal("analyze archive contents").build()
-```
-
 ## Quick Start (one-liner)
 
 ```python
@@ -54,9 +50,6 @@ run(
 )
 ```
 
-## Quick Start (CLI)
-
-```bash
 # Mixed formats — Toonic auto-detects categories
 python -m toonic.server \
   --source file:./src/ \

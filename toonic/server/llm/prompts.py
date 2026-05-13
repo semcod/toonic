@@ -30,7 +30,9 @@ class PromptBuilder(Protocol):
 class GenericPrompt:
     """Default prompt — works for any data type."""
 
-    def build(self, goal: str, chunks: List[ContextChunk], images: List[str]) -> Dict[str, Any]:
+    def build(
+        self, goal: str, chunks: List[ContextChunk], images: List[str]
+    ) -> Dict[str, Any]:
         system = (
             "You are Toonic — an intelligent data analysis assistant.\n"
             "You receive context in TOON format (Token-Oriented Object Notation) — "
@@ -45,7 +47,11 @@ class GenericPrompt:
 
         user_parts = [f"Goal: {goal}\n"]
         for chunk in chunks:
-            cat = chunk.category.value if hasattr(chunk.category, "value") else str(chunk.category)
+            cat = (
+                chunk.category.value
+                if hasattr(chunk.category, "value")
+                else str(chunk.category)
+            )
             user_parts.append(f"--- [{cat}] {chunk.source_id} ---")
             spec = chunk.toon_spec or ""
             if spec:
@@ -60,10 +66,15 @@ class GenericPrompt:
 class CodeAnalysisPrompt:
     """Prompt optimized for code analysis — understands TOON spec."""
 
-    def build(self, goal: str, chunks: List[ContextChunk], images: List[str]) -> Dict[str, Any]:
-        code_chunks = [c for c in chunks if c.category in (
-            SourceCategory.CODE, SourceCategory.CONFIG, SourceCategory.DATABASE
-        )]
+    def build(
+        self, goal: str, chunks: List[ContextChunk], images: List[str]
+    ) -> Dict[str, Any]:
+        code_chunks = [
+            c
+            for c in chunks
+            if c.category
+            in (SourceCategory.CODE, SourceCategory.CONFIG, SourceCategory.DATABASE)
+        ]
         log_chunks = [c for c in chunks if c.category == SourceCategory.LOGS]
 
         system = (
@@ -98,7 +109,9 @@ class CodeAnalysisPrompt:
 class CCTVEventPrompt:
     """Prompt for CCTV — enforces event analysis instead of scene description."""
 
-    def build(self, goal: str, chunks: List[ContextChunk], images: List[str]) -> Dict[str, Any]:
+    def build(
+        self, goal: str, chunks: List[ContextChunk], images: List[str]
+    ) -> Dict[str, Any]:
         # Extract YOLO detection metadata from video chunks
         detection_info = []
         for chunk in chunks:
@@ -146,10 +159,17 @@ class CCTVEventPrompt:
 
 # Categories that should NEVER trigger CodeAnalysisPrompt.
 _NON_CODE_CATEGORIES = {
-    SourceCategory.WEB, SourceCategory.API, SourceCategory.NETWORK,
-    SourceCategory.VIDEO, SourceCategory.AUDIO, SourceCategory.LOGS,
-    SourceCategory.DATA, SourceCategory.DOCUMENT,
-    SourceCategory.CONTAINER, SourceCategory.PROCESS, SourceCategory.INFRA,
+    SourceCategory.WEB,
+    SourceCategory.API,
+    SourceCategory.NETWORK,
+    SourceCategory.VIDEO,
+    SourceCategory.AUDIO,
+    SourceCategory.LOGS,
+    SourceCategory.DATA,
+    SourceCategory.DOCUMENT,
+    SourceCategory.CONTAINER,
+    SourceCategory.PROCESS,
+    SourceCategory.INFRA,
 }
 
 
@@ -159,7 +179,9 @@ def select_prompt_builder(goal: str, categories: set) -> PromptBuilder:
 
     # CCTV keywords
     cctv_keywords = {"cctv", "camera", "security cam", "intrusion", "surveillance"}
-    if SourceCategory.VIDEO in categories and any(k in goal_lower for k in cctv_keywords):
+    if SourceCategory.VIDEO in categories and any(
+        k in goal_lower for k in cctv_keywords
+    ):
         return CCTVEventPrompt()
 
     # If ALL categories are non-code, never use CodeAnalysisPrompt regardless of goal.

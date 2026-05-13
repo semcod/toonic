@@ -12,7 +12,6 @@ import zipfile
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from toonic.server.quick.parsing import parse_source
 
 if TYPE_CHECKING:
     from toonic.server.quick.builder import ConfigBuilder
@@ -56,7 +55,11 @@ def unpack_archive(archive_path: str, output_dir: str | None = None) -> str:
     if not ap.exists():
         raise FileNotFoundError(f"Archive does not exist: {archive_path}")
 
-    out_dir = Path(output_dir) if output_dir else Path(tempfile.mkdtemp(prefix="toonic-archive-"))
+    out_dir = (
+        Path(output_dir)
+        if output_dir
+        else Path(tempfile.mkdtemp(prefix="toonic-archive-"))
+    )
     out_dir.mkdir(parents=True, exist_ok=True)
 
     try:
@@ -115,7 +118,6 @@ def watch_archive(
     max_files: int = 200,
 ) -> "ConfigBuilder":
     """Unpack an archive and return a ConfigBuilder watching its contents."""
-    from toonic.server.quick.builder import ConfigBuilder
     from toonic.server.quick.runtime import watch
 
     extracted = unpack_archive(archive_path, output_dir=extract_dir)

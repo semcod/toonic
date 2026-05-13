@@ -12,7 +12,7 @@ import re
 import time
 from collections import deque
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from toonic.server.triggers.dsl import EventCondition
 
@@ -22,6 +22,7 @@ logger = logging.getLogger("toonic.triggers.detectors")
 @dataclass
 class DetectionResult:
     """Result of a single detection evaluation."""
+
     triggered: bool = False
     event_type: str = ""
     score: float = 0.0
@@ -34,9 +35,15 @@ class DetectionResult:
             self.timestamp = time.time()
 
     def to_dict(self) -> Dict[str, Any]:
-        d = {"triggered": self.triggered, "event_type": self.event_type, "score": self.score}
-        if self.label: d["label"] = self.label
-        if self.details: d["details"] = self.details
+        d = {
+            "triggered": self.triggered,
+            "event_type": self.event_type,
+            "score": self.score,
+        }
+        if self.label:
+            d["label"] = self.label
+        if self.details:
+            d["details"] = self.details
         return d
 
 
@@ -82,6 +89,7 @@ class BaseDetector:
 # Video detectors
 # ═══════════════════════════════════════════════════════════════
 
+
 class MotionDetector(BaseDetector):
     """Detect motion based on frame difference score."""
 
@@ -125,7 +133,7 @@ class SceneChangeDetector(BaseDetector):
 
 class ObjectDetector(BaseDetector):
     """Detect specific objects via frame analysis metadata.
-    
+
     Uses LLM-based or local detection results passed in data.
     Falls back to motion + size heuristics when no object detection is available.
     """
@@ -191,6 +199,7 @@ class ObjectDetector(BaseDetector):
 # Audio detectors
 # ═══════════════════════════════════════════════════════════════
 
+
 class AudioLevelDetector(BaseDetector):
     """Detect audio level exceeding threshold."""
 
@@ -200,8 +209,10 @@ class AudioLevelDetector(BaseDetector):
         if self.condition.negate:
             triggered = not triggered
         return DetectionResult(
-            triggered=triggered, event_type="audio_level",
-            score=level, details={"threshold": self.condition.threshold},
+            triggered=triggered,
+            event_type="audio_level",
+            score=level,
+            details={"threshold": self.condition.threshold},
         )
 
 
@@ -222,8 +233,10 @@ class SpeechDetector(BaseDetector):
             triggered = not triggered
 
         return DetectionResult(
-            triggered=triggered, event_type="speech",
-            score=score, details={"has_speech": has_speech},
+            triggered=triggered,
+            event_type="speech",
+            score=score,
+            details={"has_speech": has_speech},
         )
 
 
@@ -231,17 +244,22 @@ class SpeechDetector(BaseDetector):
 # Text / Log detectors
 # ═══════════════════════════════════════════════════════════════
 
+
 class PatternDetector(BaseDetector):
     """Detect text patterns (regex) in log/text data."""
 
     def __init__(self, condition: EventCondition):
         super().__init__(condition)
-        self._pattern = re.compile(condition.regex, re.IGNORECASE) if condition.regex else None
+        self._pattern = (
+            re.compile(condition.regex, re.IGNORECASE) if condition.regex else None
+        )
 
     def evaluate(self, data: Dict[str, Any]) -> DetectionResult:
         text = data.get("text", data.get("content", data.get("toon_spec", "")))
         if not self._pattern or not text:
-            return DetectionResult(triggered=self.condition.negate, event_type="pattern", score=0.0)
+            return DetectionResult(
+                triggered=self.condition.negate, event_type="pattern", score=0.0
+            )
 
         matches = self._pattern.findall(text)
         count = len(matches)
@@ -266,7 +284,8 @@ class PatternDetector(BaseDetector):
             triggered = not triggered
 
         return DetectionResult(
-            triggered=triggered, event_type="pattern",
+            triggered=triggered,
+            event_type="pattern",
             score=min(count / max(self.condition.count_threshold, 1), 1.0),
             label=self.condition.regex,
             details={"match_count": count, "sample": matches[:3] if matches else []},
@@ -289,7 +308,7 @@ class AnomalyDetector(BaseDetector):
 
         mean = sum(self._history) / len(self._history)
         variance = sum((x - mean) ** 2 for x in self._history) / len(self._history)
-        std = variance ** 0.5 if variance > 0 else 0.001
+        std = variance**0.5 if variance > 0 else 0.001
 
         z_score = abs(value - mean) / std if std > 0 else 0.0
         triggered = z_score >= self.condition.threshold
@@ -298,9 +317,15 @@ class AnomalyDetector(BaseDetector):
             triggered = not triggered
 
         return DetectionResult(
-            triggered=triggered, event_type="anomaly",
+            triggered=triggered,
+            event_type="anomaly",
             score=z_score,
-            details={"value": value, "mean": round(mean, 3), "std": round(std, 3), "z_score": round(z_score, 2)},
+            details={
+                "value": value,
+                "mean": round(mean, 3),
+                "std": round(std, 3),
+                "z_score": round(z_score, 2),
+            },
         )
 
 

@@ -46,7 +46,9 @@ class ResponseParser:
             if start >= 0 and end > start:
                 parsed = json.loads(clean[start:end])
                 return ActionResponse(
-                    action_type=parsed.get("action", parsed.get("action_type", "report")),
+                    action_type=parsed.get(
+                        "action", parsed.get("action_type", "report")
+                    ),
                     content=parsed.get("content", content),
                     target_path=parsed.get("target_path", ""),
                     confidence=float(parsed.get("confidence", 0.5)),
@@ -80,7 +82,8 @@ class ResponseParser:
 
         # Strip markdown fences (```json ... ```)
         import re
-        fence_match = re.search(r'```(?:json)?\s*\n(.*?)```', clean, re.DOTALL)
+
+        fence_match = re.search(r"```(?:json)?\s*\n(.*?)```", clean, re.DOTALL)
         if fence_match:
             clean = fence_match.group(1).strip()
 
@@ -98,7 +101,7 @@ class ResponseParser:
             if escape:
                 escape = False
                 continue
-            if c == '\\' and in_string:
+            if c == "\\" and in_string:
                 escape = True
                 continue
             if c == '"' and not escape:
@@ -106,9 +109,9 @@ class ResponseParser:
                 continue
             if in_string:
                 continue
-            if c == '{':
+            if c == "{":
                 depth += 1
-            elif c == '}':
+            elif c == "}":
                 depth -= 1
                 if depth == 0:
                     end = i + 1
@@ -121,7 +124,7 @@ class ResponseParser:
                 # Try with relaxed parsing — sometimes LLM outputs trailing commas
                 try:
                     # Remove trailing commas before } or ]
-                    relaxed = re.sub(r',\s*([}\]])', r'\1', clean[start:end])
+                    relaxed = re.sub(r",\s*([}\]])", r"\1", clean[start:end])
                     return json.loads(relaxed)
                 except json.JSONDecodeError:
                     pass

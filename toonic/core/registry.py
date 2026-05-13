@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import importlib.util
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Dict, List
 
 from toonic.core.protocols import FileHandler
 
@@ -57,7 +57,7 @@ class FormatRegistry:
         # Wiele kandydatów — content sniffing
         if content is None:
             try:
-                content = path.read_text(errors='replace')[:4096]
+                content = path.read_text(errors="replace")[:4096]
             except (OSError, UnicodeDecodeError):
                 return candidates[0]
 
@@ -90,10 +90,7 @@ class FormatRegistry:
     @classmethod
     def _check_deps(cls, h: FileHandler) -> bool:
         """Sprawdź czy wymagane pakiety są zainstalowane."""
-        return all(
-            importlib.util.find_spec(dep) is not None
-            for dep in h.requires
-        )
+        return all(importlib.util.find_spec(dep) is not None for dep in h.requires)
 
     @classmethod
     def reset(cls) -> None:

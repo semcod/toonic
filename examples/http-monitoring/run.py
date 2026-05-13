@@ -5,6 +5,7 @@ HTTP/API Monitoring — run with: python examples/http-monitoring/run.py
 Before: ~20 lines of manual config with HttpWatcher options.
 After:  2 lines with preset.
 """
+
 from toonic.server.quick import web_monitor
 from examples._helpers import print_config_summary, print_to_run_hint
 

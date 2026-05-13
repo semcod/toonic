@@ -15,12 +15,16 @@ def main() -> None:
         # Fallback: create a tiny archive-like workflow hint in the README
         # (This script is intentionally lightweight; it does not create archives.)
         print(f"Archive not found: {archive}")
-        print("Provide an archive path as ./bundle.zip or edit examples/archive-monitoring/run.py")
+        print(
+            "Provide an archive path as ./bundle.zip or edit examples/archive-monitoring/run.py"
+        )
         return
 
     server = (
         watch_archive(archive, include_files_as_sources=True)
-        .goal("security audit: scan extracted files for secrets, insecure configs, vulnerable patterns")
+        .goal(
+            "security audit: scan extracted files for secrets, insecure configs, vulnerable patterns"
+        )
         .interval(0)
         .build()
     )

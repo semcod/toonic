@@ -2,19 +2,13 @@
 Tests for new watchers — HTTP, Process, Directory, Docker, Database, Network.
 """
 
-import asyncio
-import json
 import os
 import sqlite3
-import tempfile
-import time
-from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from toonic.server.models import ContextChunk, SourceCategory
-from toonic.server.watchers.base import BaseWatcher, WatcherRegistry
+from toonic.server.models import SourceCategory
+from toonic.server.watchers.base import WatcherRegistry
 from toonic.server.watchers.http_watcher import HttpWatcher
 from toonic.server.watchers.process_watcher import ProcessWatcher
 from toonic.server.watchers.directory_watcher import DirectoryWatcher
@@ -22,10 +16,52 @@ from toonic.server.watchers.docker_watcher import DockerWatcher
 from toonic.server.watchers.database_watcher import DatabaseWatcher
 from toonic.server.watchers.network_watcher import NetworkWatcher
 
+CONSTANT_3 = 3
+CONSTANT_4 = 4
+TIMEOUT_5 = 5
+CONSTANT_9 = 9
+CONSTANT_14 = 14
+CONSTANT_15 = 15
+CONSTANT_15 = 15.2
+CONSTANT_50 = 50
+TIMEOUT_60 = 60
+PORT_80 = 80
+CONSTANT_150 = 150.5
+CONSTANT_200 = 200
+CONSTANT_201 = 201
+PORT_443 = 443
+CONSTANT_512 = 512
+CONSTANT_1024 = 1024
+CONSTANT_2048 = 2048
+CONSTANT_4096 = 4096
+PORT_8080 = 8080
+
+
+CONSTANT_3 = CONSTANT_3
+CONSTANT_4 = CONSTANT_4
+TIMEOUT_5 = TIMEOUT_5
+CONSTANT_9 = CONSTANT_9
+CONSTANT_14 = CONSTANT_14
+CONSTANT_15 = CONSTANT_15
+CONSTANT_15 = CONSTANT_15
+CONSTANT_50 = CONSTANT_50
+TIMEOUT_60 = TIMEOUT_60
+PORT_80 = PORT_80
+CONSTANT_150 = CONSTANT_150
+CONSTANT_200 = CONSTANT_200
+CONSTANT_201 = CONSTANT_201
+PORT_443 = PORT_443
+CONSTANT_512 = CONSTANT_512
+CONSTANT_1024 = CONSTANT_1024
+CONSTANT_2048 = CONSTANT_2048
+CONSTANT_4096 = CONSTANT_4096
+PORT_8080 = PORT_8080
+
 
 # =============================================================================
 # WatcherRegistry — new watcher resolution tests
 # =============================================================================
+
 
 class TestWatcherRegistryNew:
     def test_http_watcher_supports(self):
@@ -97,12 +133,13 @@ class TestWatcherRegistryNew:
         assert "DockerWatcher" in names
         assert "DatabaseWatcher" in names
         assert "NetworkWatcher" in names
-        assert len(names) == 9
+        assert len(names) == CONSTANT_9
 
 
 # =============================================================================
 # SourceCategory — new categories
 # =============================================================================
+
 
 class TestSourceCategoryNew:
     def test_new_categories_exist(self):
@@ -113,39 +150,49 @@ class TestSourceCategoryNew:
 
     def test_all_categories(self):
         # Should have at least 14 categories
-        assert len(SourceCategory) >= 14
+        assert len(SourceCategory) >= CONSTANT_14
 
 
 # =============================================================================
 # HttpWatcher tests
 # =============================================================================
 
+
 class TestHttpWatcher:
     def test_init(self):
-        w = HttpWatcher("test:http", "http://example.com", poll_interval=60, timeout=5)
-        assert w.poll_interval == 60.0
-        assert w.timeout == 5.0
+        w = HttpWatcher(
+            "test:http",
+            "http://example.com",
+            poll_interval=TIMEOUT_60,
+            timeout=TIMEOUT_5,
+        )
+        assert w.poll_interval == TIMEOUT_60
+        assert w.timeout == TIMEOUT_5
         assert w.method == "GET"
-        assert w.expected_status == 200
+        assert w.expected_status == CONSTANT_200
 
     def test_init_with_options(self):
-        w = HttpWatcher("test:http", "http://api.example.com",
-                        method="POST", expected_status=201,
-                        keywords=["success", "ok"],
-                        check_ssl=False)
+        w = HttpWatcher(
+            "test:http",
+            "http://api.example.com",
+            method="POST",
+            expected_status=CONSTANT_201,
+            keywords=["success", "ok"],
+            check_ssl=False,
+        )
         assert w.method == "POST"
-        assert w.expected_status == 201
+        assert w.expected_status == CONSTANT_201
         assert w.keywords == ["success", "ok"]
         assert w.check_ssl is False
 
     def test_to_toon(self):
         w = HttpWatcher("web:example", "http://example.com")
-        w._check_count = 5
+        w._check_count = TIMEOUT_5
         result = {
-            "status_code": 200,
-            "response_time_ms": 150.5,
+            "status_code": CONSTANT_200,
+            "response_time_ms": CONSTANT_150,
             "changes": ["content_changed"],
-            "check_number": 5,
+            "check_number": TIMEOUT_5,
         }
         toon = w._to_toon(result)
         assert "web:example" in toon
@@ -168,11 +215,14 @@ class TestHttpWatcher:
         w = HttpWatcher("web:example", "https://example.com")
         w._check_count = 2
         result = {
-            "status_code": 200,
+            "status_code": CONSTANT_200,
             "response_time_ms": 100,
             "changes": [],
             "check_number": 2,
-            "ssl": {"days_until_expiry": 15, "expires": "Mar 15 2026"},
+            "ssl": {
+                "days_until_expiry": CONSTANT_15,
+                "expires": "Mar CONSTANT_15 2026",
+            },
         }
         toon = w._to_toon(result)
         assert "SSL" in toon
@@ -182,6 +232,7 @@ class TestHttpWatcher:
 # =============================================================================
 # ProcessWatcher tests
 # =============================================================================
+
 
 class TestProcessWatcher:
     def test_parse_target_process(self):
@@ -215,10 +266,10 @@ class TestProcessWatcher:
         assert v == "nginx"
 
     def test_init(self):
-        w = ProcessWatcher("test:proc", "proc:nginx", poll_interval=5)
+        w = ProcessWatcher("test:proc", "proc:nginx", poll_interval=TIMEOUT_5)
         assert w._target_type == "process_name"
         assert w._target_value == "nginx"
-        assert w.poll_interval == 5.0
+        assert w.poll_interval == TIMEOUT_5
 
     def test_detect_changes_came_alive(self):
         w = ProcessWatcher("test:proc", "proc:nginx")
@@ -237,7 +288,7 @@ class TestProcessWatcher:
     def test_detect_changes_process_count(self):
         w = ProcessWatcher("test:proc", "proc:nginx")
         w._prev_state = {"alive": True, "process_count": 2}
-        result = {"alive": True, "process_count": 4}
+        result = {"alive": True, "process_count": CONSTANT_4}
         changes = w._detect_changes(result)
         assert any("process_count:" in c for c in changes)
 
@@ -248,7 +299,9 @@ class TestProcessWatcher:
             "alive": True,
             "changes": [],
             "check_number": 1,
-            "processes": [{"pid": 100, "rss_kb": 4096, "cmdline": "nginx: master"}],
+            "processes": [
+                {"pid": 100, "rss_kb": CONSTANT_4096, "cmdline": "nginx: master"}
+            ],
         }
         toon = w._to_toon(result)
         assert "UP" in toon
@@ -259,7 +312,7 @@ class TestProcessWatcher:
         result = {
             "alive": False,
             "changes": ["went_down"],
-            "check_number": 5,
+            "check_number": TIMEOUT_5,
         }
         toon = w._to_toon(result)
         assert "DOWN" in toon
@@ -287,11 +340,12 @@ class TestProcessWatcher:
 # DirectoryWatcher tests
 # =============================================================================
 
+
 class TestDirectoryWatcher:
     def test_init(self):
-        w = DirectoryWatcher("test:dir", "dir:/tmp", poll_interval=3)
+        w = DirectoryWatcher("test:dir", "dir:/tmp", poll_interval=CONSTANT_3)
         assert w.path_or_url == "/tmp"
-        assert w.poll_interval == 3.0
+        assert w.poll_interval == CONSTANT_3
         assert w.recursive is True
 
     def test_init_without_prefix(self):
@@ -300,9 +354,11 @@ class TestDirectoryWatcher:
 
     def test_human_size(self):
         assert DirectoryWatcher._human_size(0) == "0B"
-        assert DirectoryWatcher._human_size(512) == "512B"
-        assert "KB" in DirectoryWatcher._human_size(2048)
-        assert "MB" in DirectoryWatcher._human_size(5 * 1024 * 1024)
+        assert DirectoryWatcher._human_size(CONSTANT_512) == "512B"
+        assert "KB" in DirectoryWatcher._human_size(CONSTANT_2048)
+        assert "MB" in DirectoryWatcher._human_size(
+            TIMEOUT_5 * CONSTANT_1024 * CONSTANT_1024
+        )
 
     @pytest.mark.anyio
     async def test_take_snapshot(self, tmp_path):
@@ -313,7 +369,7 @@ class TestDirectoryWatcher:
 
         w = DirectoryWatcher("test:dir", str(tmp_path))
         snapshot = await w._take_snapshot()
-        assert len(snapshot) >= 4  # 2 files + 1 dir + 1 nested file
+        assert len(snapshot) >= CONSTANT_4  # 2 files + 1 dir + 1 nested file
         assert any("file1.txt" in k for k in snapshot)
         assert any("file3.txt" in k for k in snapshot)
 
@@ -394,8 +450,8 @@ class TestDirectoryWatcher:
         w = DirectoryWatcher("test:dir", "/tmp")
         snapshot = {
             "src": {"type": "dir", "size": 0},
-            f"src{os.sep}main.py": {"type": "file", "size": 1024},
-            "README.md": {"type": "file", "size": 512},
+            f"src{os.sep}main.py": {"type": "file", "size": CONSTANT_1024},
+            "README.md": {"type": "file", "size": CONSTANT_512},
         }
         toon = w._build_tree_toon(snapshot)
         assert "dir-structure" in toon
@@ -407,11 +463,12 @@ class TestDirectoryWatcher:
 # DockerWatcher tests
 # =============================================================================
 
+
 class TestDockerWatcher:
     def test_init(self):
         w = DockerWatcher("test:docker", "docker:myapp")
         assert w.container_filter == "myapp"
-        assert w.poll_interval == 15.0
+        assert w.poll_interval == CONSTANT_15
 
     def test_init_all_containers(self):
         w = DockerWatcher("test:docker", "docker:*")
@@ -454,7 +511,11 @@ class TestDockerWatcher:
             "changes": [],
             "containers": {
                 "web": {"state": "running", "image": "nginx:latest", "status": "Up 2h"},
-                "db": {"state": "exited", "image": "postgres:16", "status": "Exited (0)"},
+                "db": {
+                    "state": "exited",
+                    "image": "postgres:16",
+                    "status": "Exited (0)",
+                },
             },
         }
         toon = w._to_toon(result)
@@ -467,6 +528,7 @@ class TestDockerWatcher:
 # =============================================================================
 # DatabaseWatcher tests
 # =============================================================================
+
 
 class TestDatabaseWatcher:
     def test_init_sqlite(self):
@@ -517,8 +579,13 @@ class TestDatabaseWatcher:
         conn.commit()
         conn.close()
 
-        w = DatabaseWatcher("test:db", f"db:{db_path}",
-                            queries=[{"name": "event_count", "sql": "SELECT COUNT(*) as cnt FROM events"}])
+        w = DatabaseWatcher(
+            "test:db",
+            f"db:{db_path}",
+            queries=[
+                {"name": "event_count", "sql": "SELECT COUNT(*) as cnt FROM events"}
+            ],
+        )
         result: dict = {"dsn": str(db_path), "db_type": "sqlite"}
         await w._check_sqlite(result)
 
@@ -537,7 +604,7 @@ class TestDatabaseWatcher:
         w = DatabaseWatcher("test:db", "db:test.db")
         w._prev_row_counts = {"users": 10}
         w._check_count = 2
-        result = {"row_counts": {"users": 15}}
+        result = {"row_counts": {"users": CONSTANT_15}}
         changes = w._detect_changes(result)
         assert any("rows:users:+5" in c for c in changes)
 
@@ -558,7 +625,7 @@ class TestDatabaseWatcher:
             "check_number": 1,
             "tables": [{"name": "users", "type": "table"}],
             "row_counts": {"users": 100},
-            "file_size": 1024 * 1024,
+            "file_size": CONSTANT_1024 * CONSTANT_1024,
         }
         toon = w._to_toon(result)
         assert "db-check" in toon
@@ -605,6 +672,7 @@ class TestDatabaseWatcher:
 # NetworkWatcher tests
 # =============================================================================
 
+
 class TestNetworkWatcher:
     def test_init(self):
         w = NetworkWatcher("test:net", "net:8.8.8.8,1.1.1.1")
@@ -612,7 +680,7 @@ class TestNetworkWatcher:
 
     def test_init_with_ports(self):
         w = NetworkWatcher("test:net", "net:localhost", ports="80,443,8080")
-        assert w.check_ports == [80, 443, 8080]
+        assert w.check_ports == [PORT_80, PORT_443, PORT_8080]
 
     def test_init_ping_prefix(self):
         w = NetworkWatcher("test:net", "ping:google.com")
@@ -639,14 +707,16 @@ class TestNetworkWatcher:
     def test_detect_changes_latency_spike(self):
         w = NetworkWatcher("test:net", "net:host1")
         w._prev_results = {"host1": {"reachable": True, "latency_ms": 10}}
-        current = {"host1": {"reachable": True, "latency_ms": 50}}
+        current = {"host1": {"reachable": True, "latency_ms": CONSTANT_50}}
         changes = w._detect_changes(current)
         assert any("latency_spike" in c for c in changes)
 
     def test_detect_changes_port_change(self):
         w = NetworkWatcher("test:net", "net:host1")
-        w._prev_results = {"host1": {"reachable": True, "ports": {80: {"open": True}}}}
-        current = {"host1": {"reachable": True, "ports": {80: {"open": False}}}}
+        w._prev_results = {
+            "host1": {"reachable": True, "ports": {PORT_80: {"open": True}}}
+        }
+        current = {"host1": {"reachable": True, "ports": {PORT_80: {"open": False}}}}
         changes = w._detect_changes(current)
         assert any("port_closed" in c for c in changes)
 
@@ -668,7 +738,7 @@ class TestNetworkWatcher:
             "results": {
                 "8.8.8.8": {
                     "reachable": True,
-                    "latency_ms": 15.2,
+                    "latency_ms": CONSTANT_15,
                     "dns": {"ips": ["8.8.8.8"]},
                 },
             },

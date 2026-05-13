@@ -1,5 +1,3 @@
-# TOON (Token-Oriented Object Notation) Specification v2.0
-
 ## Overview
 
 TOON is a compact, LLM-friendly notation format for defining:
@@ -18,8 +16,6 @@ TOON is a compact, LLM-friendly notation format for defining:
 
 ---
 
-## Basic Syntax
-
 ### Header Block
 ```yaml toon
 @toon/2.0
@@ -28,8 +24,6 @@ version: 1.0.0
 author: developer@example.com
 license: MIT
 ```
-
-### Type Definitions
 
 #### Primitive Types
 ```yaml toon
@@ -64,8 +58,6 @@ model Profile{bio,avatar,social}:
   social: {str:url}
 ```
 
-### Compact Model Notation
-```toon
 # Full definition
 model Product{name,price,stock}:
   name: str @required
@@ -96,8 +88,6 @@ const RATE_LIMITS: {str:int} = {free:100,pro:1000,enterprise:10000}
 
 ---
 
-## Services Definition
-
 ### Basic Service
 ```yaml toon
 service UserService @base("/api/users"):
@@ -127,10 +117,6 @@ service ProductService @base("/api/products") @middleware(auth,logging,ratelimit
 
 ---
 
-## API Contracts
-
-### Request/Response Models
-```yaml toon
 # Input models (for creation/updates)
 input CreateUser{name,email,password}:
   name: str @min(2) @max(100)
@@ -177,8 +163,6 @@ errors UserService:
 ```
 
 ---
-
-## Validators and Decorators
 
 ### Built-in Validators
 ```yaml toon
@@ -283,9 +267,6 @@ config testing @extends(development):
 
 ---
 
-## Imports and Modules
-
-```yaml toon
 # Import from other TOON files
 import "./auth.toon" as auth
 import "./common/pagination.toon" use {Paginated, PageInfo}

@@ -3,7 +3,6 @@
 Shared helpers for examples (dry-run output formatting).
 """
 
-from typing import List
 from toonic.server.config import ServerConfig
 
 
@@ -21,5 +20,5 @@ def print_to_run_hint(preset_or_fn: str, example_args: str = "") -> None:
     """Print a copy-pasteable 'to run' hint."""
     print("\nTo run:")
     print(f"  from toonic.server.quick import {preset_or_fn}")
-    args = f'({example_args})' if example_args else ""
+    args = f"({example_args})" if example_args else ""
     print(f"  {preset_or_fn}{args}.run()")

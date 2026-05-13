@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
@@ -73,11 +73,13 @@ async def get_data_dir():
     files = []
     for f in sorted(data_dir.rglob("*")):
         if f.is_file():
-            files.append({
-                "path": str(f.relative_to(data_dir)),
-                "size_bytes": f.stat().st_size,
-                "modified": f.stat().st_mtime,
-            })
+            files.append(
+                {
+                    "path": str(f.relative_to(data_dir)),
+                    "size_bytes": f.stat().st_size,
+                    "modified": f.stat().st_mtime,
+                }
+            )
     return {
         "data_dir": str(data_dir.resolve()),
         "files": files,
@@ -87,6 +89,7 @@ async def get_data_dir():
 @router.get("/formats")
 async def list_formats():
     from toonic.pipeline import Pipeline
+
     return Pipeline.formats()
 
 
@@ -94,6 +97,7 @@ async def list_formats():
 async def convert_file(body: dict = {}):
     """Convert a file to TOON/YAML/JSON spec."""
     from toonic.pipeline import Pipeline
+
     path = body.get("path", "")
     fmt = body.get("format", "toon")
     try:
@@ -181,7 +185,9 @@ async def get_exchanges(
 ):
     """Read persisted exchanges.jsonl with basic pagination."""
     server = _get_server()
-    path = Path(getattr(server, "_exchanges_log_path", server.data_dir / "exchanges.jsonl"))
+    path = Path(
+        getattr(server, "_exchanges_log_path", server.data_dir / "exchanges.jsonl")
+    )
     if limit < 1:
         limit = 1
     if limit > 200:

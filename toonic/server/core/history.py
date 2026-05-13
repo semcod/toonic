@@ -11,19 +11,18 @@ Stores every request/response pair with full metadata for:
 from __future__ import annotations
 
 import json
-import os
 import sqlite3
 import time
 import threading
 import uuid
-from dataclasses import dataclass, field, asdict
-from pathlib import Path
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 
 @dataclass
 class ExchangeRecord:
     """Single LLM exchange record."""
+
     id: str = ""
     timestamp: float = 0.0
     session_id: str = ""
@@ -34,7 +33,7 @@ class ExchangeRecord:
     model: str = ""
     context_tokens: int = 0
     context_preview: str = ""
-    sources: str = ""               # JSON list of source_ids
+    sources: str = ""  # JSON list of source_ids
     images_count: int = 0
 
     # Response
@@ -42,12 +41,12 @@ class ExchangeRecord:
     content: str = ""
     confidence: float = 0.0
     target_path: str = ""
-    affected_files: str = ""        # JSON list
+    affected_files: str = ""  # JSON list
 
     # Metrics
     tokens_used: int = 0
     duration_s: float = 0.0
-    status: str = "ok"              # ok|error|timeout
+    status: str = "ok"  # ok|error|timeout
     error_message: str = ""
 
     def __post_init__(self):
@@ -72,7 +71,9 @@ class ExchangeRecord:
             "content": self.content,
             "confidence": self.confidence,
             "target_path": self.target_path,
-            "affected_files": json.loads(self.affected_files) if self.affected_files else [],
+            "affected_files": json.loads(self.affected_files)
+            if self.affected_files
+            else [],
             "tokens_used": self.tokens_used,
             "duration_s": self.duration_s,
             "status": self.status,
@@ -154,27 +155,30 @@ class ConversationHistory:
             exchange.session_id = self.session_id
         with self._lock:
             conn = self._conn()
-            conn.execute(_INSERT_SQL, {
-                "id": exchange.id,
-                "timestamp": exchange.timestamp,
-                "session_id": exchange.session_id,
-                "goal": exchange.goal,
-                "category": exchange.category,
-                "model": exchange.model,
-                "context_tokens": exchange.context_tokens,
-                "context_preview": exchange.context_preview[:2000],
-                "sources": exchange.sources,
-                "images_count": exchange.images_count,
-                "action_type": exchange.action_type,
-                "content": exchange.content,
-                "confidence": exchange.confidence,
-                "target_path": exchange.target_path,
-                "affected_files": exchange.affected_files,
-                "tokens_used": exchange.tokens_used,
-                "duration_s": exchange.duration_s,
-                "status": exchange.status,
-                "error_message": exchange.error_message,
-            })
+            conn.execute(
+                _INSERT_SQL,
+                {
+                    "id": exchange.id,
+                    "timestamp": exchange.timestamp,
+                    "session_id": exchange.session_id,
+                    "goal": exchange.goal,
+                    "category": exchange.category,
+                    "model": exchange.model,
+                    "context_tokens": exchange.context_tokens,
+                    "context_preview": exchange.context_preview[:2000],
+                    "sources": exchange.sources,
+                    "images_count": exchange.images_count,
+                    "action_type": exchange.action_type,
+                    "content": exchange.content,
+                    "confidence": exchange.confidence,
+                    "target_path": exchange.target_path,
+                    "affected_files": exchange.affected_files,
+                    "tokens_used": exchange.tokens_used,
+                    "duration_s": exchange.duration_s,
+                    "status": exchange.status,
+                    "error_message": exchange.error_message,
+                },
+            )
             conn.commit()
             conn.close()
         return exchange.id
@@ -182,15 +186,23 @@ class ConversationHistory:
     def get(self, exchange_id: str) -> Optional[ExchangeRecord]:
         """Get a single exchange by ID."""
         conn = self._conn()
-        row = conn.execute("SELECT * FROM exchanges WHERE id = ?", (exchange_id,)).fetchone()
+        row = conn.execute(
+            "SELECT * FROM exchanges WHERE id = ?", (exchange_id,)
+        ).fetchone()
         conn.close()
         if row:
             return self._row_to_record(row)
         return None
 
-    def recent(self, limit: int = 20, category: str = "",
-               model: str = "", action_type: str = "",
-               session_id: str = "", status: str = "") -> List[ExchangeRecord]:
+    def recent(
+        self,
+        limit: int = 20,
+        category: str = "",
+        model: str = "",
+        action_type: str = "",
+        session_id: str = "",
+        status: str = "",
+    ) -> List[ExchangeRecord]:
         """Get recent exchanges with optional filters."""
         conditions = []
         params = []
@@ -219,14 +231,17 @@ class ConversationHistory:
         conn.close()
         return [self._row_to_record(r) for r in rows]
 
-    def search(self, query: str = "", since: str = "",
-               category: str = "", limit: int = 50) -> List[ExchangeRecord]:
+    def search(
+        self, query: str = "", since: str = "", category: str = "", limit: int = 50
+    ) -> List[ExchangeRecord]:
         """Search exchanges by text content and time range."""
         conditions = []
         params = []
 
         if query:
-            conditions.append("(content LIKE ? OR goal LIKE ? OR context_preview LIKE ?)")
+            conditions.append(
+                "(content LIKE ? OR goal LIKE ? OR context_preview LIKE ?)"
+            )
             q = f"%{query}%"
             params.extend([q, q, q])
 
@@ -287,8 +302,10 @@ class ConversationHistory:
             "session_id": self.session_id,
             "db_path": self.db_path,
             "by_category": {r["category"]: r["cnt"] for r in by_category},
-            "by_model": {r["model"]: {"count": r["cnt"], "tokens": r["tokens"] or 0}
-                         for r in by_model},
+            "by_model": {
+                r["model"]: {"count": r["cnt"], "tokens": r["tokens"] or 0}
+                for r in by_model
+            },
             "by_status": {r["status"]: r["cnt"] for r in by_status},
         }
 
@@ -296,7 +313,9 @@ class ConversationHistory:
         """Clear history. If before_timestamp given, only clear older records."""
         conn = self._conn()
         if before_timestamp > 0:
-            cursor = conn.execute("DELETE FROM exchanges WHERE timestamp < ?", (before_timestamp,))
+            cursor = conn.execute(
+                "DELETE FROM exchanges WHERE timestamp < ?", (before_timestamp,)
+            )
         else:
             cursor = conn.execute("DELETE FROM exchanges")
         count = cursor.rowcount

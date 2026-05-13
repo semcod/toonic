@@ -10,7 +10,6 @@ Supports three modes:
 
 from __future__ import annotations
 
-import asyncio
 import logging
 import time
 from dataclasses import dataclass, field
@@ -18,7 +17,9 @@ from typing import Any, Callable, Coroutine, Dict, List, Optional
 
 from toonic.server.triggers.dsl import TriggerConfig, TriggerRule
 from toonic.server.triggers.detectors import (
-    BaseDetector, DetectionResult, create_detectors,
+    BaseDetector,
+    DetectionResult,
+    create_detectors,
 )
 
 logger = logging.getLogger("toonic.triggers.scheduler")
@@ -27,8 +28,9 @@ logger = logging.getLogger("toonic.triggers.scheduler")
 @dataclass
 class TriggerEvent:
     """Fired when a trigger rule decides to dispatch."""
+
     rule_name: str
-    reason: str              # "periodic"|"event"|"fallback"|"hybrid"
+    reason: str  # "periodic"|"event"|"fallback"|"hybrid"
     detections: List[DetectionResult] = field(default_factory=list)
     goal: str = ""
     source: str = ""
@@ -60,7 +62,9 @@ class RuleState:
         self.event_count: int = 0
         self.periodic_count: int = 0
 
-    def evaluate(self, data: Dict[str, Any], source_category: str) -> Optional[TriggerEvent]:
+    def evaluate(
+        self, data: Dict[str, Any], source_category: str
+    ) -> Optional[TriggerEvent]:
         """Evaluate rule against data. Returns TriggerEvent if should fire."""
         now = time.time()
 
@@ -169,14 +173,18 @@ class TriggerScheduler:
 
     def __init__(self, config: TriggerConfig):
         self.config = config
-        self._states: List[RuleState] = [RuleState(r) for r in config.triggers if r.enabled]
+        self._states: List[RuleState] = [
+            RuleState(r) for r in config.triggers if r.enabled
+        ]
         self._callback: Optional[Callable] = None
 
     def on_trigger(self, callback: Callable[[TriggerEvent], Coroutine]) -> None:
         """Register callback for trigger events."""
         self._callback = callback
 
-    def evaluate(self, data: Dict[str, Any], source_category: str = "") -> List[TriggerEvent]:
+    def evaluate(
+        self, data: Dict[str, Any], source_category: str = ""
+    ) -> List[TriggerEvent]:
         """Evaluate all rules against data. Returns list of fired triggers."""
         events = []
         for state in self._states:
@@ -186,7 +194,9 @@ class TriggerScheduler:
                 logger.info(f"Trigger fired: {event.rule_name} ({event.reason})")
         return events
 
-    async def evaluate_async(self, data: Dict[str, Any], source_category: str = "") -> List[TriggerEvent]:
+    async def evaluate_async(
+        self, data: Dict[str, Any], source_category: str = ""
+    ) -> List[TriggerEvent]:
         """Evaluate and call registered callback for each trigger."""
         events = self.evaluate(data, source_category)
         if self._callback:
@@ -218,13 +228,20 @@ class TriggerScheduler:
     def from_yaml(cls, yaml_str: str) -> TriggerScheduler:
         """Create scheduler from YAML string."""
         from toonic.server.triggers.dsl import load_triggers
+
         config = load_triggers(yaml_str)
         return cls(config)
 
     @classmethod
-    def default_periodic(cls, interval_s: float = 30.0, goal: str = "") -> TriggerScheduler:
+    def default_periodic(
+        cls, interval_s: float = 30.0, goal: str = ""
+    ) -> TriggerScheduler:
         """Create a simple periodic-only scheduler."""
-        config = TriggerConfig(triggers=[
-            TriggerRule(name="periodic", mode="periodic", interval_s=interval_s, goal=goal),
-        ])
+        config = TriggerConfig(
+            triggers=[
+                TriggerRule(
+                    name="periodic", mode="periodic", interval_s=interval_s, goal=goal
+                ),
+            ]
+        )
         return cls(config)

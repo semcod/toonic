@@ -69,8 +69,6 @@ For advanced use, access individual components directly:
 
 ---
 
-## Low-Level Examples
-
 ### 1. Accumulator with Priority
 
 ```python
@@ -201,7 +199,6 @@ from toonic.server.llm.parser import ResponseParser
 
 parser = ResponseParser()
 
-# parse() expects a dict (as returned by LLMCaller)
 # Parse JSON response (with or without markdown fences)
 raw = {
     "content": '```json\n{"action": "alert", "content": "Hardcoded API key in config.py:15", "confidence": 0.95, "affected_files": ["config.py"]}\n```',
@@ -307,9 +304,6 @@ asyncio.run(main())
 
 ---
 
-## Running the Demos
-
-```bash
 # Install toonic with server extras
 pip install -e ".[server,llm]"
 

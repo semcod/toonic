@@ -2,6 +2,7 @@
 """
 Realtime API recipes — run with: python examples/realtime-api/run.py
 """
+
 from toonic.server.quick import watch
 from examples._helpers import print_config_summary
 

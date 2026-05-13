@@ -34,9 +34,6 @@ Toonic Server dodaje **dwukierunkowe strumieniowanie** danych między źródłam
 
 ---
 
-## 🚀 Quick Start
-
-```bash
 # 1. Instalacja
 git clone https://github.com/wronai/toonic.git
 cd toonic
@@ -45,13 +42,6 @@ make install-all
 
 # 2. Konwersja pliku do TOON
 toonic spec ./main.py --format toon
-
-# 3. Start serwera z Web UI
-make server
-# → http://localhost:8900
-
-# 4. Analiza projektu z LLM
-make server-code
 
 # 5. Monitoring kamery RTSP
 make server-camera
@@ -91,9 +81,6 @@ Sources (watchers)  →  TOON Pipeline  →  Context Accumulator  →  LLM Route
 
 → Pełna dokumentacja: [docs/architecture.md](docs/architecture.md)
 
-## 🖥 Toonic Server
-
-```bash
 # Minimalny start
 python -m toonic.server --source file:./src/ --goal "analyze code"
 
@@ -259,16 +246,10 @@ Start: `make server` → otwórz http://localhost:8900
 
 → Dokumentacja: [docs/web-ui.md](docs/web-ui.md)
 
-## 🐳 Docker
-
-```bash
 # Pełny stack: RTSP test streams + Toonic Server
 cd docker/
 cp ../.env.example ../.env    # uzupełnij LLM_API_KEY
 docker compose up -d
-
-# Tylko test streams (bez serwera)
-make docker-streams
 
 # Logi
 make docker-logs
@@ -281,9 +262,6 @@ Test streams w Docker:
 
 → Dokumentacja: [docs/docker.md](docs/docker.md)
 
-## 📹 RTSP Cameras
-
-```bash
 # Real camera
 python -m toonic.server \
   --source "rtsp://admin:123456@192.168.188.146:554/h264Preview_01_main" \
@@ -474,3 +452,20 @@ Apache License 2.0 - see [LICENSE](LICENSE) for details.
 ## Author
 
 Created by **Tom Sapletta** - [tom@sapletta.com](mailto:tom@sapletta.com)
+
+<!-- taskill:status:start -->
+
+## Status
+
+_Last updated by [taskill](https://github.com/oqlos/taskill) at 2026-04-25 13:48 UTC_
+
+| Metric | Value |
+|---|---|
+| HEAD | `191f17d` |
+| Coverage | — |
+| Failing tests | — |
+| Commits in last cycle | 33 |
+
+> Introduced a CLI interface for toonic with supporting modules, added a deep code analysis engine and a configuration management system, and applied related docs/tests improvements and refactors.
+
+<!-- taskill:status:end -->

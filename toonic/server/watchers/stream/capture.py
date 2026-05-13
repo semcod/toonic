@@ -1,4 +1,5 @@
 """Stream capture implementations - OpenCV and mock."""
+
 from __future__ import annotations
 
 import asyncio
@@ -9,7 +10,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .models import FrameRecord
     from .watcher import StreamWatcher
 
 logger = logging.getLogger("toonic.watcher.stream")
@@ -31,6 +31,7 @@ async def capture_opencv(watcher: "StreamWatcher") -> None:
 
     # Try initialising YOLO (non-blocking, best-effort)
     from .detection import init_yolo
+
     use_yolo = init_yolo(watcher)
     mode_label = "detection" if use_yolo else "basic"
     logger.info(
@@ -77,12 +78,18 @@ async def capture_opencv(watcher: "StreamWatcher") -> None:
         # --- Detection mode ---
         if use_yolo:
             from .detection import run_detection
+
             detections = await run_detection(watcher, frame)
             from .models import FrameRecord
+
             record = FrameRecord(
-                timestamp=now, frame_idx=watcher._frame_count,
-                frame=frame, small=small, gray=gray,
-                scene_score=scene_score, detections=detections,
+                timestamp=now,
+                frame_idx=watcher._frame_count,
+                frame=frame,
+                small=small,
+                gray=gray,
+                scene_score=scene_score,
+                detections=detections,
                 motion_mask=motion_mask,
             )
             watcher._frame_buffer.append(record)
@@ -93,10 +100,13 @@ async def capture_opencv(watcher: "StreamWatcher") -> None:
 
             # Check if we have a confirmed event
             from .events import check_event_and_emit, emit_heartbeat
+
             await check_event_and_emit(watcher, cv2, np)
 
             # Heartbeat fallback: emit even if no detections
-            silent_elapsed = now - watcher._last_emit_time if watcher._last_emit_time else 0
+            silent_elapsed = (
+                now - watcher._last_emit_time if watcher._last_emit_time else 0
+            )
             if watcher._last_emit_time > 0 and silent_elapsed >= watcher.max_silent_s:
                 await emit_heartbeat(watcher, cv2, small, scene_score)
 
@@ -105,7 +115,9 @@ async def capture_opencv(watcher: "StreamWatcher") -> None:
 
         # --- Basic mode (no YOLO) ---
         else:
-            await _handle_basic_mode(watcher, cv2, small, gray, now, is_keyframe, scene_score, send_h)
+            await _handle_basic_mode(
+                watcher, cv2, small, gray, now, is_keyframe, scene_score, send_h
+            )
 
         await asyncio.sleep(0.01)
 
@@ -120,22 +132,23 @@ async def _handle_basic_mode(
     now: float,
     is_keyframe: bool,
     scene_score: float,
-    send_h: int
+    send_h: int,
 ) -> None:
     """Handle basic mode without YOLO detection."""
-    import base64
     from toonic.server.models import ContextChunk, ContentType, SourceCategory
 
     silent_elapsed = now - watcher._last_emit_time if watcher._last_emit_time else 0
     is_heartbeat = (
-        not is_keyframe and watcher._last_emit_time > 0
+        not is_keyframe
+        and watcher._last_emit_time > 0
         and silent_elapsed >= watcher.max_silent_s
     )
     if is_keyframe or is_heartbeat:
         watcher._keyframe_count += 1
         watcher._last_emit_time = now
         _, buf = cv2.imencode(
-            ".jpg", small, [cv2.IMWRITE_JPEG_QUALITY, watcher.send_quality])
+            ".jpg", small, [cv2.IMWRITE_JPEG_QUALITY, watcher.send_quality]
+        )
         b64 = base64.b64encode(buf.tobytes()).decode()
         reason = "keyframe" if is_keyframe else "heartbeat"
         toon = (
@@ -145,24 +158,26 @@ async def _handle_basic_mode(
         )
         ct = ContentType.VIDEO_EVENT if is_keyframe else ContentType.VIDEO_HEARTBEAT
         pri = 0.7 if is_keyframe else 0.2
-        await watcher.emit(ContextChunk(
-            source_id=watcher.source_id,
-            category=SourceCategory.VIDEO,
-            toon_spec=toon,
-            raw_data=buf.tobytes(),
-            raw_encoding="base64_jpeg",
-            is_delta=True,
-            content_type=ct,
-            priority=pri,
-            metadata={
-                "frame": watcher._frame_count,
-                "keyframe": watcher._keyframe_count,
-                "scene_score": round(scene_score, 3),
-                "reason": reason,
-                "b64_preview": b64[:100],
-                "size_bytes": len(buf),
-            },
-        ))
+        await watcher.emit(
+            ContextChunk(
+                source_id=watcher.source_id,
+                category=SourceCategory.VIDEO,
+                toon_spec=toon,
+                raw_data=buf.tobytes(),
+                raw_encoding="base64_jpeg",
+                is_delta=True,
+                content_type=ct,
+                priority=pri,
+                metadata={
+                    "frame": watcher._frame_count,
+                    "keyframe": watcher._keyframe_count,
+                    "scene_score": round(scene_score, 3),
+                    "reason": reason,
+                    "b64_preview": b64[:100],
+                    "size_bytes": len(buf),
+                },
+            )
+        )
     elif watcher._last_emit_time == 0:
         watcher._last_emit_time = now
 
@@ -185,14 +200,16 @@ async def capture_mock(watcher: "StreamWatcher") -> None:
             f"scene:0.50 | {watcher.frame_width}x{watcher.frame_height}"
         )
 
-        await watcher.emit(ContextChunk(
-            source_id=watcher.source_id,
-            category=SourceCategory.VIDEO,
-            toon_spec=toon,
-            is_delta=True,
-            metadata={
-                "mock": True,
-                "segment": seg_index,
-                "keyframe": watcher._keyframe_count,
-            },
-        ))
+        await watcher.emit(
+            ContextChunk(
+                source_id=watcher.source_id,
+                category=SourceCategory.VIDEO,
+                toon_spec=toon,
+                is_delta=True,
+                metadata={
+                    "mock": True,
+                    "segment": seg_index,
+                    "keyframe": watcher._keyframe_count,
+                },
+            )
+        )

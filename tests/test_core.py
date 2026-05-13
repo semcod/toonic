@@ -2,12 +2,9 @@
 Tests for toonic.core — Stage 0: Foundation
 """
 
-import pytest
 from pathlib import Path
 
 from toonic.core import (
-    FileLogic,
-    FileHandler,
     BaseHandlerMixin,
     FormatRegistry,
     SpecDetector,
@@ -22,13 +19,21 @@ class TestFormatRegistry:
         FormatRegistry.reset()
 
         class MockHandler:
-            extensions = frozenset({'.test'})
-            category = 'test'
+            extensions = frozenset({".test"})
+            category = "test"
             requires = ()
-            def parse(self, path): return None
-            def to_spec(self, logic, fmt): return ""
-            def reproduce(self, logic, client, target_fmt): return ""
-            def sniff(self, path, content): return 0.5
+
+            def parse(self, path):
+                return None
+
+            def to_spec(self, logic, fmt):
+                return ""
+
+            def reproduce(self, logic, client, target_fmt):
+                return ""
+
+            def sniff(self, path, content):
+                return 0.5
 
         handler = MockHandler()
         FormatRegistry.register(handler)
@@ -39,13 +44,21 @@ class TestFormatRegistry:
         FormatRegistry.reset()
 
         class MockHandler:
-            extensions = frozenset({'.test'})
-            category = 'test'
+            extensions = frozenset({".test"})
+            category = "test"
             requires = ()
-            def parse(self, path): return None
-            def to_spec(self, logic, fmt): return ""
-            def reproduce(self, logic, client, target_fmt): return ""
-            def sniff(self, path, content): return 0.5
+
+            def parse(self, path):
+                return None
+
+            def to_spec(self, logic, fmt):
+                return ""
+
+            def reproduce(self, logic, client, target_fmt):
+                return ""
+
+            def sniff(self, path, content):
+                return 0.5
 
         FormatRegistry.register(MockHandler())
         avail = FormatRegistry.available()
@@ -55,18 +68,26 @@ class TestFormatRegistry:
         FormatRegistry.reset()
 
         class MockHandler:
-            extensions = frozenset({'.test'})
-            category = 'mycat'
+            extensions = frozenset({".test"})
+            category = "mycat"
             requires = ()
-            def parse(self, path): return None
-            def to_spec(self, logic, fmt): return ""
-            def reproduce(self, logic, client, target_fmt): return ""
-            def sniff(self, path, content): return 0.5
+
+            def parse(self, path):
+                return None
+
+            def to_spec(self, logic, fmt):
+                return ""
+
+            def reproduce(self, logic, client, target_fmt):
+                return ""
+
+            def sniff(self, path, content):
+                return 0.5
 
         FormatRegistry.register(MockHandler())
         cats = FormatRegistry.list_categories()
-        assert 'mycat' in cats
-        assert '.test' in cats['mycat']
+        assert "mycat" in cats
+        assert ".test" in cats["mycat"]
 
     def test_resolve_none_for_unknown(self):
         FormatRegistry.reset()
@@ -77,73 +98,94 @@ class TestFormatRegistry:
         FormatRegistry.reset()
 
         class HandlerA:
-            extensions = frozenset({'.yaml'})
-            category = 'a'
+            extensions = frozenset({".yaml"})
+            category = "a"
             requires = ()
-            def parse(self, path): return None
-            def to_spec(self, logic, fmt): return ""
-            def reproduce(self, logic, client, target_fmt): return ""
-            def sniff(self, path, content): return 0.3
+
+            def parse(self, path):
+                return None
+
+            def to_spec(self, logic, fmt):
+                return ""
+
+            def reproduce(self, logic, client, target_fmt):
+                return ""
+
+            def sniff(self, path, content):
+                return 0.3
 
         class HandlerB:
-            extensions = frozenset({'.yaml'})
-            category = 'b'
+            extensions = frozenset({".yaml"})
+            category = "b"
             requires = ()
-            def parse(self, path): return None
-            def to_spec(self, logic, fmt): return ""
-            def reproduce(self, logic, client, target_fmt): return ""
-            def sniff(self, path, content): return 0.9
+
+            def parse(self, path):
+                return None
+
+            def to_spec(self, logic, fmt):
+                return ""
+
+            def reproduce(self, logic, client, target_fmt):
+                return ""
+
+            def sniff(self, path, content):
+                return 0.9
 
         FormatRegistry.register(HandlerA())
         FormatRegistry.register(HandlerB())
 
         resolved = FormatRegistry.resolve(Path("test.yaml"), content="some content")
-        assert resolved.category == 'b'
+        assert resolved.category == "b"
 
 
 class TestSpecDetector:
     """Tests for SpecDetector."""
 
     def test_detect_code(self):
-        assert SpecDetector.detect("# myproject | 42f | python:35") == 'code'
+        assert SpecDetector.detect("# myproject | 42f | python:35") == "code"
 
     def test_detect_document(self):
-        assert SpecDetector.detect("# README.md | markdown | 1240w") == 'document'
+        assert SpecDetector.detect("# README.md | markdown | 1240w") == "document"
 
     def test_detect_database(self):
-        assert SpecDetector.detect("# schema.sql | postgresql | 6 tables") == 'database'
+        assert SpecDetector.detect("# schema.sql | postgresql | 6 tables") == "database"
 
     def test_detect_infra(self):
-        assert SpecDetector.detect("# deploy.yaml | kubernetes | 3 resources") == 'infra'
+        assert (
+            SpecDetector.detect("# deploy.yaml | kubernetes | 3 resources") == "infra"
+        )
 
     def test_detect_api(self):
-        assert SpecDetector.detect("# api.yaml | openapi 3.0 | 12 endpoints") == 'api'
+        assert SpecDetector.detect("# api.yaml | openapi 3.0 | 12 endpoints") == "api"
 
     def test_detect_data(self):
-        assert SpecDetector.detect("# data.csv | csv | 1250 rows") == 'data'
+        assert SpecDetector.detect("# data.csv | csv | 1250 rows") == "data"
 
     def test_detect_config(self):
-        assert SpecDetector.detect("# Dockerfile | dockerfile | 12 instructions") == 'config'
+        assert (
+            SpecDetector.detect("# Dockerfile | dockerfile | 12 instructions")
+            == "config"
+        )
 
     def test_detect_unknown(self):
-        assert SpecDetector.detect("random content here") == 'unknown'
+        assert SpecDetector.detect("random content here") == "unknown"
 
     def test_detect_spec_format_json(self):
-        assert SpecDetector.detect_spec_format('{"key": "val"}') == 'json'
+        assert SpecDetector.detect_spec_format('{"key": "val"}') == "json"
 
     def test_detect_spec_format_toon(self):
-        assert SpecDetector.detect_spec_format('# proj | M[42]:\n  mod.py') == 'toon'
+        assert SpecDetector.detect_spec_format("# proj | M[42]:\n  mod.py") == "toon"
 
     def test_detect_spec_format_yaml(self):
-        assert SpecDetector.detect_spec_format('source_file: test.py') == 'yaml'
+        assert SpecDetector.detect_spec_format("source_file: test.py") == "yaml"
 
     def test_detect_heuristic_database(self):
         content = "T[3]:\n  users | id:bigserial PK, email:varchar FK→profiles"
-        assert SpecDetector.detect(content) == 'database'
+        assert SpecDetector.detect(content) == "database"
 
     def test_detect_heuristic_code(self):
         content = "M[10]:\n  main.py,100\n    f[3]: foo,bar"
-        assert SpecDetector.detect(content) == 'code'
+        assert SpecDetector.detect(content) == "code"
 
 
 class TestCodeLogicBase:

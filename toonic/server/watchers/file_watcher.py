@@ -7,10 +7,8 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import logging
-import os
-import time
 from pathlib import Path
-from typing import Dict, Set
+from typing import Dict
 
 from toonic.server.models import ContextChunk, SourceCategory
 from toonic.server.watchers.base import BaseWatcher, WatcherRegistry
@@ -55,13 +53,15 @@ class FileWatcher(BaseWatcher):
         if path.is_file():
             spec = await self._convert_file(path)
             if spec:
-                await self.emit(ContextChunk(
-                    source_id=self.source_id,
-                    category=self._detect_category(path),
-                    toon_spec=spec,
-                    is_delta=False,
-                    metadata={"path": str(path), "scan": "full"},
-                ))
+                await self.emit(
+                    ContextChunk(
+                        source_id=self.source_id,
+                        category=self._detect_category(path),
+                        toon_spec=spec,
+                        is_delta=False,
+                        metadata={"path": str(path), "scan": "full"},
+                    )
+                )
             return
 
         # Directory scan
@@ -79,13 +79,15 @@ class FileWatcher(BaseWatcher):
 
         if specs:
             combined = "\n".join(specs)
-            await self.emit(ContextChunk(
-                source_id=self.source_id,
-                category=self._detect_category(path),
-                toon_spec=combined,
-                is_delta=False,
-                metadata={"path": str(path), "files": len(specs), "scan": "full"},
-            ))
+            await self.emit(
+                ContextChunk(
+                    source_id=self.source_id,
+                    category=self._detect_category(path),
+                    toon_spec=combined,
+                    is_delta=False,
+                    metadata={"path": str(path), "files": len(specs), "scan": "full"},
+                )
+            )
             logger.info(f"[{self.source_id}] Full scan: {len(specs)} files")
 
     async def _poll_loop(self) -> None:
@@ -116,19 +118,22 @@ class FileWatcher(BaseWatcher):
                 self._file_hashes[str(fpath)] = h
                 spec = await self._convert_file(fpath)
                 if spec:
-                    await self.emit(ContextChunk(
-                        source_id=f"{self.source_id}:{fpath.name}",
-                        category=self._detect_category(fpath),
-                        toon_spec=spec,
-                        is_delta=True,
-                        metadata={"path": str(fpath), "change": "modified"},
-                    ))
+                    await self.emit(
+                        ContextChunk(
+                            source_id=f"{self.source_id}:{fpath.name}",
+                            category=self._detect_category(fpath),
+                            toon_spec=spec,
+                            is_delta=True,
+                            metadata={"path": str(fpath), "change": "modified"},
+                        )
+                    )
                     logger.info(f"[{self.source_id}] Changed: {fpath.name}")
 
     async def _convert_file(self, fpath: Path) -> str:
         """Convert file to TOON spec using toonic pipeline."""
         try:
             from toonic.pipeline import Pipeline
+
             return Pipeline.to_spec(str(fpath), fmt="toon")
         except Exception:
             # Fallback: basic file info
@@ -153,8 +158,31 @@ class FileWatcher(BaseWatcher):
         return SourceCategory.CODE
 
     def _should_skip(self, path: Path) -> bool:
-        skip_dirs = {".git", "__pycache__", "node_modules", ".venv", "venv", ".idea", ".vscode", "dist", "build"}
-        skip_exts = {".pyc", ".pyo", ".so", ".o", ".a", ".dll", ".exe", ".bin", ".png", ".jpg", ".gif", ".ico"}
+        skip_dirs = {
+            ".git",
+            "__pycache__",
+            "node_modules",
+            ".venv",
+            "venv",
+            ".idea",
+            ".vscode",
+            "dist",
+            "build",
+        }
+        skip_exts = {
+            ".pyc",
+            ".pyo",
+            ".so",
+            ".o",
+            ".a",
+            ".dll",
+            ".exe",
+            ".bin",
+            ".png",
+            ".jpg",
+            ".gif",
+            ".ico",
+        }
         parts = set(path.parts)
         if parts & skip_dirs:
             return True

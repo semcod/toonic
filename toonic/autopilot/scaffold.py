@@ -14,11 +14,10 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 import textwrap
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 logger = logging.getLogger("toonic.autopilot.scaffold")
 
@@ -26,6 +25,7 @@ logger = logging.getLogger("toonic.autopilot.scaffold")
 @dataclass
 class ProjectSpec:
     """Parsed project specification."""
+
     name: str
     description: str
     language: str = "python"
@@ -147,13 +147,16 @@ README_TEMPLATE = textwrap.dedent("""\
 
 # ── Language-specific generators ─────────────────────────────────────
 
+
 def _python_project(spec: ProjectSpec, project_dir: Path) -> Dict[str, str]:
     """Generate Python project files."""
     files = {}
     pkg = spec.name.replace("-", "_").replace(" ", "_").lower()
 
     # pyproject.toml
-    deps_str = ", ".join(f'"{d}"' for d in spec.dependencies) if spec.dependencies else ""
+    deps_str = (
+        ", ".join(f'"{d}"' for d in spec.dependencies) if spec.dependencies else ""
+    )
     files["pyproject.toml"] = textwrap.dedent(f"""\
         [build-system]
         requires = ["setuptools>=68.0", "wheel"]
@@ -174,7 +177,9 @@ def _python_project(spec: ProjectSpec, project_dir: Path) -> Dict[str, str]:
     """)
 
     # Package init
-    files[f"{pkg}/__init__.py"] = f'"""{ spec.name} — {spec.description}"""\n\n__version__ = "0.1.0"\n'
+    files[f"{pkg}/__init__.py"] = (
+        f'"""{spec.name} — {spec.description}"""\n\n__version__ = "0.1.0"\n'
+    )
 
     # Main models
     files[f"{pkg}/models.py"] = textwrap.dedent(f"""\
@@ -309,19 +314,25 @@ def _node_project(spec: ProjectSpec, project_dir: Path) -> Dict[str, str]:
     if spec.project_type == "api" and "express" not in deps:
         deps["express"] = "^4.18"
 
-    files["package.json"] = json.dumps({
-        "name": spec.name,
-        "version": "0.1.0",
-        "description": spec.description,
-        "main": "src/index.js",
-        "scripts": {
-            "start": "node src/index.js",
-            "test": "jest",
-            "dev": "node --watch src/index.js",
-        },
-        "dependencies": deps,
-        "devDependencies": {"jest": "^29.0"},
-    }, indent=2) + "\n"
+    files["package.json"] = (
+        json.dumps(
+            {
+                "name": spec.name,
+                "version": "0.1.0",
+                "description": spec.description,
+                "main": "src/index.js",
+                "scripts": {
+                    "start": "node src/index.js",
+                    "test": "jest",
+                    "dev": "node --watch src/index.js",
+                },
+                "dependencies": deps,
+                "devDependencies": {"jest": "^29.0"},
+            },
+            indent=2,
+        )
+        + "\n"
+    )
 
     files["src/index.js"] = textwrap.dedent(f"""\
         // {spec.name} — {spec.description}
@@ -380,7 +391,9 @@ class ProjectScaffold:
     """Generate a full project scaffold from a description."""
 
     @staticmethod
-    def detect_spec(description: str, name: str = "", language: str = "") -> ProjectSpec:
+    def detect_spec(
+        description: str, name: str = "", language: str = ""
+    ) -> ProjectSpec:
         """Parse a natural-language description into ProjectSpec."""
         desc_lower = description.lower()
 
@@ -453,17 +466,23 @@ class ProjectScaffold:
 
         # project.toon
         pkg = spec.name.replace("-", "_").replace(" ", "_").lower()
-        modules = "\n        ".join(f'f[{pkg}/{f.split("/")[-1]}]' for f in lang_files if f.startswith(pkg + "/") or f.startswith("src/"))
-        test_modules = "\n        ".join(f'f[{f}]' for f in lang_files if f.startswith("tests/"))
+        modules = "\n        ".join(
+            f"f[{pkg}/{f.split('/')[-1]}]"
+            for f in lang_files
+            if f.startswith(pkg + "/") or f.startswith("src/")
+        )
+        test_modules = "\n        ".join(
+            f"f[{f}]" for f in lang_files if f.startswith("tests/")
+        )
         deps = "\n        ".join(f'"{d}"' for d in spec.dependencies)
-        features = "\n        ".join(f'- {f}' for f in spec.features)
+        features = "\n        ".join(f"- {f}" for f in spec.features)
 
         all_files["project.toon"] = TOON_TEMPLATE.format(
             name=spec.name,
             description=spec.description,
             project_type=spec.project_type,
             language=spec.language,
-            framework_line=f'framework: {spec.framework}' if spec.framework else '',
+            framework_line=f"framework: {spec.framework}" if spec.framework else "",
             modules=modules or "# (to be generated)",
             test_modules=test_modules or "# (to be generated)",
             deps=deps or "# (none yet)",
@@ -499,8 +518,12 @@ class ProjectScaffold:
         tree = "\n    ".join(tree_lines)
 
         if spec.language == "python":
-            install_cmd = f"pip install -e ."
-            run_cmd = f"python -m {pkg}" if spec.project_type != "api" else f"python -m {pkg}.server"
+            install_cmd = "pip install -e ."
+            run_cmd = (
+                f"python -m {pkg}"
+                if spec.project_type != "api"
+                else f"python -m {pkg}.server"
+            )
             test_cmd = "pytest tests/ -v"
         else:
             install_cmd = "npm install"
@@ -571,8 +594,9 @@ class ProjectScaffold:
         return written
 
     @classmethod
-    def init(cls, description: str, name: str = "", language: str = "",
-             output_dir: str = "") -> tuple[ProjectSpec, Dict[str, str]]:
+    def init(
+        cls, description: str, name: str = "", language: str = "", output_dir: str = ""
+    ) -> tuple[ProjectSpec, Dict[str, str]]:
         """One-call scaffold: detect spec + generate files."""
         spec = cls.detect_spec(description, name=name, language=language)
         if not output_dir:

@@ -1,5 +1,3 @@
-# Manual Installation Guide
-
 ## 📋 Required Packages Installation
 
 The deployment script requires several packages to be installed. Here's how to install them manually:
@@ -25,19 +23,8 @@ sudo systemctl start nginx
 sudo systemctl enable nginx
 ```
 
-### Step 5: Verify Installation
-```bash
-# Check nginx
-nginx -v
-
 # Check curl
 curl --version | head -n1
-
-# Check openssl
-openssl version
-
-# Check jq
-jq --version
 
 # Check python3
 python3 --version
@@ -60,8 +47,6 @@ sudo ./INSTALL_REQUIREMENTS.sh
 
 If you don't have sudo access, you can still use the security audit tools:
 
-### Option 1: Use Python-only monitoring
-```bash
 # Install Python packages locally
 pip3 install --user aiohttp pyyaml
 
@@ -72,8 +57,6 @@ python3 continuous_monitoring.py --once
 python3 generate_report.py --data-dir ../../toonic_data
 ```
 
-### Option 2: Use Docker (if available)
-```bash
 # Create Dockerfile for security monitoring
 cat > Dockerfile << 'EOF'
 FROM python:3.9-slim
@@ -110,8 +93,6 @@ After installing packages:
 sudo ./QUICK_DEPLOYMENT.sh
 ```
 
-### 2. Verify installation
-```bash
 # Check service status
 sudo systemctl status security-monitor.service
 
@@ -122,8 +103,6 @@ sudo journalctl -u security-monitor.service -f
 curl -I https://obywatel.bielik.ai
 ```
 
-### 3. Access the dashboard
-```bash
 # Start local server
 python3 -m http.server 8080
 
@@ -131,12 +110,6 @@ python3 -m http.server 8080
 open http://localhost:8080/security_dashboard.html
 ```
 
-## 🔍 Troubleshooting
-
-### Common Issues
-
-#### 1. "Permission denied" errors
-```bash
 # Make sure you're using sudo
 sudo ./QUICK_DEPLOYMENT.sh
 
@@ -145,8 +118,6 @@ ls -la QUICK_DEPLOYMENT.sh
 chmod +x QUICK_DEPLOYMENT.sh
 ```
 
-#### 2. "nginx: command not found"
-```bash
 # Install nginx
 sudo apt install nginx
 
@@ -154,8 +125,6 @@ sudo apt install nginx
 sudo systemctl status nginx
 ```
 
-#### 3. Python package errors
-```bash
 # Install packages with --user flag
 pip3 install --user aiohttp pyyaml
 
@@ -165,13 +134,8 @@ source security-env/bin/activate
 pip install aiohttp pyyaml
 ```
 
-#### 4. Port conflicts
-```bash
 # Check what's using port 8080
 sudo netstat -tlnp | grep :8080
-
-# Kill the process
-sudo kill -9 <PID>
 
 # Or use different port
 python3 -m http.server 8081

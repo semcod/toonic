@@ -1,5 +1,3 @@
-# Plugin System (Watchers)
-
 ## Przegląd
 
 Każdy typ źródła danych jest obsługiwany przez osobny plugin (Watcher).
@@ -59,9 +57,6 @@ WatcherRegistry.register(MQTTWatcher)
 | `get_chunks()` | AsyncIterator[ContextChunk] |
 | `supports(path)` | 0.0-1.0 confidence |
 
-## WatcherRegistry
-
-```python
 # Rozpoznanie najlepszego pluginu
 cls = WatcherRegistry.resolve("rtsp://cam1")  # → StreamWatcher
 

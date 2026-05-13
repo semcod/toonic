@@ -10,32 +10,21 @@ import asyncio
 import json
 import logging
 import os
-import signal
 import time
-import uuid
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Set
+from typing import Any, Callable, Dict, List, Set
 
 from toonic.server.config import ServerConfig, SourceConfig
-from toonic.server.models import ActionResponse, ContextChunk, ServerEvent, SourceCategory
+from toonic.server.models import ActionResponse, ServerEvent, SourceCategory
 from toonic.server.core.accumulator import ContextAccumulator
 from toonic.server.core.history import ConversationHistory
 from toonic.server.core.query import QueryAdapter
 from toonic.server.core.router import LLMRequest, LLMRouter
-from toonic.server.triggers.dsl import TriggerConfig, TriggerRule
+from toonic.server.triggers.dsl import TriggerConfig
 from toonic.server.triggers.scheduler import TriggerScheduler, TriggerEvent
 from toonic.server.watchers.base import BaseWatcher, WatcherRegistry
 
 # Ensure watchers are registered
-import toonic.server.watchers.file_watcher
-import toonic.server.watchers.log_watcher
-import toonic.server.watchers.stream_watcher
-import toonic.server.watchers.http_watcher
-import toonic.server.watchers.directory_watcher
-import toonic.server.watchers.docker_watcher
-import toonic.server.watchers.process_watcher
-import toonic.server.watchers.network_watcher
-import toonic.server.watchers.database_watcher
 
 logger = logging.getLogger("toonic.server")
 
@@ -43,7 +32,9 @@ logger = logging.getLogger("toonic.server")
 class ToonicServer:
     """Main server — connects watchers → accumulator → LLM router → actions."""
 
-    def __init__(self, config: ServerConfig, trigger_config: TriggerConfig | None = None):
+    def __init__(
+        self, config: ServerConfig, trigger_config: TriggerConfig | None = None
+    ):
         self.config = config
         self.trigger_config = trigger_config
         self.accumulator = ContextAccumulator(
@@ -84,7 +75,7 @@ class ToonicServer:
         self._total_chunks = 0
         self._actions: List[ActionResponse] = []
         self._recent_images: List[str] = []  # base64 JPEG keyframes for multimodal
-        self._event_log: List[Dict] = []     # in-memory event log for Web UI
+        self._event_log: List[Dict] = []  # in-memory event log for Web UI
         # Open persistent log files
         self._events_log_path = self.data_dir / "events.jsonl"
         self._exchanges_log_path = self.data_dir / "exchanges.jsonl"
@@ -108,7 +99,9 @@ class ToonicServer:
             # One-shot mode: wait for initial data, then analyze once
             self._analysis_task = asyncio.create_task(self._one_shot())
 
-        await self._emit_event("status", {"message": "Server started", "sources": len(self._watchers)})
+        await self._emit_event(
+            "status", {"message": "Server started", "sources": len(self._watchers)}
+        )
 
     async def stop(self) -> None:
         """Stop all watchers and tasks."""
@@ -158,7 +151,9 @@ class ToonicServer:
         self._watcher_tasks[sid] = task
 
         logger.info(f"Source added: {sid} ({type(watcher).__name__})")
-        await self._emit_event("source_added", {"source_id": sid, "type": type(watcher).__name__})
+        await self._emit_event(
+            "source_added", {"source_id": sid, "type": type(watcher).__name__}
+        )
         return sid
 
     async def remove_source(self, source_id: str) -> None:
@@ -184,6 +179,7 @@ class ToonicServer:
                 # Collect base64 images for multimodal analysis
                 if chunk.raw_data and chunk.raw_encoding == "base64_jpeg":
                     import base64
+
                     b64 = base64.b64encode(chunk.raw_data).decode()
                     self._recent_images.append(b64)
                     # Also collect extra images from detection events
@@ -196,7 +192,11 @@ class ToonicServer:
                 # Evaluate triggers against this chunk's metadata
                 trigger_data = dict(chunk.metadata)
                 trigger_data["toon_spec"] = chunk.toon_spec
-                cat = chunk.category.value if isinstance(chunk.category, SourceCategory) else chunk.category
+                cat = (
+                    chunk.category.value
+                    if isinstance(chunk.category, SourceCategory)
+                    else chunk.category
+                )
                 await self.trigger_scheduler.evaluate_async(trigger_data, cat)
         except asyncio.CancelledError:
             pass
@@ -235,7 +235,9 @@ class ToonicServer:
         # Prefer structured chunks for correct prompt selection (SOLID/CQRS-friendly).
         # Keep context string for history preview/backward compatibility.
         context = self.accumulator.get_context(goal=goal, system_prompt="")
-        chunks, images = self.accumulator.get_chunks(max_tokens=self.config.max_context_tokens)
+        chunks, images = self.accumulator.get_chunks(
+            max_tokens=self.config.max_context_tokens
+        )
         if not context.strip() and not chunks:
             return
 
@@ -244,7 +246,8 @@ class ToonicServer:
         # Determine category and collect images for multimodal
         category = "text"
         if images or any(
-            (c.category.value if isinstance(c.category, SourceCategory) else c.category) in ("video", "audio")
+            (c.category.value if isinstance(c.category, SourceCategory) else c.category)
+            in ("video", "audio")
             for c in chunks
         ):
             category = "multimodal"
@@ -261,16 +264,21 @@ class ToonicServer:
             source_chunks=chunks,
         )
 
-        await self._emit_event("analysis_start", {
-            "context_tokens": stats["total_tokens"],
-            "sources": stats["total_sources"],
-        })
+        await self._emit_event(
+            "analysis_start",
+            {
+                "context_tokens": stats["total_tokens"],
+                "sources": stats["total_sources"],
+            },
+        )
 
         action = await self.router.query(request)
         self._actions.append(action)
 
         await self._emit_event("action", action.to_dict())
-        logger.info(f"Analysis complete: {action.action_type} ({action.duration_s:.1f}s)")
+        logger.info(
+            f"Analysis complete: {action.action_type} ({action.duration_s:.1f}s)"
+        )
 
     # ── Manual analysis trigger ──────────────────────────────────
 
@@ -281,7 +289,9 @@ class ToonicServer:
             self.config.goal = goal
 
         context = self.accumulator.get_context(goal=self.config.goal)
-        chunks, images = self.accumulator.get_chunks(max_tokens=self.config.max_context_tokens)
+        chunks, images = self.accumulator.get_chunks(
+            max_tokens=self.config.max_context_tokens
+        )
         category = "multimodal" if images else "text"
         request = LLMRequest(
             context=context,
@@ -339,7 +349,9 @@ class ToonicServer:
         """Get server status."""
         return {
             "running": self._running,
-            "uptime_s": round(time.time() - self._start_time, 1) if self._start_time else 0,
+            "uptime_s": round(time.time() - self._start_time, 1)
+            if self._start_time
+            else 0,
             "goal": self.config.goal,
             "sources": {sid: type(w).__name__ for sid, w in self._watchers.items()},
             "total_chunks": self._total_chunks,

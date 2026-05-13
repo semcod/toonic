@@ -3,10 +3,8 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, Optional
 
 from fastapi import APIRouter
-from fastapi.responses import JSONResponse
 
 logger = logging.getLogger("toonic.transport.routes.sources")
 
@@ -36,6 +34,7 @@ async def list_sources():
 @router.post("/")
 async def add_source(body: dict = {}):
     from toonic.server.config import SourceConfig
+
     src = SourceConfig(
         path_or_url=body.get("path_or_url", ""),
         category=body.get("category", "code"),

@@ -11,15 +11,18 @@ import pytest
 
 def _parse(src: str):
     from toonic.server.__main__ import parse_source_string
+
     return parse_source_string(src)
 
 
 def _quick(src: str):
     from toonic.server.quick import parse_source
+
     return parse_source(src)
 
 
 # ── 13 supported protocols ────────────────────────────────────────
+
 
 class TestSupportedProtocols:
     """Protocols that have matching watchers."""
@@ -47,7 +50,9 @@ class TestSupportedProtocols:
     )
     def test_cli_parser_category(self, src, expected_cat):
         cfg = _parse(src)
-        assert cfg.category == expected_cat, f"{src} -> {cfg.category} (expected {expected_cat})"
+        assert cfg.category == expected_cat, (
+            f"{src} -> {cfg.category} (expected {expected_cat})"
+        )
         assert cfg.path_or_url.startswith(src.split("://")[0])
 
     @pytest.mark.parametrize(
@@ -69,7 +74,9 @@ class TestSupportedProtocols:
     )
     def test_quick_parser_category(self, src, expected_cat):
         cfg = _quick(src)
-        assert cfg.category == expected_cat, f"{src} -> {cfg.category} (expected {expected_cat})"
+        assert cfg.category == expected_cat, (
+            f"{src} -> {cfg.category} (expected {expected_cat})"
+        )
 
     @pytest.mark.parametrize(
         "src,expected_cat",
@@ -93,6 +100,7 @@ class TestSupportedProtocols:
 
 
 # ── 10 unsupported protocols ──────────────────────────────────────
+
 
 class TestUnsupportedProtocols:
     """Protocols without watchers — should fail fast with clear error."""
@@ -136,8 +144,8 @@ class TestUnsupportedProtocols:
 
 # ── Prefix-based sources ──────────────────────────────────────────
 
-class TestPrefixSources:
 
+class TestPrefixSources:
     @pytest.mark.parametrize(
         "src,expected_path",
         [
@@ -179,6 +187,7 @@ class TestPrefixSources:
 
 # ── Watcher resolution ────────────────────────────────────────────
 
+
 class TestWatcherResolution:
     """Verify WatcherRegistry.resolve picks the correct watcher class."""
 
@@ -197,19 +206,28 @@ class TestWatcherResolution:
     )
     def test_resolve_picks_correct_watcher(self, url, expected_watcher):
         from toonic.server.watchers.base import WatcherRegistry
+
         cls = WatcherRegistry.resolve(url)
         assert cls is not None, f"No watcher resolved for {url}"
-        assert cls.__name__ == expected_watcher, f"{url} -> {cls.__name__} (expected {expected_watcher})"
+        assert cls.__name__ == expected_watcher, (
+            f"{url} -> {cls.__name__} (expected {expected_watcher})"
+        )
 
 
 # ── Prompt builder selection ──────────────────────────────────────
+
 
 class TestPromptBuilderForProtocols:
     """Web/API sources must use GenericPrompt, not CodeAnalysisPrompt."""
 
     def test_web_source_uses_generic_prompt(self):
-        from toonic.server.llm.prompts import select_prompt_builder, GenericPrompt, CodeAnalysisPrompt
+        from toonic.server.llm.prompts import (
+            select_prompt_builder,
+            GenericPrompt,
+            CodeAnalysisPrompt,
+        )
         from toonic.server.models import SourceCategory
+
         builder = select_prompt_builder("describe what you see", {SourceCategory.WEB})
         assert isinstance(builder, GenericPrompt)
         assert not isinstance(builder, CodeAnalysisPrompt)
@@ -217,27 +235,32 @@ class TestPromptBuilderForProtocols:
     def test_api_source_uses_generic_prompt(self):
         from toonic.server.llm.prompts import select_prompt_builder, GenericPrompt
         from toonic.server.models import SourceCategory
+
         builder = select_prompt_builder("monitor API health", {SourceCategory.API})
         assert isinstance(builder, GenericPrompt)
 
     def test_network_source_uses_generic_prompt(self):
         from toonic.server.llm.prompts import select_prompt_builder, GenericPrompt
         from toonic.server.models import SourceCategory
+
         builder = select_prompt_builder("check connectivity", {SourceCategory.NETWORK})
         assert isinstance(builder, GenericPrompt)
 
     def test_code_source_uses_code_prompt(self):
         from toonic.server.llm.prompts import select_prompt_builder, CodeAnalysisPrompt
         from toonic.server.models import SourceCategory
+
         builder = select_prompt_builder("find bugs", {SourceCategory.CODE})
         assert isinstance(builder, CodeAnalysisPrompt)
 
     def test_empty_categories_with_code_goal_uses_code_prompt(self):
         from toonic.server.llm.prompts import select_prompt_builder, CodeAnalysisPrompt
+
         builder = select_prompt_builder("analyze code quality", set())
         assert isinstance(builder, CodeAnalysisPrompt)
 
     def test_empty_categories_with_generic_goal_uses_generic(self):
         from toonic.server.llm.prompts import select_prompt_builder, GenericPrompt
+
         builder = select_prompt_builder("describe what you see", set())
         assert isinstance(builder, GenericPrompt)

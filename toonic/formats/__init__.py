@@ -80,6 +80,7 @@ def initialize_all_handlers() -> None:
     Odpowiednik formats/__init__.py _register_all()
     """
     from toonic.core.registry import FormatRegistry
+
     FormatRegistry.reset()
     register_document_handlers()
     register_data_handlers()
@@ -101,13 +102,40 @@ def initialize_all_handlers() -> None:
 
 __all__ = [
     "initialize_all_handlers",
-    "DocumentSection", "DocumentLogic", "MarkdownHandler", "TextHandler", "RstHandler",
-    "ColumnSpec", "TableLogic", "JsonSchemaLogic", "CsvHandler", "JsonDataHandler",
-    "ConfigEntry", "ConfigLogic", "DockerfileHandler", "EnvHandler",
-    "ColumnDef", "TableDef", "SqlSchemaLogic", "SqlHandler",
-    "EndpointSpec", "ApiLogic", "OpenApiHandler",
-    "InfraResource", "InfraLogic", "KubernetesHandler", "GithubActionsHandler",
-    "KeyframeSpec", "VideoSegment", "VideoLogic", "VideoFileHandler",
-    "SpeechSegment", "AudioLogic", "AudioFileHandler",
-    "EvidenceNode", "EvidenceGraph", "EvidenceGraphBuilder", "EvidenceGraphHandler",
+    "DocumentSection",
+    "DocumentLogic",
+    "MarkdownHandler",
+    "TextHandler",
+    "RstHandler",
+    "ColumnSpec",
+    "TableLogic",
+    "JsonSchemaLogic",
+    "CsvHandler",
+    "JsonDataHandler",
+    "ConfigEntry",
+    "ConfigLogic",
+    "DockerfileHandler",
+    "EnvHandler",
+    "ColumnDef",
+    "TableDef",
+    "SqlSchemaLogic",
+    "SqlHandler",
+    "EndpointSpec",
+    "ApiLogic",
+    "OpenApiHandler",
+    "InfraResource",
+    "InfraLogic",
+    "KubernetesHandler",
+    "GithubActionsHandler",
+    "KeyframeSpec",
+    "VideoSegment",
+    "VideoLogic",
+    "VideoFileHandler",
+    "SpeechSegment",
+    "AudioLogic",
+    "AudioFileHandler",
+    "EvidenceNode",
+    "EvidenceGraph",
+    "EvidenceGraphBuilder",
+    "EvidenceGraphHandler",
 ]

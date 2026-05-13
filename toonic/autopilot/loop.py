@@ -19,12 +19,11 @@ import asyncio
 import json
 import logging
 import os
-import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
-from toonic.autopilot.executor import ActionExecutor, ExecutionResult
+from toonic.autopilot.executor import ActionExecutor
 from toonic.autopilot.prompts import AutopilotPrompt, FixPrompt
 
 logger = logging.getLogger("toonic.autopilot.loop")
@@ -33,6 +32,7 @@ logger = logging.getLogger("toonic.autopilot.loop")
 @dataclass
 class AutopilotConfig:
     """Configuration for the autopilot loop."""
+
     project_dir: str = "."
     goal: str = "build MVP"
     max_iterations: int = 20
@@ -71,8 +71,12 @@ class AutopilotLoop:
         self._on_event = on_event
         self._running = True
 
-        await self._emit("start", {"project": str(self.project_dir), "goal": self.config.goal})
-        logger.info(f"Autopilot starting: {self.project_dir} — goal: {self.config.goal}")
+        await self._emit(
+            "start", {"project": str(self.project_dir), "goal": self.config.goal}
+        )
+        logger.info(
+            f"Autopilot starting: {self.project_dir} — goal: {self.config.goal}"
+        )
 
         # Initialize LLM caller
         from toonic.server.llm.caller import LLMCaller
@@ -93,7 +97,9 @@ class AutopilotLoop:
 
             self._iteration = i + 1
             await self._emit("iteration_start", {"iteration": self._iteration})
-            logger.info(f"\n{'='*60}\n  Iteration {self._iteration}/{self.config.max_iterations}\n{'='*60}")
+            logger.info(
+                f"\n{'=' * 60}\n  Iteration {self._iteration}/{self.config.max_iterations}\n{'=' * 60}"
+            )
 
             try:
                 # Step 1: Scan project
@@ -122,7 +128,9 @@ class AutopilotLoop:
 
                 content = raw_response.get("content", "")
                 if not content:
-                    logger.warning(f"Empty LLM response: {raw_response.get('error', 'unknown')}")
+                    logger.warning(
+                        f"Empty LLM response: {raw_response.get('error', 'unknown')}"
+                    )
                     await self._emit("error", {"message": "Empty LLM response"})
                     await asyncio.sleep(self.config.interval_s)
                     continue
@@ -136,12 +144,15 @@ class AutopilotLoop:
                     except json.JSONDecodeError:
                         action_data = {"action": "report", "content": content}
 
-                await self._emit("llm_response", {
-                    "iteration": self._iteration,
-                    "action": action_data.get("action", "unknown"),
-                    "description": action_data.get("description", "")[:200],
-                    "files_count": len(action_data.get("files", [])),
-                })
+                await self._emit(
+                    "llm_response",
+                    {
+                        "iteration": self._iteration,
+                        "action": action_data.get("action", "unknown"),
+                        "description": action_data.get("description", "")[:200],
+                        "files_count": len(action_data.get("files", [])),
+                    },
+                )
 
                 # Step 5: Execute file changes
                 result = self.executor.execute(action_data)
@@ -176,14 +187,18 @@ class AutopilotLoop:
 
                     # Step 8: Update roadmap
                     roadmap_update = action_data.get("roadmap_update", "")
-                    if roadmap_update and (not self.config.auto_test or test_result.success):
+                    if roadmap_update and (
+                        not self.config.auto_test or test_result.success
+                    ):
                         self._update_roadmap(roadmap_update)
 
                 self._actions_log.append(log_entry)
                 await self._emit("iteration_done", log_entry)
 
-                logger.info(f"  Result: {len(result.files_written)} files written, "
-                          f"success={result.success}")
+                logger.info(
+                    f"  Result: {len(result.files_written)} files written, "
+                    f"success={result.success}"
+                )
 
                 # Check if roadmap is complete
                 if self._is_roadmap_complete():
@@ -193,12 +208,17 @@ class AutopilotLoop:
 
             except Exception as e:
                 logger.error(f"Iteration {self._iteration} error: {e}", exc_info=True)
-                await self._emit("error", {"iteration": self._iteration, "error": str(e)})
+                await self._emit(
+                    "error", {"iteration": self._iteration, "error": str(e)}
+                )
 
             await asyncio.sleep(self.config.interval_s)
 
         self._running = False
-        await self._emit("stop", {"iterations": self._iteration, "total_actions": len(self._actions_log)})
+        await self._emit(
+            "stop",
+            {"iterations": self._iteration, "total_actions": len(self._actions_log)},
+        )
         return self._actions_log
 
     def stop(self):
@@ -259,8 +279,11 @@ class AutopilotLoop:
                 continue
             # Skip hidden, __pycache__, node_modules, toonic_data
             rel = str(path.relative_to(project))
-            if any(part.startswith(".") or part in ("__pycache__", "node_modules", "toonic_data", ".git")
-                   for part in path.parts):
+            if any(
+                part.startswith(".")
+                or part in ("__pycache__", "node_modules", "toonic_data", ".git")
+                for part in path.parts
+            ):
                 continue
             if path.suffix in (".pyc", ".pyo", ".so", ".o"):
                 continue
@@ -287,13 +310,15 @@ class AutopilotLoop:
             # Create TOON-like spec
             toon_spec = f"# {rel}\n{content[:4000]}"
 
-            chunks.append(ContextChunk(
-                source_id=rel,
-                category=cat,
-                toon_spec=toon_spec,
-                content_type=ContentType.TOON_SPEC,
-                priority=0.8 if cat == SourceCategory.CODE else 0.5,
-            ))
+            chunks.append(
+                ContextChunk(
+                    source_id=rel,
+                    category=cat,
+                    toon_spec=toon_spec,
+                    content_type=ContentType.TOON_SPEC,
+                    priority=0.8 if cat == SourceCategory.CODE else 0.5,
+                )
+            )
 
         logger.info(f"  Scanned {len(chunks)} files")
         return chunks
@@ -340,7 +365,9 @@ class AutopilotLoop:
         recent = self._actions_log[-3:]
         lines = []
         for a in recent:
-            lines.append(f"- Iteration {a['iteration']}: {a.get('description', '')[:100]}")
+            lines.append(
+                f"- Iteration {a['iteration']}: {a.get('description', '')[:100]}"
+            )
             if a.get("files_written"):
                 lines.append(f"  Files: {', '.join(a['files_written'])}")
             if a.get("error"):

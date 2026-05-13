@@ -1,7 +1,3 @@
-# Toonic Architecture Review — SOLID, CQRS, Event Sourcing
-
-## Current State Assessment
-
 ### SOLID Principles
 
 | Principle | Status | Notes |
@@ -75,8 +71,6 @@
    │  → events.jsonl  → exchanges.jsonl  → WebSocket clients  │
    └──────────────────────────────────────────────────────────┘
 ```
-
-## Recommendations
 
 ### Low Priority (current architecture is sound)
 1. **Event replay**: Add `ToonicServer.replay(events_file)` for debugging/testing

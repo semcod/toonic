@@ -2,21 +2,30 @@
 Tests for toonic.server.triggers — DSL, detectors, scheduler, NLP2YAML.
 """
 
-import asyncio
 import time
 
 import pytest
 
 from toonic.server.triggers.dsl import (
-    TriggerConfig, TriggerRule, EventCondition, FallbackConfig,
-    load_triggers, dump_triggers,
+    TriggerConfig,
+    TriggerRule,
+    EventCondition,
+    FallbackConfig,
+    load_triggers,
+    dump_triggers,
 )
 from toonic.server.triggers.detectors import (
-    MotionDetector, SceneChangeDetector, ObjectDetector,
-    AudioLevelDetector, SpeechDetector, PatternDetector, AnomalyDetector,
-    create_detector, create_detectors, DetectionResult,
+    MotionDetector,
+    SceneChangeDetector,
+    ObjectDetector,
+    AudioLevelDetector,
+    SpeechDetector,
+    PatternDetector,
+    AnomalyDetector,
+    create_detector,
+    create_detectors,
 )
-from toonic.server.triggers.scheduler import TriggerScheduler, TriggerEvent, RuleState
+from toonic.server.triggers.scheduler import TriggerScheduler
 from toonic.server.triggers.nlp2yaml import NLP2YAML
 
 
@@ -24,9 +33,12 @@ from toonic.server.triggers.nlp2yaml import NLP2YAML
 # DSL tests
 # =============================================================================
 
+
 class TestDSL:
     def test_event_condition_roundtrip(self):
-        ec = EventCondition(type="object", label="person", threshold=0.5, min_duration_s=1.0)
+        ec = EventCondition(
+            type="object", label="person", threshold=0.5, min_duration_s=1.0
+        )
         d = ec.to_dict()
         assert d["type"] == "object"
         assert d["label"] == "person"
@@ -56,11 +68,16 @@ class TestDSL:
         assert len(rule2.events) == 1
 
     def test_trigger_config_roundtrip(self):
-        cfg = TriggerConfig(triggers=[
-            TriggerRule(name="r1", mode="periodic", interval_s=10),
-            TriggerRule(name="r2", mode="on_event",
-                        events=[EventCondition(type="pattern", regex="ERROR")]),
-        ])
+        cfg = TriggerConfig(
+            triggers=[
+                TriggerRule(name="r1", mode="periodic", interval_s=10),
+                TriggerRule(
+                    name="r2",
+                    mode="on_event",
+                    events=[EventCondition(type="pattern", regex="ERROR")],
+                ),
+            ]
+        )
         d = cfg.to_dict()
         assert len(d["triggers"]) == 2
 
@@ -93,11 +110,13 @@ triggers:
         assert "motion" in out
 
     def test_get_rules_for_source(self):
-        cfg = TriggerConfig(triggers=[
-            TriggerRule(name="video-r", source="video"),
-            TriggerRule(name="log-r", source="logs"),
-            TriggerRule(name="all-r", source=""),
-        ])
+        cfg = TriggerConfig(
+            triggers=[
+                TriggerRule(name="video-r", source="video"),
+                TriggerRule(name="log-r", source="logs"),
+                TriggerRule(name="all-r", source=""),
+            ]
+        )
         video_rules = cfg.get_rules_for_source("video")
         assert len(video_rules) == 2  # video-r + all-r
         log_rules = cfg.get_rules_for_source("logs")
@@ -107,6 +126,7 @@ triggers:
 # =============================================================================
 # Detector tests
 # =============================================================================
+
 
 class TestDetectors:
     def test_motion_detector(self):
@@ -142,9 +162,13 @@ class TestDetectors:
         cond = EventCondition(type="object", label="person", threshold=0.3)
         det = ObjectDetector(cond)
 
-        r = det.evaluate({"detected_objects": [
-            {"label": "person", "confidence": 0.8, "size_pct": 20.0},
-        ]})
+        r = det.evaluate(
+            {
+                "detected_objects": [
+                    {"label": "person", "confidence": 0.8, "size_pct": 20.0},
+                ]
+            }
+        )
         assert r.triggered
         assert r.label == "person"
 
@@ -152,23 +176,37 @@ class TestDetectors:
         cond = EventCondition(type="object", label="car", threshold=0.5)
         det = ObjectDetector(cond)
 
-        r = det.evaluate({"detected_objects": [
-            {"label": "person", "confidence": 0.9},
-        ]})
+        r = det.evaluate(
+            {
+                "detected_objects": [
+                    {"label": "person", "confidence": 0.9},
+                ]
+            }
+        )
         assert not r.triggered
 
     def test_object_detector_size_filter(self):
-        cond = EventCondition(type="object", label="person", threshold=0.3, min_size_pct=10.0)
+        cond = EventCondition(
+            type="object", label="person", threshold=0.3, min_size_pct=10.0
+        )
         det = ObjectDetector(cond)
 
-        r = det.evaluate({"detected_objects": [
-            {"label": "person", "confidence": 0.8, "size_pct": 5.0},
-        ]})
+        r = det.evaluate(
+            {
+                "detected_objects": [
+                    {"label": "person", "confidence": 0.8, "size_pct": 5.0},
+                ]
+            }
+        )
         assert not r.triggered  # too small
 
-        r = det.evaluate({"detected_objects": [
-            {"label": "person", "confidence": 0.8, "size_pct": 15.0},
-        ]})
+        r = det.evaluate(
+            {
+                "detected_objects": [
+                    {"label": "person", "confidence": 0.8, "size_pct": 15.0},
+                ]
+            }
+        )
         assert r.triggered
 
     def test_audio_level_detector(self):
@@ -186,7 +224,9 @@ class TestDetectors:
         assert det.evaluate({"has_speech": True}).triggered
 
     def test_pattern_detector(self):
-        cond = EventCondition(type="pattern", regex="ERROR|CRITICAL", count_threshold=2, window_s=10)
+        cond = EventCondition(
+            type="pattern", regex="ERROR|CRITICAL", count_threshold=2, window_s=10
+        )
         det = PatternDetector(cond)
 
         r = det.evaluate({"text": "INFO: all good"})
@@ -226,7 +266,15 @@ class TestDetectors:
         assert r.triggered  # no motion, negated = triggered
 
     def test_create_detector_factory(self):
-        for t in ["motion", "scene_change", "object", "audio_level", "speech", "pattern", "anomaly"]:
+        for t in [
+            "motion",
+            "scene_change",
+            "object",
+            "audio_level",
+            "speech",
+            "pattern",
+            "anomaly",
+        ]:
             cond = EventCondition(type=t, regex="test" if t == "pattern" else "")
             det = create_detector(cond)
             assert det is not None
@@ -244,11 +292,16 @@ class TestDetectors:
 # Scheduler tests
 # =============================================================================
 
+
 class TestScheduler:
     def test_periodic_mode(self):
-        cfg = TriggerConfig(triggers=[
-            TriggerRule(name="periodic", mode="periodic", interval_s=0.05, cooldown_s=0.01),
-        ])
+        cfg = TriggerConfig(
+            triggers=[
+                TriggerRule(
+                    name="periodic", mode="periodic", interval_s=0.05, cooldown_s=0.01
+                ),
+            ]
+        )
         sched = TriggerScheduler(cfg)
 
         # First eval: last_periodic=0, so elapsed is huge -> fires immediately
@@ -267,10 +320,15 @@ class TestScheduler:
         assert events[0].reason == "periodic"
 
     def test_on_event_mode(self):
-        cfg = TriggerConfig(triggers=[
-            TriggerRule(name="motion", mode="on_event",
-                        events=[EventCondition(type="motion", threshold=0.2)]),
-        ])
+        cfg = TriggerConfig(
+            triggers=[
+                TriggerRule(
+                    name="motion",
+                    mode="on_event",
+                    events=[EventCondition(type="motion", threshold=0.2)],
+                ),
+            ]
+        )
         sched = TriggerScheduler(cfg)
 
         events = sched.evaluate({"scene_score": 0.05}, "video")
@@ -281,12 +339,17 @@ class TestScheduler:
         assert events[0].reason == "event"
 
     def test_on_event_with_fallback(self):
-        cfg = TriggerConfig(triggers=[
-            TriggerRule(name="motion-fb", mode="on_event",
-                        events=[EventCondition(type="motion", threshold=0.9)],
-                        fallback=FallbackConfig(periodic_s=0.1),
-                        cooldown_s=0.01),
-        ])
+        cfg = TriggerConfig(
+            triggers=[
+                TriggerRule(
+                    name="motion-fb",
+                    mode="on_event",
+                    events=[EventCondition(type="motion", threshold=0.9)],
+                    fallback=FallbackConfig(periodic_s=0.1),
+                    cooldown_s=0.01,
+                ),
+            ]
+        )
         sched = TriggerScheduler(cfg)
 
         # First eval: last_triggered=0, so fallback fires immediately
@@ -304,11 +367,17 @@ class TestScheduler:
         assert events[0].reason == "fallback"
 
     def test_hybrid_mode(self):
-        cfg = TriggerConfig(triggers=[
-            TriggerRule(name="hybrid", mode="hybrid",
-                        events=[EventCondition(type="motion", threshold=0.3)],
-                        interval_s=0.1, cooldown_s=0.01),
-        ])
+        cfg = TriggerConfig(
+            triggers=[
+                TriggerRule(
+                    name="hybrid",
+                    mode="hybrid",
+                    events=[EventCondition(type="motion", threshold=0.3)],
+                    interval_s=0.1,
+                    cooldown_s=0.01,
+                ),
+            ]
+        )
         sched = TriggerScheduler(cfg)
 
         # Event triggers immediately
@@ -317,9 +386,13 @@ class TestScheduler:
         assert events[0].reason == "event"
 
     def test_source_filter(self):
-        cfg = TriggerConfig(triggers=[
-            TriggerRule(name="video-only", source="video", mode="periodic", interval_s=0.01),
-        ])
+        cfg = TriggerConfig(
+            triggers=[
+                TriggerRule(
+                    name="video-only", source="video", mode="periodic", interval_s=0.01
+                ),
+            ]
+        )
         sched = TriggerScheduler(cfg)
 
         events = sched.evaluate({}, "logs")
@@ -329,11 +402,16 @@ class TestScheduler:
         assert len(events) == 1  # correct source
 
     def test_cooldown(self):
-        cfg = TriggerConfig(triggers=[
-            TriggerRule(name="cd", mode="on_event",
-                        events=[EventCondition(type="motion", threshold=0.1)],
-                        cooldown_s=1.0),
-        ])
+        cfg = TriggerConfig(
+            triggers=[
+                TriggerRule(
+                    name="cd",
+                    mode="on_event",
+                    events=[EventCondition(type="motion", threshold=0.1)],
+                    cooldown_s=1.0,
+                ),
+            ]
+        )
         sched = TriggerScheduler(cfg)
 
         events = sched.evaluate({"scene_score": 0.5}, "video")
@@ -358,15 +436,22 @@ class TestScheduler:
 
     @pytest.mark.anyio
     async def test_evaluate_async_with_callback(self):
-        cfg = TriggerConfig(triggers=[
-            TriggerRule(name="cb-test", mode="on_event",
-                        events=[EventCondition(type="motion", threshold=0.1)]),
-        ])
+        cfg = TriggerConfig(
+            triggers=[
+                TriggerRule(
+                    name="cb-test",
+                    mode="on_event",
+                    events=[EventCondition(type="motion", threshold=0.1)],
+                ),
+            ]
+        )
         sched = TriggerScheduler(cfg)
 
         fired = []
+
         async def callback(event):
             fired.append(event)
+
         sched.on_trigger(callback)
 
         await sched.evaluate_async({"scene_score": 0.5}, "video")
@@ -384,13 +469,19 @@ triggers:
         assert sched.get_stats()["total_rules"] == 1
 
     def test_event_logic_all(self):
-        cfg = TriggerConfig(triggers=[
-            TriggerRule(name="all-logic", mode="on_event", event_logic="all",
-                        events=[
-                            EventCondition(type="motion", threshold=0.2),
-                            EventCondition(type="scene_change", threshold=0.3),
-                        ]),
-        ])
+        cfg = TriggerConfig(
+            triggers=[
+                TriggerRule(
+                    name="all-logic",
+                    mode="on_event",
+                    event_logic="all",
+                    events=[
+                        EventCondition(type="motion", threshold=0.2),
+                        EventCondition(type="scene_change", threshold=0.3),
+                    ],
+                ),
+            ]
+        )
         sched = TriggerScheduler(cfg)
 
         # Only motion met
@@ -406,12 +497,14 @@ triggers:
 # NLP2YAML tests
 # =============================================================================
 
+
 class TestNLP2YAML:
     def test_parse_person_detected(self):
         nlp = NLP2YAML()
         config = nlp._try_local_parse(
             "the object person will be detected for 1 second on the frame, if not send frame min. every 1 minute",
-            source="video", goal="describe people"
+            source="video",
+            goal="describe people",
         )
         assert config is not None
         assert len(config.triggers) == 1
@@ -467,21 +560,28 @@ class TestNLP2YAML:
     @pytest.mark.anyio
     async def test_generate_fallback(self):
         nlp = NLP2YAML()
-        config = await nlp.generate("something completely unparseable xyz123", goal="test")
+        config = await nlp.generate(
+            "something completely unparseable xyz123", goal="test"
+        )
         assert config is not None
         assert len(config.triggers) >= 1  # should fallback to default
 
     def test_extract_time_seconds(self):
-        assert NLP2YAML._extract_time("every 10 seconds", r'every\s+(\d+)\s*(s)') == 10.0
-        assert NLP2YAML._extract_time("every 2 minutes", r'every\s+(\d+)\s*(m)') == 120.0
-        assert NLP2YAML._extract_time("every 1 hour", r'every\s+(\d+)\s*(h)') == 3600.0
+        assert (
+            NLP2YAML._extract_time("every 10 seconds", r"every\s+(\d+)\s*(s)") == 10.0
+        )
+        assert (
+            NLP2YAML._extract_time("every 2 minutes", r"every\s+(\d+)\s*(m)") == 120.0
+        )
+        assert NLP2YAML._extract_time("every 1 hour", r"every\s+(\d+)\s*(h)") == 3600.0
 
     def test_the_exact_user_example(self):
         """Test the exact --when parameter from user's request."""
         nlp = NLP2YAML()
         desc = "the object person will be detected for 1 second on the frame, if not send frame min. every 1 minute"
-        config = nlp._try_local_parse(desc, source="video",
-                                       goal="describe what you see in each video frame")
+        config = nlp._try_local_parse(
+            desc, source="video", goal="describe what you see in each video frame"
+        )
         assert config is not None
         rule = config.triggers[0]
         # Must have object/person event

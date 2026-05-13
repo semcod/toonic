@@ -13,10 +13,8 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 import re
 import subprocess
-import textwrap
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -28,6 +26,7 @@ logger = logging.getLogger("toonic.autopilot.executor")
 @dataclass
 class ExecutionResult:
     """Result of executing an action."""
+
     action_type: str
     success: bool = False
     files_written: List[str] = field(default_factory=list)
@@ -40,8 +39,13 @@ class ExecutionResult:
 class ActionExecutor:
     """Executes LLM-generated actions on the project filesystem."""
 
-    def __init__(self, project_dir: str | Path, dry_run: bool = False,
-                 auto_test: bool = True, auto_commit: bool = False):
+    def __init__(
+        self,
+        project_dir: str | Path,
+        dry_run: bool = False,
+        auto_test: bool = True,
+        auto_commit: bool = False,
+    ):
         self.project_dir = Path(project_dir).resolve()
         self.dry_run = dry_run
         self.auto_test = auto_test
@@ -76,7 +80,9 @@ class ActionExecutor:
                 test_result = self._execute_tests()
                 result.test_output = test_result.test_output
                 if not test_result.success:
-                    logger.warning(f"Tests failed after code change: {test_result.test_output[:200]}")
+                    logger.warning(
+                        f"Tests failed after code change: {test_result.test_output[:200]}"
+                    )
 
             self._history.append(result)
             return result
@@ -180,22 +186,33 @@ class ActionExecutor:
     def _execute_tests(self) -> ExecutionResult:
         """Run project tests."""
         # Detect test runner
-        if (self.project_dir / "pyproject.toml").exists() or (self.project_dir / "tests").exists():
+        if (self.project_dir / "pyproject.toml").exists() or (
+            self.project_dir / "tests"
+        ).exists():
             cmd = ["python", "-m", "pytest", "tests/", "-v", "--tb=short", "-q"]
         elif (self.project_dir / "package.json").exists():
             cmd = ["npm", "test"]
         else:
-            return ExecutionResult(action_type="run_tests", success=True,
-                                   test_output="No test runner detected")
+            return ExecutionResult(
+                action_type="run_tests",
+                success=True,
+                test_output="No test runner detected",
+            )
 
         if self.dry_run:
-            return ExecutionResult(action_type="run_tests", success=True,
-                                   test_output="[DRY-RUN] Would run tests")
+            return ExecutionResult(
+                action_type="run_tests",
+                success=True,
+                test_output="[DRY-RUN] Would run tests",
+            )
 
         try:
             result = subprocess.run(
-                cmd, cwd=str(self.project_dir),
-                capture_output=True, text=True, timeout=120,
+                cmd,
+                cwd=str(self.project_dir),
+                capture_output=True,
+                text=True,
+                timeout=120,
             )
             output = result.stdout + result.stderr
             return ExecutionResult(
@@ -241,13 +258,18 @@ class ActionExecutor:
     def _extract_code(text: str) -> str:
         """Extract code from markdown code blocks or raw text."""
         # Try to find a code block
-        pattern = r'```(?:\w+)?\n(.*?)```'
+        pattern = r"```(?:\w+)?\n(.*?)```"
         matches = re.findall(pattern, text, re.DOTALL)
         if matches:
             return matches[0].strip()
         # If no code block, return stripped text if it looks like code
         lines = text.strip().split("\n")
-        if any(line.strip().startswith(("import ", "from ", "def ", "class ", "const ", "function ")) for line in lines[:5]):
+        if any(
+            line.strip().startswith(
+                ("import ", "from ", "def ", "class ", "const ", "function ")
+            )
+            for line in lines[:5]
+        ):
             return text.strip()
         return ""
 
@@ -257,7 +279,7 @@ class ActionExecutor:
         files = {}
         # Pattern: ```<optional lang> path/file.ext\n...code...\n```
         # or: ### file: path/file.ext\n```\n...code...\n```
-        pattern = r'(?:###?\s*(?:file:?\s*)?)?```(?:\w+\s+)?([a-zA-Z0-9_/.\-]+\.\w{1,5})\n(.*?)```'
+        pattern = r"(?:###?\s*(?:file:?\s*)?)?```(?:\w+\s+)?([a-zA-Z0-9_/.\-]+\.\w{1,5})\n(.*?)```"
         for match in re.finditer(pattern, text, re.DOTALL):
             fpath = match.group(1).strip()
             fcode = match.group(2).strip()

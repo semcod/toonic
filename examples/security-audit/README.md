@@ -48,9 +48,6 @@ python -m toonic.server \
   --when "when error occurs 3 times in 30 seconds, otherwise every 5 minutes"
 ```
 
-## Multi-Source Security Audit
-
-```bash
 # Audit code + check for exposed services + monitor logs
 python -m toonic.server \
   --source file:./src/ \
@@ -83,8 +80,6 @@ toonic> sql SELECT target_path, content FROM exchanges WHERE action_type='alert'
 toonic> sql SELECT action_type, COUNT(*) FROM exchanges GROUP BY action_type
 ```
 
-## Website Security Audit - obywatel.bielik.ai
-
 ### Quick Start (Python — 1 line)
 
 ```python
@@ -107,23 +102,12 @@ server = (
 )
 ```
 
-### CLI Commands
-
-```bash
 # One-shot security audit of the website (use HTTP if SSL issues)
 python -m toonic.server \
   --source "http://obywatel.bielik.ai/" \
   --goal "security audit: OWASP Top 10 vulnerabilities, security headers, TLS configuration, exposed endpoints, input validation" \
   --model google/gemini-3-flash-preview \
   --interval 0
-
-# With custom port (if 8901 is occupied)
-python -m toonic.server \
-  --source "http://obywatel.bielik.ai/" \
-  --goal "security audit: OWASP Top 10 vulnerabilities, security headers, TLS configuration, exposed endpoints, input validation" \
-  --model google/gemini-3-flash-preview \
-  --interval 0 \
-  --port 8902
 
 # Alternative: SSL/TLS focused analysis
 python -m toonic.server \

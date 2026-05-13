@@ -1,5 +1,3 @@
-# Architektura Toonic Server
-
 ## Diagram przepływu danych
 
 ```
@@ -47,8 +45,6 @@
 │  REST + WebSocket (FastAPI)  │  CLI Shell  │  Web UI              │
 └───────────────────────────────────────────────────────────────────┘
 ```
-
-## Komponenty
 
 ### Source Watchers
 Każdy watcher to niezależny async task, który emituje `ContextChunk`:

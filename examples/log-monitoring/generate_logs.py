@@ -70,10 +70,12 @@ MESSAGES = {
 def _fill(template: str) -> str:
     """Fill template placeholders with random values."""
     return (
-        template
-        .replace("{uid}", str(random.randint(1000, 9999)))
+        template.replace("{uid}", str(random.randint(1000, 9999)))
         .replace("{ms}", str(random.randint(5, 5000)))
-        .replace("{ip}", f"{random.randint(10,200)}.{random.randint(0,255)}.{random.randint(0,255)}.{random.randint(1,254)}")
+        .replace(
+            "{ip}",
+            f"{random.randint(10, 200)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(1, 254)}",
+        )
         .replace("{n}", str(random.randint(1, 200)))
         .replace("{h}", str(random.randint(1, 720)))
         .replace("{pct}", str(random.randint(10, 99)))
@@ -91,7 +93,13 @@ def generate_line(level: str) -> str:
 
 def run_normal(out, count: int = 50, delay: float = 0.2):
     """Normal mode: mostly INFO."""
-    weights = {"DEBUG": 0.15, "INFO": 0.60, "WARNING": 0.20, "ERROR": 0.04, "CRITICAL": 0.01}
+    weights = {
+        "DEBUG": 0.15,
+        "INFO": 0.60,
+        "WARNING": 0.20,
+        "ERROR": 0.04,
+        "CRITICAL": 0.01,
+    }
     levels = list(weights.keys())
     probs = list(weights.values())
     for _ in range(count):
@@ -152,9 +160,19 @@ def run_mixed(out, duration: float = 120.0, delay: float = 0.3):
 
 def main():
     parser = argparse.ArgumentParser(description="Generate test log data for Toonic")
-    parser.add_argument("--output", "-o", default="", help="Output file (default: stdout)")
-    parser.add_argument("--mode", "-m", default="mixed", choices=["normal", "error-spike", "mixed"])
-    parser.add_argument("--duration", "-d", type=float, default=120.0, help="Duration in seconds (mixed mode)")
+    parser.add_argument(
+        "--output", "-o", default="", help="Output file (default: stdout)"
+    )
+    parser.add_argument(
+        "--mode", "-m", default="mixed", choices=["normal", "error-spike", "mixed"]
+    )
+    parser.add_argument(
+        "--duration",
+        "-d",
+        type=float,
+        default=120.0,
+        help="Duration in seconds (mixed mode)",
+    )
     args = parser.parse_args()
 
     if args.output:

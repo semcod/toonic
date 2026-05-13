@@ -83,13 +83,8 @@ producing far more actionable intelligence.
 
 ---
 
-## Installation
-
-```bash
 # Recommended: full CCTV stack
 pip install toonic[cctv]
-
-# This installs: opencv-python, ultralytics, fastapi, uvicorn, litellm, etc.
 
 # Minimal: detection only (no web UI)
 pip install toonic[detection,llm]
@@ -98,9 +93,6 @@ pip install toonic[detection,llm]
 python -c "from ultralytics import YOLO; YOLO('yolov8n.pt').export(format='ncnn')"
 ```
 
-### Environment Variables
-
-```bash
 # Required: LLM API key
 export OPENROUTER_API_KEY="sk-or-..."
 # Or:
@@ -114,8 +106,6 @@ export TOONIC_DATA_DIR="./toonic_data"
 ```
 
 ---
-
-## Command Reference
 
 ### Basic pattern
 
@@ -139,8 +129,6 @@ python -m toonic.server \
 | `--no-web` | Disable web UI | — |
 
 ---
-
-## Implementation Guide
 
 ### Step 1: Basic person detection
 
@@ -240,8 +228,6 @@ sources:
 
 ---
 
-## Configuration Reference
-
 ### StreamWatcher Options
 
 | Option | Type | Default | Description |
@@ -310,8 +296,6 @@ CCTV-specific instructions when the goal contains video/monitoring keywords.
 
 ---
 
-## Trigger Design Patterns
-
 ### Pattern 1: Person detection with fallback
 
 ```
@@ -333,9 +317,6 @@ CCTV-specific instructions when the goal contains video/monitoring keywords.
 ```
 → 3s duration = requires ~2-3 consistent frames = very low false positive rate
 
-### YAML trigger (advanced)
-
-```yaml
 # triggers.yaml
 triggers:
   - name: intrusion-detection
@@ -368,8 +349,6 @@ triggers:
 ```
 
 ---
-
-## Optimization
 
 ### For Raspberry Pi / Edge
 
@@ -413,18 +392,10 @@ options:
 
 ---
 
-## Troubleshooting
-
 ### "ultralytics not installed — basic mode"
 
 ```bash
 pip install ultralytics>=8.0
-# Or: pip install toonic[detection]
-```
-
-### YOLO model download fails
-
-```bash
 # Pre-download model
 python -c "from ultralytics import YOLO; YOLO('yolov8n.pt')"
 ```

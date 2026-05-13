@@ -8,7 +8,7 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-from toonic.server.config import ModelConfig, ServerConfig, SourceConfig
+from toonic.server.config import ServerConfig, SourceConfig
 from toonic.server.quick.parsing import parse_source
 
 logger = logging.getLogger("toonic.quick.builder")
@@ -56,75 +56,93 @@ class ConfigBuilder:
 
     def code(self, path: str, **opts) -> "ConfigBuilder":
         """Add code source."""
-        return self.add(SourceConfig(
-            path_or_url=path,
-            category="code",
-            options={k: str(v) for k, v in opts.items()}
-        ))
+        return self.add(
+            SourceConfig(
+                path_or_url=path,
+                category="code",
+                options={k: str(v) for k, v in opts.items()},
+            )
+        )
 
     def logs(self, path: str, **opts) -> "ConfigBuilder":
         """Add log source."""
-        return self.add(SourceConfig(
-            path_or_url=path,
-            category="logs",
-            options={k: str(v) for k, v in opts.items()}
-        ))
+        return self.add(
+            SourceConfig(
+                path_or_url=path,
+                category="logs",
+                options={k: str(v) for k, v in opts.items()},
+            )
+        )
 
     def video(self, url: str, **opts) -> "ConfigBuilder":
         """Add video/RTSP source."""
-        return self.add(SourceConfig(
-            path_or_url=url,
-            category="video",
-            options={k: str(v) for k, v in opts.items()}
-        ))
+        return self.add(
+            SourceConfig(
+                path_or_url=url,
+                category="video",
+                options={k: str(v) for k, v in opts.items()},
+            )
+        )
 
     def docker(self, filter: str = "*", **opts) -> "ConfigBuilder":
         """Add Docker container monitoring."""
-        return self.add(SourceConfig(
-            path_or_url=f"docker:{filter}",
-            category="container",
-            options={k: str(v) for k, v in opts.items()}
-        ))
+        return self.add(
+            SourceConfig(
+                path_or_url=f"docker:{filter}",
+                category="container",
+                options={k: str(v) for k, v in opts.items()},
+            )
+        )
 
     def database(self, dsn: str, **opts) -> "ConfigBuilder":
         """Add database monitoring."""
-        return self.add(SourceConfig(
-            path_or_url=dsn,
-            category="database",
-            options={k: str(v) for k, v in opts.items()}
-        ))
+        return self.add(
+            SourceConfig(
+                path_or_url=dsn,
+                category="database",
+                options={k: str(v) for k, v in opts.items()},
+            )
+        )
 
     def network(self, targets: str, **opts) -> "ConfigBuilder":
         """Add network monitoring (comma-separated hosts)."""
-        return self.add(SourceConfig(
-            path_or_url=f"net:{targets}",
-            category="network",
-            options={k: str(v) for k, v in opts.items()}
-        ))
+        return self.add(
+            SourceConfig(
+                path_or_url=f"net:{targets}",
+                category="network",
+                options={k: str(v) for k, v in opts.items()},
+            )
+        )
 
     def process(self, target: str, **opts) -> "ConfigBuilder":
         """Add process/port/service monitoring."""
-        return self.add(SourceConfig(
-            path_or_url=target,
-            category="process",
-            options={k: str(v) for k, v in opts.items()}
-        ))
+        return self.add(
+            SourceConfig(
+                path_or_url=target,
+                category="process",
+                options={k: str(v) for k, v in opts.items()},
+            )
+        )
 
     def http(self, url: str, **opts) -> "ConfigBuilder":
         """Add HTTP API endpoint monitoring."""
-        return self.add(SourceConfig(
-            path_or_url=url,
-            category="api",
-            options={k: str(v) for k, v in opts.items()}
-        ))
+        return self.add(
+            SourceConfig(
+                path_or_url=url,
+                category="api",
+                options={k: str(v) for k, v in opts.items()},
+            )
+        )
 
     def directory(self, path: str, **opts) -> "ConfigBuilder":
         """Add directory structure monitoring."""
-        return self.add(SourceConfig(
-            path_or_url=f"dir:{path}",
-            category="infra",
-            options={k: str(v) for k, v in opts.items()}
-        ))
+        return self.add(
+            SourceConfig(
+                path_or_url=f"dir:{path}",
+                category="infra",
+                options={k: str(v) for k, v in opts.items()},
+            )
+        )
 
     # ── Config methods ──
 
@@ -153,7 +171,9 @@ class ConfigBuilder:
         self._host = host
         return self
 
-    def tokens(self, max_tokens: int, allocation: Optional[Dict[str, float]] = None) -> "ConfigBuilder":
+    def tokens(
+        self, max_tokens: int, allocation: Optional[Dict[str, float]] = None
+    ) -> "ConfigBuilder":
         """Set token budget and optional per-category allocation."""
         self._max_tokens = max_tokens
         if allocation:
@@ -208,7 +228,7 @@ class ConfigBuilder:
     def build(self):
         """Build ToonicServer instance."""
         from toonic.server.main import ToonicServer
-        from toonic.server.triggers.dsl import TriggerConfig, load_triggers
+        from toonic.server.triggers.dsl import load_triggers
 
         cfg = self.build_config()
 

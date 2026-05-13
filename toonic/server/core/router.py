@@ -7,7 +7,6 @@ Keeps backward-compatible LLMRequest/query() interface.
 
 from __future__ import annotations
 
-import asyncio
 import json
 import logging
 import os
@@ -19,7 +18,6 @@ from toonic.server.config import ModelConfig, ServerConfig
 from toonic.server.models import ActionResponse, ContextChunk, SourceCategory
 from toonic.server.core.history import ConversationHistory, ExchangeRecord
 from toonic.server.llm.caller import LLMCaller
-from toonic.server.llm.parser import ResponseParser
 from toonic.server.llm.pipeline import LLMPipeline
 
 logger = logging.getLogger("toonic.router")
@@ -28,10 +26,11 @@ logger = logging.getLogger("toonic.router")
 @dataclass
 class LLMRequest:
     """Request to send to an LLM."""
+
     context: str
     goal: str
     category: str = "text"
-    images: List[str] = None       # base64 images
+    images: List[str] = None  # base64 images
     model_override: str = ""
     source_chunks: List[ContextChunk] = None
 
@@ -48,7 +47,9 @@ class LLMRouter:
     REFACTORED: delegates to LLMPipeline for prompt + call + parse.
     """
 
-    def __init__(self, config: ServerConfig, history: Optional['ConversationHistory'] = None):
+    def __init__(
+        self, config: ServerConfig, history: Optional["ConversationHistory"] = None
+    ):
         self.config = config
         self.history = history
         self._clients: Dict[str, Any] = {}
@@ -58,8 +59,9 @@ class LLMRouter:
         # Build pipeline from config
         self.pipeline = LLMPipeline(
             caller=LLMCaller(
-                api_key=os.environ.get("LLM_API_KEY",
-                         os.environ.get("OPENROUTER_API_KEY", "")),
+                api_key=os.environ.get(
+                    "LLM_API_KEY", os.environ.get("OPENROUTER_API_KEY", "")
+                ),
                 provider=os.environ.get("LLM_PROVIDER", "openrouter"),
                 model_map={
                     "code": config.models.get("code", ModelConfig()).model,
@@ -82,11 +84,13 @@ class LLMRouter:
         # Build chunks from legacy context string if no source_chunks
         chunks = request.source_chunks or []
         if not chunks and request.context:
-            chunks = [ContextChunk(
-                source_id="legacy",
-                category=SourceCategory.CODE,
-                toon_spec=request.context,
-            )]
+            chunks = [
+                ContextChunk(
+                    source_id="legacy",
+                    category=SourceCategory.CODE,
+                    toon_spec=request.context,
+                )
+            ]
 
         # Override model in caller if requested
         if request.model_override:
@@ -121,7 +125,9 @@ class LLMRouter:
                 duration_s=time.time() - start,
             )
             model_cfg = self._get_model_for_category(request.category)
-            self._record_exchange(request, action, model_cfg, time.time() - start, "error", str(e))
+            self._record_exchange(
+                request, action, model_cfg, time.time() - start, "error", str(e)
+            )
             return action
 
         finally:
@@ -133,39 +139,55 @@ class LLMRouter:
     def _get_model_for_category(self, category: str) -> ModelConfig:
         """Select model based on content category."""
         mapping = {
-            "code": "code", "config": "code", "database": "code",
-            "api": "code", "infra": "code",
-            "logs": "text", "document": "text", "data": "text",
-            "video": "multimodal", "audio": "multimodal",
+            "code": "code",
+            "config": "code",
+            "database": "code",
+            "api": "code",
+            "infra": "code",
+            "logs": "text",
+            "document": "text",
+            "data": "text",
+            "video": "multimodal",
+            "audio": "multimodal",
         }
         model_key = mapping.get(category, "text")
-        return self.config.models.get(model_key, self.config.models.get("text", ModelConfig()))
+        return self.config.models.get(
+            model_key, self.config.models.get("text", ModelConfig())
+        )
 
-    def _record_exchange(self, request: LLMRequest, action: ActionResponse,
-                          model_cfg: ModelConfig, duration: float,
-                          status: str = "ok", error: str = "") -> None:
+    def _record_exchange(
+        self,
+        request: LLMRequest,
+        action: ActionResponse,
+        model_cfg: ModelConfig,
+        duration: float,
+        status: str = "ok",
+        error: str = "",
+    ) -> None:
         """Log exchange to ConversationHistory."""
         if not self.history:
             return
         try:
-            self.history.record(ExchangeRecord(
-                goal=request.goal,
-                category=request.category,
-                model=model_cfg.model,
-                context_tokens=len(request.context.split()) * 4 // 3,
-                context_preview=request.context[:2000],
-                sources=json.dumps([]),
-                images_count=len(request.images) if request.images else 0,
-                action_type=action.action_type,
-                content=action.content[:5000],
-                confidence=action.confidence,
-                target_path=action.target_path,
-                affected_files=json.dumps(action.affected_files),
-                tokens_used=action.tokens_used,
-                duration_s=duration,
-                status=status,
-                error_message=error,
-            ))
+            self.history.record(
+                ExchangeRecord(
+                    goal=request.goal,
+                    category=request.category,
+                    model=model_cfg.model,
+                    context_tokens=len(request.context.split()) * 4 // 3,
+                    context_preview=request.context[:2000],
+                    sources=json.dumps([]),
+                    images_count=len(request.images) if request.images else 0,
+                    action_type=action.action_type,
+                    content=action.content[:5000],
+                    confidence=action.confidence,
+                    target_path=action.target_path,
+                    affected_files=json.dumps(action.affected_files),
+                    tokens_used=action.tokens_used,
+                    duration_s=duration,
+                    status=status,
+                    error_message=error,
+                )
+            )
         except Exception as e:
             logger.warning(f"Failed to record exchange: {e}")
 

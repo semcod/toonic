@@ -5,7 +5,6 @@ Video handlers — Video files and RTSP streams
 from __future__ import annotations
 
 import base64
-import hashlib
 import json
 import threading
 import time
@@ -22,9 +21,11 @@ from toonic.core.registry import FormatRegistry
 # Modele logiki video
 # =============================================================================
 
+
 @dataclass
 class KeyframeSpec:
     """Pojedynczy keyframe z video."""
+
     timestamp_s: float
     camera_id: int = 0
     scene_change_score: float = 0.0
@@ -38,6 +39,7 @@ class KeyframeSpec:
 @dataclass
 class VideoSegment:
     """Segment video — zgrupowane keyframes + audio."""
+
     index: int
     start_s: float
     end_s: float
@@ -50,6 +52,7 @@ class VideoSegment:
 @dataclass
 class VideoLogic:
     """Logika video — implementuje FileLogic Protocol."""
+
     source_file: str
     source_hash: str
     file_category: str = "video"
@@ -87,6 +90,7 @@ class VideoLogic:
 # =============================================================================
 # Multi-cam RTSP capture buffer
 # =============================================================================
+
 
 class LowQRTSPExtractor:
     """Pure OpenCV RTSP → low-quality keyframe buffer."""
@@ -131,20 +135,22 @@ class LowQRTSPExtractor:
 
     def _capture_thread(self, cap: Any, buffer: deque, idx: int) -> None:
         import cv2
+
         while self.running and cap.isOpened():
             ret, frame = cap.read()
             if ret:
                 frame = cv2.resize(frame, self.frame_size)
                 _, buf = cv2.imencode(
-                    '.jpg', frame,
-                    [cv2.IMWRITE_JPEG_QUALITY, self.quality]
+                    ".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, self.quality]
                 )
-                buffer.append({
-                    'b64': base64.b64encode(buf).decode(),
-                    'ts': time.time(),
-                    'cam': idx,
-                    'size': len(buf),
-                })
+                buffer.append(
+                    {
+                        "b64": base64.b64encode(buf).decode(),
+                        "ts": time.time(),
+                        "cam": idx,
+                        "size": len(buf),
+                    }
+                )
             time.sleep(0.033)
 
     def get_sync_frame(self) -> List[Optional[Dict]]:
@@ -158,6 +164,7 @@ class LowQRTSPExtractor:
 # Scene change detection (Pure OpenCV)
 # =============================================================================
 
+
 class SceneDetector:
     """Detekcja zmian scen — pixel diff bez AI."""
 
@@ -169,10 +176,7 @@ class SceneDetector:
         import cv2
         import numpy as np
 
-        frame = cv2.imdecode(
-            np.frombuffer(frame_bytes, np.uint8),
-            cv2.IMREAD_GRAYSCALE
-        )
+        frame = cv2.imdecode(np.frombuffer(frame_bytes, np.uint8), cv2.IMREAD_GRAYSCALE)
 
         if self.prev_frame is None:
             self.prev_frame = frame
@@ -187,7 +191,9 @@ class SceneDetector:
 
         return is_change, round(change_ratio, 3)
 
-    def detect_from_file(self, video_path: str, sample_every_s: float = 1.0) -> List[KeyframeSpec]:
+    def detect_from_file(
+        self, video_path: str, sample_every_s: float = 1.0
+    ) -> List[KeyframeSpec]:
         import cv2
 
         cap = cv2.VideoCapture(video_path)
@@ -204,16 +210,18 @@ class SceneDetector:
 
             if frame_idx % sample_interval == 0:
                 small = cv2.resize(frame, (160, 120))
-                _, buf = cv2.imencode('.jpg', small, [cv2.IMWRITE_JPEG_QUALITY, 10])
+                _, buf = cv2.imencode(".jpg", small, [cv2.IMWRITE_JPEG_QUALITY, 10])
 
                 is_change, score = self.is_scene_change(buf.tobytes())
                 if is_change:
-                    keyframes.append(KeyframeSpec(
-                        timestamp_s=round(frame_idx / fps, 2),
-                        scene_change_score=score,
-                        b64_data=base64.b64encode(buf).decode(),
-                        size_bytes=len(buf),
-                    ))
+                    keyframes.append(
+                        KeyframeSpec(
+                            timestamp_s=round(frame_idx / fps, 2),
+                            scene_change_score=score,
+                            b64_data=base64.b64encode(buf).decode(),
+                            size_bytes=len(buf),
+                        )
+                    )
 
             frame_idx += 1
 
@@ -225,12 +233,13 @@ class SceneDetector:
 # Video File Handler
 # =============================================================================
 
+
 class VideoFileHandler(BaseHandlerMixin):
     """Handler dla plików video (.mp4, .avi, .mkv, .mov, .webm)."""
 
-    extensions = frozenset({'.mp4', '.avi', '.mkv', '.mov', '.webm'})
-    category = 'video'
-    requires = ('cv2',)
+    extensions = frozenset({".mp4", ".avi", ".mkv", ".mov", ".webm"})
+    category = "video"
+    requires = ("cv2",)
 
     def parse(self, path: Path) -> VideoLogic:
         import cv2
@@ -253,13 +262,15 @@ class VideoFileHandler(BaseHandlerMixin):
             end = min(start + seg_duration, duration)
             seg_kf = [kf for kf in keyframes if start <= kf.timestamp_s < end]
             if seg_kf:
-                segments.append(VideoSegment(
-                    index=seg_idx,
-                    start_s=start,
-                    end_s=end,
-                    keyframes=seg_kf,
-                    scene_changes=len(seg_kf),
-                ))
+                segments.append(
+                    VideoSegment(
+                        index=seg_idx,
+                        start_s=start,
+                        end_s=end,
+                        keyframes=seg_kf,
+                        scene_changes=len(seg_kf),
+                    )
+                )
 
         return VideoLogic(
             source_file=path.name,
@@ -272,8 +283,8 @@ class VideoFileHandler(BaseHandlerMixin):
             segments=segments,
         )
 
-    def to_spec(self, logic: VideoLogic, fmt: str = 'toon') -> str:
-        if fmt == 'toon':
+    def to_spec(self, logic: VideoLogic, fmt: str = "toon") -> str:
+        if fmt == "toon":
             return self._to_toon(logic)
         return json.dumps(logic.to_dict(), indent=2, ensure_ascii=False)
 
@@ -284,11 +295,11 @@ class VideoFileHandler(BaseHandlerMixin):
             f"{v.total_keyframes} keyframes"
         ]
 
-        total_size = sum(
-            kf.size_bytes for seg in v.segments for kf in seg.keyframes
+        total_size = sum(kf.size_bytes for seg in v.segments for kf in seg.keyframes)
+        lines.append(
+            f"# lowq: {v.lowq_resolution[0]}x{v.lowq_resolution[1]} "
+            f"Q={v.lowq_quality} | total:{total_size / 1024:.1f}kB"
         )
-        lines.append(f"# lowq: {v.lowq_resolution[0]}x{v.lowq_resolution[1]} "
-                     f"Q={v.lowq_quality} | total:{total_size/1024:.1f}kB")
 
         lines.append(f"S[{len(v.segments)}]:")
         for seg in v.segments:
@@ -307,14 +318,18 @@ class VideoFileHandler(BaseHandlerMixin):
                         f"data:image/jpeg;base64,{kf.b64_data[:60]}..."
                     )
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
-    def reproduce(self, logic: VideoLogic, client: Any = None, target_fmt: str | None = None) -> str:
+    def reproduce(
+        self, logic: VideoLogic, client: Any = None, target_fmt: str | None = None
+    ) -> str:
         lines = [f"# Video timeline: {logic.source_file}"]
         for seg in logic.segments:
-            lines.append(f"[{seg.start_s:.0f}s-{seg.end_s:.0f}s] "
-                        f"{seg.scene_changes} scene changes")
-        return '\n'.join(lines)
+            lines.append(
+                f"[{seg.start_s:.0f}s-{seg.end_s:.0f}s] "
+                f"{seg.scene_changes} scene changes"
+            )
+        return "\n".join(lines)
 
     def sniff(self, path: Path, content: str) -> float:
         return 0.8 if path.suffix.lower() in self.extensions else 0.0
@@ -323,6 +338,7 @@ class VideoFileHandler(BaseHandlerMixin):
 # =============================================================================
 # Rejestracja
 # =============================================================================
+
 
 def register_video_handlers() -> None:
     """Rejestruje handlery video w FormatRegistry."""

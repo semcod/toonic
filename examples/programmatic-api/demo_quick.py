@@ -122,7 +122,9 @@ def demo_options():
     server = (
         watch()
         .add("log:./app.log", poll_interval=2, max_lines=1000)
-        .add("rtsp://cam:554/stream", detect_objects="true", detect_classes="person,car")
+        .add(
+            "rtsp://cam:554/stream", detect_objects="true", detect_classes="person,car"
+        )
         .video("rtsp://cam2:554/stream", detect_model="yolov8n.pt", min_event_frames=3)
         .docker("*", track_logs="true", log_tail=20)
         .database("db:./app.db", track_schema="true", track_row_counts="true")
@@ -146,7 +148,7 @@ def main():
     print("All demos completed!")
     print("=" * 60)
     print("\nTo actually run a server:")
-    print('  from toonic.server.quick import run')
+    print("  from toonic.server.quick import run")
     print('  run("./src/", "log:./app.log", goal="find bugs")')
 
 

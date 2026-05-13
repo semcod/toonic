@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Any, AsyncIterator, Dict, List, Optional, Type
+from typing import AsyncIterator, List, Optional, Type
 
 from toonic.server.models import ContextChunk, SourceCategory
 
@@ -82,7 +82,9 @@ class WatcherRegistry:
         return best_cls if best_score > 0.0 else None
 
     @classmethod
-    def create(cls, source_id: str, category: str, path_or_url: str, **options) -> Optional[BaseWatcher]:
+    def create(
+        cls, source_id: str, category: str, path_or_url: str, **options
+    ) -> Optional[BaseWatcher]:
         """Create appropriate watcher for the source."""
         watcher_cls = cls.resolve(path_or_url)
         if watcher_cls:

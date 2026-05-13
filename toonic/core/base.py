@@ -23,16 +23,15 @@ class BaseHandlerMixin:
 
     def _read_content(self, path: Path, limit: int = 4096) -> str:
         """Czyta początek pliku do content sniffing."""
-        return path.read_text(errors='replace')[:limit]
+        return path.read_text(errors="replace")[:limit]
 
     def _format_toon_header(
-        self,
-        source_file: str,
-        file_type: str,
-        **kwargs: Any
+        self, source_file: str, file_type: str, **kwargs: Any
     ) -> str:
         """Generuje nagłówek TOON: # filename | type | metryki."""
         parts = [f"# {source_file}", file_type]
         for key, value in kwargs.items():
-            parts.append(f"{key}:{value}" if isinstance(value, (int, float)) else str(value))
+            parts.append(
+                f"{key}:{value}" if isinstance(value, (int, float)) else str(value)
+            )
         return " | ".join(parts)

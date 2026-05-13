@@ -5,13 +5,10 @@ Audio handlers — VAD speech detection, telephony filter, μ-law compression
 from __future__ import annotations
 
 import base64
-import hashlib
 import json
-import struct
-import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 from toonic.core.base import BaseHandlerMixin
 from toonic.core.registry import FormatRegistry
@@ -21,9 +18,11 @@ from toonic.core.registry import FormatRegistry
 # Modele logiki audio
 # =============================================================================
 
+
 @dataclass
 class SpeechSegment:
     """Pojedynczy segment wykrytej mowy."""
+
     start_s: float
     end_s: float
     duration_s: float
@@ -38,6 +37,7 @@ class SpeechSegment:
 @dataclass
 class AudioLogic:
     """Logika audio — implementuje FileLogic Protocol."""
+
     source_file: str
     source_hash: str
     file_category: str = "audio"
@@ -77,6 +77,7 @@ class AudioLogic:
 # μ-law kompresja (G.711)
 # =============================================================================
 
+
 class MuLawCodec:
     """μ-law kompresja/dekompresja — standard G.711 telephony."""
 
@@ -85,18 +86,22 @@ class MuLawCodec:
     @staticmethod
     def compress(pcm_16bit: bytes) -> bytes:
         import numpy as np
+
         samples = np.frombuffer(pcm_16bit, dtype=np.int16).astype(np.float64)
         MAX = 32767.0
         normalized = np.clip(samples / MAX, -1.0, 1.0)
         sign = np.sign(normalized)
         magnitude = np.abs(normalized)
-        compressed = sign * np.log(1 + MuLawCodec.MU * magnitude) / np.log(1 + MuLawCodec.MU)
+        compressed = (
+            sign * np.log(1 + MuLawCodec.MU * magnitude) / np.log(1 + MuLawCodec.MU)
+        )
         quantized = ((compressed + 1.0) * 127.5).astype(np.uint8)
         return quantized.tobytes()
 
     @staticmethod
     def decompress(ulaw_8bit: bytes) -> bytes:
         import numpy as np
+
         samples = np.frombuffer(ulaw_8bit, dtype=np.uint8).astype(np.float64)
         normalized = (samples / 127.5) - 1.0
         sign = np.sign(normalized)
@@ -109,6 +114,7 @@ class MuLawCodec:
 # =============================================================================
 # Telephony band lowpass filter
 # =============================================================================
+
 
 class TelephonyFilter:
     """Filtr dolnoprzepustowy 3kHz — pasmo telefoniczne ITU-T G.711."""
@@ -127,7 +133,7 @@ class TelephonyFilter:
         h *= np.hanning(filter_order)
         h /= np.sum(h)
 
-        filtered = np.convolve(samples, h, mode='same')
+        filtered = np.convolve(samples, h, mode="same")
 
         downsampled = filtered[::2].astype(np.int16)
 
@@ -137,6 +143,7 @@ class TelephonyFilter:
 # =============================================================================
 # VAD Speech Detector
 # =============================================================================
+
 
 class SpeechDetector:
     """Voice Activity Detection z WebRTC VAD."""
@@ -151,6 +158,7 @@ class SpeechDetector:
     def _get_vad(self):
         if self._vad is None:
             import webrtcvad
+
             self._vad = webrtcvad.Vad(self.aggressiveness)
         return self._vad
 
@@ -167,7 +175,7 @@ class SpeechDetector:
         is_speech_frames = []
         for i in range(total_frames):
             offset = i * frame_bytes
-            frame = pcm_16bit[offset:offset + frame_bytes]
+            frame = pcm_16bit[offset : offset + frame_bytes]
             if len(frame) < frame_bytes:
                 break
             is_speech_frames.append(vad.is_speech(frame, self.sample_rate))
@@ -206,19 +214,20 @@ class SpeechDetector:
 # Audio File Handler
 # =============================================================================
 
+
 class AudioFileHandler(BaseHandlerMixin):
     """Handler dla plików audio (.wav, .mp3, .flac, .ogg)."""
 
-    extensions = frozenset({'.wav', '.mp3', '.flac', '.ogg', '.m4a'})
-    category = 'audio'
-    requires = ('numpy',)
+    extensions = frozenset({".wav", ".mp3", ".flac", ".ogg", ".m4a"})
+    category = "audio"
+    requires = ("numpy",)
 
     def parse(self, path: Path) -> AudioLogic:
         import wave
         import numpy as np
 
-        if path.suffix == '.wav':
-            with wave.open(str(path), 'rb') as wav:
+        if path.suffix == ".wav":
+            with wave.open(str(path), "rb") as wav:
                 sr = wav.getframerate()
                 channels = wav.getnchannels()
                 bitdepth = wav.getsampwidth() * 8
@@ -257,23 +266,30 @@ class AudioFileHandler(BaseHandlerMixin):
                 else:
                     telephony = seg_pcm
 
-                ulaw = MuLawCodec.compress(telephony) if len(telephony) > 0 else b''
+                ulaw = MuLawCodec.compress(telephony) if len(telephony) > 0 else b""
 
-                speech_segs.append(SpeechSegment(
-                    start_s=round(start, 2),
-                    end_s=round(end, 2),
-                    duration_s=round(dur, 2),
-                    sample_rate=8000,
-                    encoding='ulaw',
-                    b64_data=base64.b64encode(ulaw).decode(),
-                    size_bytes=len(ulaw),
-                ))
+                speech_segs.append(
+                    SpeechSegment(
+                        start_s=round(start, 2),
+                        end_s=round(end, 2),
+                        duration_s=round(dur, 2),
+                        sample_rate=8000,
+                        encoding="ulaw",
+                        b64_data=base64.b64encode(ulaw).decode(),
+                        size_bytes=len(ulaw),
+                    )
+                )
 
         except ImportError:
-            speech_segs.append(SpeechSegment(
-                start_s=0, end_s=duration, duration_s=duration,
-                sample_rate=sr, encoding='pcm16',
-            ))
+            speech_segs.append(
+                SpeechSegment(
+                    start_s=0,
+                    end_s=duration,
+                    duration_s=duration,
+                    sample_rate=sr,
+                    encoding="pcm16",
+                )
+            )
             total_speech = duration
 
         return AudioLogic(
@@ -288,8 +304,8 @@ class AudioFileHandler(BaseHandlerMixin):
             speech_ratio=round(total_speech / max(duration, 0.01), 2),
         )
 
-    def to_spec(self, logic: AudioLogic, fmt: str = 'toon') -> str:
-        if fmt == 'toon':
+    def to_spec(self, logic: AudioLogic, fmt: str = "toon") -> str:
+        if fmt == "toon":
             return self._to_toon(logic)
         return json.dumps(logic.to_dict(), indent=2, ensure_ascii=False)
 
@@ -302,8 +318,8 @@ class AudioFileHandler(BaseHandlerMixin):
 
         total_size = sum(s.size_bytes for s in a.speech_segments)
         lines.append(
-            f"# VAD:{a.vad_aggressiveness} | {a.telephony_band_hz/1000:.0f}kHz "
-            f"u-law {a.output_sample_rate}Hz | total:{total_size/1024:.1f}kB"
+            f"# VAD:{a.vad_aggressiveness} | {a.telephony_band_hz / 1000:.0f}kHz "
+            f"u-law {a.output_sample_rate}Hz | total:{total_size / 1024:.1f}kB"
         )
 
         if a.speech_segments:
@@ -312,16 +328,20 @@ class AudioFileHandler(BaseHandlerMixin):
                 lines.append(
                     f"  A{i}[{seg.start_s:.1f}-{seg.end_s:.1f}s]: "
                     f"{seg.duration_s:.1f}s {seg.encoding} | "
-                    f"{seg.size_bytes/1024:.1f}kB"
+                    f"{seg.size_bytes / 1024:.1f}kB"
                 )
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
-    def reproduce(self, logic: AudioLogic, client: Any = None, target_fmt: str | None = None) -> str:
+    def reproduce(
+        self, logic: AudioLogic, client: Any = None, target_fmt: str | None = None
+    ) -> str:
         lines = [f"# Audio timeline: {logic.source_file}"]
         for seg in logic.speech_segments:
-            lines.append(f"[{seg.start_s:.1f}s-{seg.end_s:.1f}s] speech ({seg.encoding})")
-        return '\n'.join(lines)
+            lines.append(
+                f"[{seg.start_s:.1f}s-{seg.end_s:.1f}s] speech ({seg.encoding})"
+            )
+        return "\n".join(lines)
 
     def sniff(self, path: Path, content: str) -> float:
         return 0.8 if path.suffix.lower() in self.extensions else 0.0
@@ -330,6 +350,7 @@ class AudioFileHandler(BaseHandlerMixin):
 # =============================================================================
 # Rejestracja
 # =============================================================================
+
 
 def register_audio_handlers() -> None:
     FormatRegistry.register(AudioFileHandler())

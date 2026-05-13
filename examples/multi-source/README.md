@@ -87,21 +87,9 @@ python -m toonic.server \
   --interval 30
 ```
 
-## Quick Start (with Docker)
-
-```bash
 # Start RTSP test streams + Toonic Server
 cd docker/
 docker compose up -d
-
-# Open http://localhost:8900 for full Web UI
-# - See live video keyframe events from RTSP
-# - See log monitoring events
-# - See code analysis results
-# - Trigger manual analysis with different goals
-```
-
----
 
 ## Priority-Based Context Management
 

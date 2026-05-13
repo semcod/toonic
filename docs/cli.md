@@ -1,5 +1,3 @@
-# CLI Shell
-
 ## Uruchamianie
 
 ```bash

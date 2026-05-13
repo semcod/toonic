@@ -4,18 +4,19 @@ Tests for toonic.server — Server core, watchers, accumulator, router.
 
 import pytest
 import anyio
-import asyncio
-import tempfile
-import time
-from pathlib import Path
 
-from toonic.server.config import ServerConfig, SourceConfig, ModelConfig
-from toonic.server.models import ContextChunk, ActionResponse, ServerEvent, SourceCategory
+from toonic.server.config import ServerConfig, SourceConfig
+from toonic.server.models import (
+    ContextChunk,
+    ActionResponse,
+    ServerEvent,
+    SourceCategory,
+)
 from toonic.server.core.accumulator import ContextAccumulator
 from toonic.server.core.history import ConversationHistory, ExchangeRecord
 from toonic.server.core.query import QueryAdapter
 from toonic.server.core.router import LLMRouter, LLMRequest
-from toonic.server.watchers.base import BaseWatcher, WatcherRegistry
+from toonic.server.watchers.base import WatcherRegistry
 from toonic.server.watchers.file_watcher import FileWatcher
 from toonic.server.watchers.log_watcher import LogWatcher
 from toonic.server.watchers.stream_watcher import StreamWatcher
@@ -26,6 +27,7 @@ from toonic.server.main import ToonicServer
 # Config tests
 # =============================================================================
 
+
 class TestServerConfig:
     def test_default_config(self):
         cfg = ServerConfig()
@@ -34,11 +36,13 @@ class TestServerConfig:
         assert "code" in cfg.models
 
     def test_from_dict(self):
-        cfg = ServerConfig.from_dict({
-            "port": 9999,
-            "goal": "test goal",
-            "interval": 10.0,
-        })
+        cfg = ServerConfig.from_dict(
+            {
+                "port": 9999,
+                "goal": "test goal",
+                "interval": 10.0,
+            }
+        )
         assert cfg.port == 9999
         assert cfg.goal == "test goal"
 
@@ -53,6 +57,7 @@ class TestServerConfig:
 # =============================================================================
 # Models tests
 # =============================================================================
+
 
 class TestModels:
     def test_context_chunk(self):
@@ -100,19 +105,24 @@ class TestModels:
 # Accumulator tests
 # =============================================================================
 
+
 class TestAccumulator:
     def test_update_and_get(self):
         acc = ContextAccumulator(max_tokens=10000)
-        acc.update(ContextChunk(
-            source_id="code:main.py",
-            category=SourceCategory.CODE,
-            toon_spec="# main.py | python | 50L\nf[2]: foo, bar",
-        ))
-        acc.update(ContextChunk(
-            source_id="log:app.log",
-            category=SourceCategory.LOGS,
-            toon_spec="# app.log | log | 10L\nERR[1]: connection failed",
-        ))
+        acc.update(
+            ContextChunk(
+                source_id="code:main.py",
+                category=SourceCategory.CODE,
+                toon_spec="# main.py | python | 50L\nf[2]: foo, bar",
+            )
+        )
+        acc.update(
+            ContextChunk(
+                source_id="log:app.log",
+                category=SourceCategory.LOGS,
+                toon_spec="# app.log | log | 10L\nERR[1]: connection failed",
+            )
+        )
 
         context = acc.get_context(goal="find bugs")
         assert "[GOAL]" in context
@@ -122,36 +132,44 @@ class TestAccumulator:
 
     def test_stats(self):
         acc = ContextAccumulator(max_tokens=50000)
-        acc.update(ContextChunk(
-            source_id="code:a.py",
-            category=SourceCategory.CODE,
-            toon_spec="# a.py | python",
-        ))
+        acc.update(
+            ContextChunk(
+                source_id="code:a.py",
+                category=SourceCategory.CODE,
+                toon_spec="# a.py | python",
+            )
+        )
         stats = acc.get_stats()
         assert stats["total_sources"] == 1
         assert "code" in stats["per_category"]
 
     def test_delta_keeps_history(self):
         acc = ContextAccumulator()
-        acc.update(ContextChunk(
-            source_id="f:a.py",
-            category=SourceCategory.CODE,
-            toon_spec="v1",
-            is_delta=False,
-        ))
-        acc.update(ContextChunk(
-            source_id="f:a.py",
-            category=SourceCategory.CODE,
-            toon_spec="v2",
-            is_delta=True,
-        ))
+        acc.update(
+            ContextChunk(
+                source_id="f:a.py",
+                category=SourceCategory.CODE,
+                toon_spec="v1",
+                is_delta=False,
+            )
+        )
+        acc.update(
+            ContextChunk(
+                source_id="f:a.py",
+                category=SourceCategory.CODE,
+                toon_spec="v2",
+                is_delta=True,
+            )
+        )
         # Latest should be v2
         context = acc.get_context()
         assert "v2" in context
 
     def test_clear(self):
         acc = ContextAccumulator()
-        acc.update(ContextChunk(source_id="x", category=SourceCategory.CODE, toon_spec="data"))
+        acc.update(
+            ContextChunk(source_id="x", category=SourceCategory.CODE, toon_spec="data")
+        )
         acc.clear()
         assert acc.get_stats()["total_sources"] == 0
 
@@ -159,6 +177,7 @@ class TestAccumulator:
 # =============================================================================
 # Router tests
 # =============================================================================
+
 
 class TestRouter:
     def test_model_selection(self):
@@ -178,23 +197,29 @@ class TestRouter:
 
     def test_parse_json_response(self):
         from toonic.server.llm.parser import ResponseParser
+
         parser = ResponseParser()
-        result = parser.parse({
-            "content": '{"action": "code_fix", "content": "fix the bug", "confidence": 0.9}',
-            "model": "test-model",
-            "tokens_used": 100,
-        })
+        result = parser.parse(
+            {
+                "content": '{"action": "code_fix", "content": "fix the bug", "confidence": 0.9}',
+                "model": "test-model",
+                "tokens_used": 100,
+            }
+        )
         assert result.action_type == "code_fix"
         assert result.confidence == 0.9
 
     def test_parse_plain_text_response(self):
         from toonic.server.llm.parser import ResponseParser
+
         parser = ResponseParser()
-        result = parser.parse({
-            "content": "This is a plain text analysis result",
-            "model": "test-model",
-            "tokens_used": 20,
-        })
+        result = parser.parse(
+            {
+                "content": "This is a plain text analysis result",
+                "model": "test-model",
+                "tokens_used": 20,
+            }
+        )
         assert result.action_type == "report"
         assert "plain text" in result.content
 
@@ -202,7 +227,9 @@ class TestRouter:
     async def test_mock_query(self):
         cfg = ServerConfig(history_enabled=False)
         router = LLMRouter(cfg)
-        request = LLMRequest(context="# test.py | python", goal="analyze", category="code")
+        request = LLMRequest(
+            context="# test.py | python", goal="analyze", category="code"
+        )
         action = await router.query(request)
         assert action.action_type in ("report", "error", "none", "code_fix", "alert")
         assert action.model_used != ""
@@ -232,6 +259,7 @@ class TestRouter:
 # =============================================================================
 # Watcher tests
 # =============================================================================
+
 
 class TestWatcherRegistry:
     def test_file_watcher_supports(self):
@@ -319,6 +347,7 @@ class TestLogWatcher:
 # History tests
 # =============================================================================
 
+
 class TestConversationHistory:
     def test_record_and_get(self, tmp_path):
         db = str(tmp_path / "test_hist.db")
@@ -346,12 +375,14 @@ class TestConversationHistory:
         db = str(tmp_path / "test_hist2.db")
         history = ConversationHistory(db)
         for i in range(5):
-            history.record(ExchangeRecord(
-                category="code" if i % 2 == 0 else "video",
-                model="gemini",
-                action_type="report",
-                content=f"content {i}",
-            ))
+            history.record(
+                ExchangeRecord(
+                    category="code" if i % 2 == 0 else "video",
+                    model="gemini",
+                    action_type="report",
+                    content=f"content {i}",
+                )
+            )
         all_recs = history.recent(limit=10)
         assert len(all_recs) == 5
 
@@ -364,14 +395,18 @@ class TestConversationHistory:
     def test_search(self, tmp_path):
         db = str(tmp_path / "test_hist3.db")
         history = ConversationHistory(db)
-        history.record(ExchangeRecord(
-            content="Found authentication bug in auth.py",
-            category="code",
-        ))
-        history.record(ExchangeRecord(
-            content="Video shows normal activity",
-            category="video",
-        ))
+        history.record(
+            ExchangeRecord(
+                content="Found authentication bug in auth.py",
+                category="code",
+            )
+        )
+        history.record(
+            ExchangeRecord(
+                content="Video shows normal activity",
+                category="video",
+            )
+        )
         results = history.search(query="authentication")
         assert len(results) == 1
         assert "authentication" in results[0].content
@@ -379,12 +414,22 @@ class TestConversationHistory:
     def test_stats(self, tmp_path):
         db = str(tmp_path / "test_hist4.db")
         history = ConversationHistory(db)
-        history.record(ExchangeRecord(
-            category="code", model="gemini", tokens_used=50, status="ok",
-        ))
-        history.record(ExchangeRecord(
-            category="video", model="gemini", tokens_used=100, status="ok",
-        ))
+        history.record(
+            ExchangeRecord(
+                category="code",
+                model="gemini",
+                tokens_used=50,
+                status="ok",
+            )
+        )
+        history.record(
+            ExchangeRecord(
+                category="video",
+                model="gemini",
+                tokens_used=100,
+                status="ok",
+            )
+        )
         stats = history.stats()
         assert stats["total_exchanges"] == 2
         assert stats["total_tokens"] == 150
@@ -411,10 +456,15 @@ class TestConversationHistory:
     def test_to_dict(self, tmp_path):
         db = str(tmp_path / "test_hist7.db")
         history = ConversationHistory(db)
-        history.record(ExchangeRecord(
-            goal="test", category="code", model="m",
-            sources='["file:a.py"]', affected_files='["a.py"]',
-        ))
+        history.record(
+            ExchangeRecord(
+                goal="test",
+                category="code",
+                model="m",
+                sources='["file:a.py"]',
+                affected_files='["a.py"]',
+            )
+        )
         rec = history.recent(limit=1)[0]
         d = rec.to_dict()
         assert isinstance(d["sources"], list)
@@ -431,6 +481,7 @@ class TestConversationHistory:
 # =============================================================================
 # Query adapter tests
 # =============================================================================
+
 
 class TestQueryAdapter:
     def test_local_parse_time_filter(self, tmp_path):
@@ -484,10 +535,14 @@ class TestQueryAdapter:
     async def test_nlp_query_with_data(self, tmp_path):
         db = str(tmp_path / "test_qa7.db")
         history = ConversationHistory(db)
-        history.record(ExchangeRecord(
-            category="video", model="gemini", status="ok",
-            content="detected movement in camera 1",
-        ))
+        history.record(
+            ExchangeRecord(
+                category="video",
+                model="gemini",
+                status="ok",
+                content="detected movement in camera 1",
+            )
+        )
         adapter = QueryAdapter(history)
         result = await adapter.nlp_query("last 5 video events")
         assert "error" not in result or result.get("count", 0) >= 0
@@ -496,6 +551,7 @@ class TestQueryAdapter:
 # =============================================================================
 # Server integration tests
 # =============================================================================
+
 
 class TestToonicServer:
     @pytest.mark.anyio
@@ -511,8 +567,10 @@ class TestToonicServer:
         server = ToonicServer(cfg)
 
         events = []
+
         async def collect_event(event):
             events.append(event)
+
         server.on_event(collect_event)
 
         await server.start()
@@ -532,10 +590,12 @@ class TestToonicServer:
         server = ToonicServer(cfg)
         await server.start()
 
-        sid = await server.add_source(SourceConfig(
-            path_or_url="/tmp",
-            category="code",
-        ))
+        sid = await server.add_source(
+            SourceConfig(
+                path_or_url="/tmp",
+                category="code",
+            )
+        )
         assert sid != ""
         assert sid in server.get_status()["sources"]
 

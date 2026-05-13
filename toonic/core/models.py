@@ -15,6 +15,7 @@ class CodeLogicBase:
     Nie zastępuje models.py — rozszerza go o interfejs FileLogic.
     Istniejący ProjectInfo/ModuleInfo/ClassInfo/FunctionInfo pozostają bez zmian.
     """
+
     source_file: str
     source_hash: str
     file_category: str = "code"

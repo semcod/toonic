@@ -18,12 +18,14 @@ from toonic.core.registry import FormatRegistry
 # Model logiki dokumentu
 # =============================================================================
 
+
 @dataclass
 class DocumentSection:
     """Pojedyncza sekcja dokumentu."""
-    level: int              # 0=brak nagłówka, 1=h1, 2=h2, ...
-    title: str              # "Installation", "Quick Start"
-    summary: str = ""       # Skrócone streszczenie treści sekcji
+
+    level: int  # 0=brak nagłówka, 1=h1, 2=h2, ...
+    title: str  # "Installation", "Quick Start"
+    summary: str = ""  # Skrócone streszczenie treści sekcji
     word_count: int = 0
     subsection_count: int = 0
     has_code_blocks: bool = False
@@ -34,12 +36,13 @@ class DocumentSection:
 @dataclass
 class DocumentLogic:
     """Logika dokumentu — implementuje FileLogic Protocol."""
+
     source_file: str
     source_hash: str
     file_category: str = "document"
 
     title: str = ""
-    source_type: str = "markdown"   # markdown | text | rst | asciidoc | pdf | docx
+    source_type: str = "markdown"  # markdown | text | rst | asciidoc | pdf | docx
     language: str = "en"
     word_count: int = 0
     sections: List[DocumentSection] = field(default_factory=list)
@@ -74,29 +77,30 @@ class DocumentLogic:
 # Markdown Handler
 # =============================================================================
 
+
 class MarkdownHandler(BaseHandlerMixin):
     """Handler dla plików Markdown (.md, .markdown)."""
 
-    extensions = frozenset({'.md', '.markdown'})
-    category = 'document'
+    extensions = frozenset({".md", ".markdown"})
+    category = "document"
     requires = ()
 
     def parse(self, path: Path) -> DocumentLogic:
         """Parsuje Markdown → DocumentLogic."""
-        content = path.read_text(errors='replace')
+        content = path.read_text(errors="replace")
         source_hash = self._compute_hash(path)
 
         # Frontmatter YAML
         frontmatter = {}
         body = content
-        if content.startswith('---'):
-            parts = content.split('---', 2)
+        if content.startswith("---"):
+            parts = content.split("---", 2)
             if len(parts) >= 3:
                 try:
-                    for line in parts[1].strip().split('\n'):
-                        if ':' in line:
-                            key, _, val = line.partition(':')
-                            frontmatter[key.strip()] = val.strip().strip('"\'')
+                    for line in parts[1].strip().split("\n"):
+                        if ":" in line:
+                            key, _, val = line.partition(":")
+                            frontmatter[key.strip()] = val.strip().strip("\"'")
                 except Exception:
                     pass
                 body = parts[2]
@@ -105,7 +109,7 @@ class MarkdownHandler(BaseHandlerMixin):
         sections = self._extract_sections(body)
 
         # Tytuł
-        title = frontmatter.get('title', '')
+        title = frontmatter.get("title", "")
         if not title and sections:
             title = sections[0].title
 
@@ -115,8 +119,8 @@ class MarkdownHandler(BaseHandlerMixin):
             source_file=path.name,
             source_hash=source_hash,
             title=title,
-            source_type='markdown',
-            language=frontmatter.get('lang', frontmatter.get('language', 'en')),
+            source_type="markdown",
+            language=frontmatter.get("lang", frontmatter.get("language", "en")),
             word_count=total_words,
             sections=sections,
             frontmatter=frontmatter,
@@ -129,21 +133,24 @@ class MarkdownHandler(BaseHandlerMixin):
         current_level = 0
         current_title = ""
 
-        for line in content.split('\n'):
-            header_match = re.match(r'^(#{1,6})\s+(.+)', line)
+        for line in content.split("\n"):
+            header_match = re.match(r"^(#{1,6})\s+(.+)", line)
             if header_match:
                 # Zapisz poprzednią sekcję
                 if current_title or current_lines:
-                    section_text = '\n'.join(current_lines)
-                    sections.append(DocumentSection(
-                        level=current_level,
-                        title=current_title,
-                        summary=self._summarize(section_text),
-                        word_count=len(section_text.split()),
-                        has_code_blocks='```' in section_text,
-                        has_links='](http' in section_text or ']: http' in section_text,
-                        has_images='![' in section_text,
-                    ))
+                    section_text = "\n".join(current_lines)
+                    sections.append(
+                        DocumentSection(
+                            level=current_level,
+                            title=current_title,
+                            summary=self._summarize(section_text),
+                            word_count=len(section_text.split()),
+                            has_code_blocks="```" in section_text,
+                            has_links="](http" in section_text
+                            or "]: http" in section_text,
+                            has_images="![" in section_text,
+                        )
+                    )
                 current_level = len(header_match.group(1))
                 current_title = header_match.group(2).strip()
                 current_lines = []
@@ -152,16 +159,18 @@ class MarkdownHandler(BaseHandlerMixin):
 
         # Ostatnia sekcja
         if current_title or current_lines:
-            section_text = '\n'.join(current_lines)
-            sections.append(DocumentSection(
-                level=current_level,
-                title=current_title,
-                summary=self._summarize(section_text),
-                word_count=len(section_text.split()),
-                has_code_blocks='```' in section_text,
-                has_links='](http' in section_text,
-                has_images='![' in section_text,
-            ))
+            section_text = "\n".join(current_lines)
+            sections.append(
+                DocumentSection(
+                    level=current_level,
+                    title=current_title,
+                    summary=self._summarize(section_text),
+                    word_count=len(section_text.split()),
+                    has_code_blocks="```" in section_text,
+                    has_links="](http" in section_text,
+                    has_images="![" in section_text,
+                )
+            )
 
         return sections
 
@@ -170,45 +179,44 @@ class MarkdownHandler(BaseHandlerMixin):
         text = text.strip()
         if not text:
             return ""
-        sentences = re.split(r'[.!?]\s', text)
+        sentences = re.split(r"[.!?]\s", text)
         if sentences:
             first = sentences[0].strip()
             words = first.split()
             if len(words) <= max_words:
                 return first
-            return ' '.join(words[:max_words]) + '...'
-        return ' '.join(text.split()[:max_words]) + '...'
+            return " ".join(words[:max_words]) + "..."
+        return " ".join(text.split()[:max_words]) + "..."
 
-    def to_spec(self, logic: DocumentLogic, fmt: str = 'toon') -> str:
+    def to_spec(self, logic: DocumentLogic, fmt: str = "toon") -> str:
         """Generuje spec dokumentu w formacie TOON, YAML lub JSON."""
-        if fmt == 'toon':
+        if fmt == "toon":
             return self._to_toon(logic)
-        elif fmt == 'yaml':
+        elif fmt == "yaml":
             return self._to_yaml(logic)
-        elif fmt == 'json':
+        elif fmt == "json":
             return json.dumps(logic.to_dict(), indent=2, ensure_ascii=False)
         raise ValueError(f"Nieznany format: {fmt}")
 
     def _to_toon(self, doc: DocumentLogic) -> str:
         lines = [
             self._format_toon_header(
-                doc.source_file, doc.source_type,
-                **{f"{doc.word_count}w": ""}
+                doc.source_file, doc.source_type, **{f"{doc.word_count}w": ""}
             )
         ]
         if doc.sections:
             lines.append(f"D[{len(doc.sections)}]:")
             for s in doc.sections:
-                title_clean = s.title.replace(' ', '_')[:30]
+                title_clean = s.title.replace(" ", "_")[:30]
                 level_prefix = f"h{s.level}" if s.level > 0 else "p"
-                summary_short = s.summary[:50].replace('\n', ' ')
+                summary_short = s.summary[:50].replace("\n", " ")
                 parts = [f"  {level_prefix}:{title_clean}"]
                 if summary_short:
                     parts.append(summary_short)
                 if s.word_count:
                     parts.append(f"{s.word_count}w")
                 lines.append(" | ".join(parts))
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _to_yaml(self, doc: DocumentLogic) -> str:
         lines = [
@@ -225,9 +233,11 @@ class MarkdownHandler(BaseHandlerMixin):
                     lines.append(f'    summary: "{s.summary}"')
                 if s.word_count:
                     lines.append(f"    words: {s.word_count}")
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
-    def reproduce(self, logic: DocumentLogic, client: Any = None, target_fmt: str | None = None) -> str:
+    def reproduce(
+        self, logic: DocumentLogic, client: Any = None, target_fmt: str | None = None
+    ) -> str:
         """Odtwarza dokument z logiki."""
         if client is None:
             return self._reproduce_template(logic)
@@ -237,20 +247,20 @@ class MarkdownHandler(BaseHandlerMixin):
             prompt = self._get_chunk_prompt(chunk, logic)
             response = client.generate(prompt)
             pieces.append(response)
-        return '\n\n'.join(pieces)
+        return "\n\n".join(pieces)
 
     def _reproduce_template(self, doc: DocumentLogic) -> str:
         lines = []
         if doc.title:
             lines.append(f"# {doc.title}\n")
         for s in doc.sections:
-            prefix = '#' * max(s.level, 1)
+            prefix = "#" * max(s.level, 1)
             lines.append(f"{prefix} {s.title}\n")
             if s.summary:
                 lines.append(f"{s.summary}\n")
             else:
                 lines.append(f"<!-- TODO: {s.word_count} words -->\n")
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _chunk_by_sections(self, doc: DocumentLogic) -> List[DocumentSection]:
         return [s for s in doc.sections if s.level <= 2]
@@ -268,13 +278,13 @@ class MarkdownHandler(BaseHandlerMixin):
 
     def sniff(self, path: Path, content: str) -> float:
         score = 0.0
-        if re.search(r'^#{1,6}\s+', content, re.MULTILINE):
+        if re.search(r"^#{1,6}\s+", content, re.MULTILINE):
             score += 0.5
-        if content.startswith('---') and '\n---' in content[3:]:
+        if content.startswith("---") and "\n---" in content[3:]:
             score += 0.3
-        if '```' in content:
+        if "```" in content:
             score += 0.1
-        if '](http' in content or '![' in content:
+        if "](http" in content or "![" in content:
             score += 0.1
         return min(score, 1.0)
 
@@ -283,46 +293,51 @@ class MarkdownHandler(BaseHandlerMixin):
 # Text Handler
 # =============================================================================
 
+
 class TextHandler(BaseHandlerMixin):
     """Handler dla plików tekstowych (.txt)."""
 
-    extensions = frozenset({'.txt'})
-    category = 'document'
+    extensions = frozenset({".txt"})
+    category = "document"
     requires = ()
 
     def parse(self, path: Path) -> DocumentLogic:
-        content = path.read_text(errors='replace')
-        paragraphs = [p.strip() for p in content.split('\n\n') if p.strip()]
+        content = path.read_text(errors="replace")
+        paragraphs = [p.strip() for p in content.split("\n\n") if p.strip()]
 
         sections = []
         for i, para in enumerate(paragraphs):
-            sections.append(DocumentSection(
-                level=0,
-                title=f"paragraph_{i+1}",
-                summary=para[:80] + ('...' if len(para) > 80 else ''),
-                word_count=len(para.split()),
-            ))
+            sections.append(
+                DocumentSection(
+                    level=0,
+                    title=f"paragraph_{i + 1}",
+                    summary=para[:80] + ("..." if len(para) > 80 else ""),
+                    word_count=len(para.split()),
+                )
+            )
 
         return DocumentLogic(
             source_file=path.name,
             source_hash=self._compute_hash(path),
             title=path.stem,
-            source_type='text',
+            source_type="text",
             word_count=len(content.split()),
             sections=sections,
         )
 
-    def to_spec(self, logic: DocumentLogic, fmt: str = 'toon') -> str:
-        if fmt == 'toon':
+    def to_spec(self, logic: DocumentLogic, fmt: str = "toon") -> str:
+        if fmt == "toon":
             lines = [f"# {logic.source_file} | text | {logic.word_count}w"]
             lines.append(f"P[{len(logic.sections)}]:")
             for s in logic.sections:
                 lines.append(f"  {s.summary[:60]} | {s.word_count}w")
-            return '\n'.join(lines)
+            return "\n".join(lines)
         return json.dumps(logic.to_dict(), indent=2, ensure_ascii=False)
 
-    def reproduce(self, logic: DocumentLogic, client: Any = None, target_fmt: str | None = None) -> str:
-        return '\n\n'.join(s.summary for s in logic.sections)
+    def reproduce(
+        self, logic: DocumentLogic, client: Any = None, target_fmt: str | None = None
+    ) -> str:
+        return "\n\n".join(s.summary for s in logic.sections)
 
     def sniff(self, path: Path, content: str) -> float:
         return 0.1  # niski — txt to fallback
@@ -332,64 +347,74 @@ class TextHandler(BaseHandlerMixin):
 # RST Handler
 # =============================================================================
 
+
 class RstHandler(BaseHandlerMixin):
     """Handler dla reStructuredText (.rst)."""
 
-    extensions = frozenset({'.rst'})
-    category = 'document'
+    extensions = frozenset({".rst"})
+    category = "document"
     requires = ()
 
     def parse(self, path: Path) -> DocumentLogic:
-        content = path.read_text(errors='replace')
+        content = path.read_text(errors="replace")
 
         sections = []
-        lines_list = content.split('\n')
+        lines_list = content.split("\n")
         for i, line in enumerate(lines_list):
-            if i > 0 and line and all(c in '=-~^"' for c in line.strip()) and len(line.strip()) >= 3:
-                title = lines_list[i-1].strip()
+            if (
+                i > 0
+                and line
+                and all(c in '=-~^"' for c in line.strip())
+                and len(line.strip()) >= 3
+            ):
+                title = lines_list[i - 1].strip()
                 if title:
-                    level = {'=': 1, '-': 2, '~': 3, '^': 4}.get(line.strip()[0], 3)
-                    sections.append(DocumentSection(
-                        level=level,
-                        title=title,
-                        word_count=0,
-                    ))
+                    level = {"=": 1, "-": 2, "~": 3, "^": 4}.get(line.strip()[0], 3)
+                    sections.append(
+                        DocumentSection(
+                            level=level,
+                            title=title,
+                            word_count=0,
+                        )
+                    )
 
         return DocumentLogic(
             source_file=path.name,
             source_hash=self._compute_hash(path),
             title=sections[0].title if sections else path.stem,
-            source_type='rst',
+            source_type="rst",
             word_count=len(content.split()),
             sections=sections,
         )
 
-    def to_spec(self, logic: DocumentLogic, fmt: str = 'toon') -> str:
-        if fmt == 'toon':
+    def to_spec(self, logic: DocumentLogic, fmt: str = "toon") -> str:
+        if fmt == "toon":
             lines = [f"# {logic.source_file} | rst | {logic.word_count}w"]
             lines.append(f"D[{len(logic.sections)}]:")
             for s in logic.sections:
                 lines.append(f"  h{s.level}:{s.title[:40]}")
-            return '\n'.join(lines)
+            return "\n".join(lines)
         return json.dumps(logic.to_dict(), indent=2, ensure_ascii=False)
 
-    def reproduce(self, logic: DocumentLogic, client: Any = None, target_fmt: str | None = None) -> str:
+    def reproduce(
+        self, logic: DocumentLogic, client: Any = None, target_fmt: str | None = None
+    ) -> str:
         lines = []
-        underlines = {1: '=', 2: '-', 3: '~', 4: '^'}
+        underlines = {1: "=", 2: "-", 3: "~", 4: "^"}
         for s in logic.sections:
             lines.append(s.title)
-            char = underlines.get(s.level, '-')
+            char = underlines.get(s.level, "-")
             lines.append(char * len(s.title))
-            lines.append('')
-        return '\n'.join(lines)
+            lines.append("")
+        return "\n".join(lines)
 
     def sniff(self, path: Path, content: str) -> float:
         score = 0.0
-        if re.search(r'^[=\-~^]{3,}\s*$', content, re.MULTILINE):
+        if re.search(r"^[=\-~^]{3,}\s*$", content, re.MULTILINE):
             score += 0.4
-        if '.. ' in content:
+        if ".. " in content:
             score += 0.3
-        if ':ref:' in content or ':doc:' in content:
+        if ":ref:" in content or ":doc:" in content:
             score += 0.2
         return min(score, 1.0)
 
@@ -397,6 +422,7 @@ class RstHandler(BaseHandlerMixin):
 # =============================================================================
 # Rejestracja
 # =============================================================================
+
 
 def register_document_handlers() -> None:
     """Rejestruje handlery dokumentów w FormatRegistry."""

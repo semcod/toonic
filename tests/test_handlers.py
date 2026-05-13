@@ -3,21 +3,21 @@ Tests for toonic.formats — Stages 1-3: Document, Data, Config, API, Infra hand
 """
 
 import json
-import pytest
 from pathlib import Path
 
 from toonic.core.registry import FormatRegistry
-from toonic.formats.document import MarkdownHandler, TextHandler, RstHandler, DocumentLogic
-from toonic.formats.data import CsvHandler, JsonDataHandler, TableLogic, JsonSchemaLogic
-from toonic.formats.config import DockerfileHandler, EnvHandler, ConfigLogic
-from toonic.formats.database import SqlHandler, SqlSchemaLogic
-from toonic.formats.api import OpenApiHandler, ApiLogic
-from toonic.formats.infra import KubernetesHandler, GithubActionsHandler, InfraLogic
+from toonic.formats.document import MarkdownHandler, TextHandler
+from toonic.formats.data import CsvHandler, JsonDataHandler
+from toonic.formats.config import EnvHandler
+from toonic.formats.database import SqlHandler
+from toonic.formats.api import OpenApiHandler
+from toonic.formats.infra import KubernetesHandler, GithubActionsHandler
 
 
 # =============================================================================
 # Stage 1: Document Handlers
 # =============================================================================
+
 
 class TestMarkdownHandler:
     def test_resolve(self, tmp_md):
@@ -35,21 +35,21 @@ class TestMarkdownHandler:
     def test_to_toon(self, tmp_md):
         handler = MarkdownHandler()
         logic = handler.parse(tmp_md)
-        toon = handler.to_spec(logic, 'toon')
-        assert 'D[' in toon
-        assert 'markdown' in toon
+        toon = handler.to_spec(logic, "toon")
+        assert "D[" in toon
+        assert "markdown" in toon
 
     def test_to_yaml(self, tmp_md):
         handler = MarkdownHandler()
         logic = handler.parse(tmp_md)
-        yaml_spec = handler.to_spec(logic, 'yaml')
-        assert 'title:' in yaml_spec
-        assert 'sections:' in yaml_spec
+        yaml_spec = handler.to_spec(logic, "yaml")
+        assert "title:" in yaml_spec
+        assert "sections:" in yaml_spec
 
     def test_to_json(self, tmp_md):
         handler = MarkdownHandler()
         logic = handler.parse(tmp_md)
-        json_spec = handler.to_spec(logic, 'json')
+        json_spec = handler.to_spec(logic, "json")
         data = json.loads(json_spec)
         assert data["title"] == "Test Document"
 
@@ -57,7 +57,7 @@ class TestMarkdownHandler:
         handler = MarkdownHandler()
         logic = handler.parse(tmp_md)
         reproduced = handler.reproduce(logic)
-        assert 'Introduction' in reproduced or 'Installation' in reproduced
+        assert "Introduction" in reproduced or "Installation" in reproduced
 
     def test_sniff(self):
         handler = MarkdownHandler()
@@ -75,19 +75,20 @@ class TestTextHandler:
         handler = TextHandler()
         logic = handler.parse(tmp_txt)
         assert len(logic.sections) == 2
-        assert logic.source_type == 'text'
+        assert logic.source_type == "text"
 
     def test_to_toon(self, tmp_txt):
         handler = TextHandler()
         logic = handler.parse(tmp_txt)
-        toon = handler.to_spec(logic, 'toon')
-        assert 'text' in toon
-        assert 'P[' in toon
+        toon = handler.to_spec(logic, "toon")
+        assert "text" in toon
+        assert "P[" in toon
 
 
 # =============================================================================
 # Stage 2: Data & Config Handlers
 # =============================================================================
+
 
 class TestCsvHandler:
     def test_resolve(self, tmp_csv):
@@ -99,22 +100,22 @@ class TestCsvHandler:
         logic = handler.parse(tmp_csv)
         assert logic.rows == 3
         assert len(logic.columns) == 4
-        assert logic.columns[0].dtype == 'int'
-        assert logic.columns[1].dtype == 'string'
+        assert logic.columns[0].dtype == "int"
+        assert logic.columns[1].dtype == "string"
 
     def test_to_toon(self, tmp_csv):
         handler = CsvHandler()
         logic = handler.parse(tmp_csv)
-        toon = handler.to_spec(logic, 'toon')
-        assert 'csv' in toon.lower()
-        assert 'C[' in toon
+        toon = handler.to_spec(logic, "toon")
+        assert "csv" in toon.lower()
+        assert "C[" in toon
 
     def test_reproduce(self, tmp_csv):
         handler = CsvHandler()
         logic = handler.parse(tmp_csv)
         reproduced = handler.reproduce(logic)
-        assert 'id' in reproduced
-        assert 'name' in reproduced
+        assert "id" in reproduced
+        assert "name" in reproduced
 
 
 class TestJsonDataHandler:
@@ -125,14 +126,14 @@ class TestJsonDataHandler:
     def test_parse(self, tmp_json):
         handler = JsonDataHandler()
         logic = handler.parse(tmp_json)
-        assert logic.root_type == 'object'
+        assert logic.root_type == "object"
         assert logic.total_keys > 0
 
     def test_to_toon(self, tmp_json):
         handler = JsonDataHandler()
         logic = handler.parse(tmp_json)
-        toon = handler.to_spec(logic, 'toon')
-        assert 'json-data' in toon
+        toon = handler.to_spec(logic, "toon")
+        assert "json-data" in toon
 
     def test_negative_sniff_package_json(self):
         handler = JsonDataHandler()
@@ -149,27 +150,28 @@ class TestEnvHandler:
         handler = EnvHandler()
         logic = handler.parse(tmp_env)
         assert len(logic.entries) == 4
-        secret = [e for e in logic.entries if e.key == 'API_SECRET_KEY'][0]
+        secret = [e for e in logic.entries if e.key == "API_SECRET_KEY"][0]
         assert secret.sensitive is True
-        assert secret.description == '***'
+        assert secret.description == "***"
 
     def test_to_toon_masks_sensitive(self, tmp_env):
         handler = EnvHandler()
         logic = handler.parse(tmp_env)
-        toon = handler.to_spec(logic, 'toon')
-        assert '***' in toon
-        assert 'env' in toon.lower()
+        toon = handler.to_spec(logic, "toon")
+        assert "***" in toon
+        assert "env" in toon.lower()
 
     def test_reproduce(self, tmp_env):
         handler = EnvHandler()
         logic = handler.parse(tmp_env)
         reproduced = handler.reproduce(logic)
-        assert 'CHANGE_ME' in reproduced  # sensitive values masked
+        assert "CHANGE_ME" in reproduced  # sensitive values masked
 
 
 # =============================================================================
 # Stage 3: Database, API, Infra Handlers
 # =============================================================================
+
 
 class TestSqlHandler:
     def test_resolve(self, tmp_sql):
@@ -179,30 +181,30 @@ class TestSqlHandler:
     def test_parse(self, tmp_sql):
         handler = SqlHandler()
         logic = handler.parse(tmp_sql)
-        assert logic.dialect == 'postgresql'
+        assert logic.dialect == "postgresql"
         assert len(logic.tables) == 2
         assert len(logic.views) == 1
 
     def test_to_toon(self, tmp_sql):
         handler = SqlHandler()
         logic = handler.parse(tmp_sql)
-        toon = handler.to_spec(logic, 'toon')
-        assert 'postgresql' in toon
-        assert 'T[2]' in toon
-        assert 'V[1]' in toon
+        toon = handler.to_spec(logic, "toon")
+        assert "postgresql" in toon
+        assert "T[2]" in toon
+        assert "V[1]" in toon
 
     def test_reproduce(self, tmp_sql):
         handler = SqlHandler()
         logic = handler.parse(tmp_sql)
         reproduced = handler.reproduce(logic)
-        assert 'CREATE TABLE' in reproduced
+        assert "CREATE TABLE" in reproduced
 
     def test_detect_mysql(self, tmp_path):
         p = tmp_path / "mysql.sql"
         p.write_text("CREATE TABLE t (id INT AUTO_INCREMENT);")
         handler = SqlHandler()
         logic = handler.parse(p)
-        assert logic.dialect == 'mysql'
+        assert logic.dialect == "mysql"
 
 
 class TestContentSniffing:

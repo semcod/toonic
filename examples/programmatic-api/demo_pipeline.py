@@ -14,12 +14,11 @@ from toonic.server.llm.caller import LLMCaller
 from toonic.server.llm.parser import ResponseParser
 from toonic.server.llm.pipeline import LLMPipeline
 from toonic.server.llm.prompts import (
-    CCTVEventPrompt,
     CodeAnalysisPrompt,
     GenericPrompt,
     select_prompt_builder,
 )
-from toonic.server.models import ActionResponse, ContextChunk, ContentType, SourceCategory
+from toonic.server.models import ContextChunk, ContentType, SourceCategory
 
 
 def demo_prompt_selection():
@@ -33,7 +32,10 @@ def demo_prompt_selection():
         ("CCTV security: detect intrusions", {SourceCategory.VIDEO}),
         ("monitor camera for suspicious activity", {SourceCategory.VIDEO}),
         ("summarize the dataset", {SourceCategory.DATA}),
-        ("analyze code quality and log errors", {SourceCategory.CODE, SourceCategory.LOGS}),
+        (
+            "analyze code quality and log errors",
+            {SourceCategory.CODE, SourceCategory.LOGS},
+        ),
     ]
 
     for goal, cats in cases:
@@ -79,24 +81,41 @@ def demo_response_parser():
     parser = ResponseParser()
 
     # JSON in markdown fence (wrapped in dict as LLMCaller returns)
-    raw_json = {"content": '```json\n{"action": "alert", "content": "Hardcoded API key in config.py:15", "confidence": 0.95, "affected_files": ["config.py"]}\n```', "model": "test-model"}
+    raw_json = {
+        "content": '```json\n{"action": "alert", "content": "Hardcoded API key in config.py:15", "confidence": 0.95, "affected_files": ["config.py"]}\n```',
+        "model": "test-model",
+    }
     result = parser.parse(raw_json, "code")
-    print(f"\n  JSON in fence → action={result.action_type}, confidence={result.confidence}, content={result.content[:50]}")
+    print(
+        f"\n  JSON in fence → action={result.action_type}, confidence={result.confidence}, content={result.content[:50]}"
+    )
 
     # Plain JSON
-    raw_plain = {"content": '{"action": "report", "content": "No issues found", "confidence": 0.8}', "model": "test-model"}
+    raw_plain = {
+        "content": '{"action": "report", "content": "No issues found", "confidence": 0.8}',
+        "model": "test-model",
+    }
     result = parser.parse(raw_plain, "code")
-    print(f"  Plain JSON   → action={result.action_type}, confidence={result.confidence}, content={result.content[:50]}")
+    print(
+        f"  Plain JSON   → action={result.action_type}, confidence={result.confidence}, content={result.content[:50]}"
+    )
 
     # Plain text fallback
-    raw_text = {"content": "The code looks clean. No major issues detected.", "model": "test-model"}
+    raw_text = {
+        "content": "The code looks clean. No major issues detected.",
+        "model": "test-model",
+    }
     result = parser.parse(raw_text, "code")
-    print(f"  Plain text   → action={result.action_type}, confidence={result.confidence}, content={result.content[:50]}")
+    print(
+        f"  Plain text   → action={result.action_type}, confidence={result.confidence}, content={result.content[:50]}"
+    )
 
     # Error response
     raw_error = {"error": "API timeout", "model": "test-model"}
     result = parser.parse(raw_error, "code")
-    print(f"  Error resp   → action={result.action_type}, confidence={result.confidence}, content={result.content[:50]}")
+    print(
+        f"  Error resp   → action={result.action_type}, confidence={result.confidence}, content={result.content[:50]}"
+    )
 
     # Also show parse_raw_to_dict for direct string parsing
     print("\n  parse_raw_to_dict (direct string → dict):")

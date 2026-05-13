@@ -15,10 +15,8 @@ Endpoints:
 
 from __future__ import annotations
 
-import base64
 import logging
 import time
-from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger("toonic.bridge.broxeen")
 
@@ -26,7 +24,6 @@ logger = logging.getLogger("toonic.bridge.broxeen")
 def register_broxeen_routes(app, server) -> None:
     """Register Broxeen-specific API routes on the FastAPI app."""
     from fastapi import HTTPException
-    from fastapi.responses import JSONResponse
 
     # ── Health ────────────────────────────────────────────────
 
@@ -84,7 +81,14 @@ def register_broxeen_routes(app, server) -> None:
 
         # Set default intervals per category
         if interval <= 0:
-            defaults = {"video": 5, "web": 30, "logs": 5, "code": 60, "container": 15, "process": 10}
+            defaults = {
+                "video": 5,
+                "web": 30,
+                "logs": 5,
+                "code": 60,
+                "container": 15,
+                "process": 10,
+            }
             interval = defaults.get(category, 30)
 
         # Update server goal if provided
@@ -97,29 +101,41 @@ def register_broxeen_routes(app, server) -> None:
         if when_condition:
             try:
                 from toonic.server.triggers.nlp2yaml import NLP2YAML
+
                 nlp = NLP2YAML()
                 source_hint = "video" if category == "video" else ""
-                trigger_config = await nlp.generate(when_condition, source=source_hint, goal=goal)
+                trigger_config = await nlp.generate(
+                    when_condition, source=source_hint, goal=goal
+                )
                 if trigger_config and trigger_config.triggers:
                     # Add trigger rules to the server's scheduler
-                    if hasattr(server, 'trigger_scheduler') and server.trigger_scheduler:
+                    if (
+                        hasattr(server, "trigger_scheduler")
+                        and server.trigger_scheduler
+                    ):
                         for rule in trigger_config.triggers:
                             server.trigger_scheduler.add_rule(rule)
                     else:
                         # Initialize trigger scheduler if not present
                         from toonic.server.triggers.scheduler import TriggerScheduler
+
                         server.trigger_scheduler = TriggerScheduler(trigger_config)
                         server.trigger_config = trigger_config
                     trigger_info = {
                         "trigger_rules": len(trigger_config.triggers),
                         "trigger_condition": when_condition,
                     }
-                    logger.info(f"Generated {len(trigger_config.triggers)} trigger rule(s) from: {when_condition}")
+                    logger.info(
+                        f"Generated {len(trigger_config.triggers)} trigger rule(s) from: {when_condition}"
+                    )
             except Exception as e:
-                logger.warning(f"Failed to generate triggers from '{when_condition}': {e}")
+                logger.warning(
+                    f"Failed to generate triggers from '{when_condition}': {e}"
+                )
                 trigger_info = {"trigger_error": str(e)}
 
         from toonic.server.config import SourceConfig
+
         src = SourceConfig(
             path_or_url=url,
             category=category,
@@ -159,7 +175,9 @@ def register_broxeen_routes(app, server) -> None:
             info = {
                 "source_id": sid,
                 "type": type(watcher).__name__,
-                "category": watcher.category.value if hasattr(watcher.category, "value") else str(watcher.category),
+                "category": watcher.category.value
+                if hasattr(watcher.category, "value")
+                else str(watcher.category),
                 "url": watcher.path_or_url,
                 "running": watcher.running,
             }
@@ -200,7 +218,11 @@ def register_broxeen_routes(app, server) -> None:
         if since > 0:
             events = [e for e in events if e.get("timestamp", 0) > since]
         if source_id:
-            events = [e for e in events if source_id in str(e.get("data", {}).get("source_id", ""))]
+            events = [
+                e
+                for e in events
+                if source_id in str(e.get("data", {}).get("source_id", ""))
+            ]
 
         # Normalize for Broxeen consumption
         normalized = []
@@ -294,9 +316,12 @@ def register_broxeen_routes(app, server) -> None:
             # Quick fetch
             try:
                 import httpx
+
                 async with httpx.AsyncClient(timeout=10) as client:
                     resp = await client.get(url)
-                    context_parts.append(f"URL: {url}\nStatus: {resp.status_code}\nContent:\n{resp.text[:4000]}")
+                    context_parts.append(
+                        f"URL: {url}\nStatus: {resp.status_code}\nContent:\n{resp.text[:4000]}"
+                    )
             except Exception as e:
                 context_parts.append(f"URL: {url}\nFetch error: {e}")
 

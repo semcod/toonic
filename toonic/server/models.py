@@ -7,7 +7,7 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 
 class SourceCategory(str, Enum):
@@ -29,6 +29,7 @@ class SourceCategory(str, Enum):
 
 class ContentType(str, Enum):
     """Content type — allows Accumulator to make intelligent decisions."""
+
     TOON_SPEC = "toon_spec"
     LOG_ENTRIES = "log_entries"
     VIDEO_EVENT = "video_event"
@@ -43,18 +44,19 @@ class ContentType(str, Enum):
 @dataclass
 class ContextChunk:
     """Single chunk of context from a data source."""
+
     source_id: str
     category: SourceCategory
     toon_spec: str = ""
     raw_data: bytes = b""
-    raw_encoding: str = "text"      # text|base64_jpeg|base64_ulaw
+    raw_encoding: str = "text"  # text|base64_jpeg|base64_ulaw
     timestamp: float = 0.0
     is_delta: bool = False
     token_estimate: int = 0
     metadata: Dict[str, Any] = field(default_factory=dict)
     # New fields (backward compatible — have defaults)
     content_type: ContentType = ContentType.RAW_TEXT
-    priority: float = 0.5          # 0.0–1.0, higher = more important
+    priority: float = 0.5  # 0.0–1.0, higher = more important
 
     def __post_init__(self):
         if not self.timestamp:
@@ -65,7 +67,9 @@ class ContextChunk:
     def to_dict(self) -> Dict[str, Any]:
         d = {
             "source_id": self.source_id,
-            "category": self.category.value if isinstance(self.category, SourceCategory) else self.category,
+            "category": self.category.value
+            if isinstance(self.category, SourceCategory)
+            else self.category,
             "toon_spec": self.toon_spec,
             "timestamp": self.timestamp,
             "is_delta": self.is_delta,
@@ -73,6 +77,7 @@ class ContextChunk:
         }
         if self.raw_data:
             import base64
+
             d["raw_data"] = base64.b64encode(self.raw_data).decode()
             d["raw_encoding"] = self.raw_encoding
         if self.metadata:
@@ -83,8 +88,9 @@ class ContextChunk:
 @dataclass
 class ActionResponse:
     """LLM response → action to execute."""
+
     action_id: str = ""
-    action_type: str = "none"       # code_fix|report|alert|none
+    action_type: str = "none"  # code_fix|report|alert|none
     content: str = ""
     target_path: str = ""
     confidence: float = 0.0
@@ -111,7 +117,8 @@ class ActionResponse:
 @dataclass
 class ServerEvent:
     """Event emitted by the server to clients."""
-    event_type: str                  # context|action|status|error|log
+
+    event_type: str  # context|action|status|error|log
     data: Dict[str, Any] = field(default_factory=dict)
     timestamp: float = 0.0
 

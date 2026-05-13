@@ -1,5 +1,3 @@
-# Docker Setup
-
 ## Quick Start
 
 ```bash
@@ -8,9 +6,6 @@ cp .env.example .env
 
 cd docker/
 docker compose up -d
-# → http://localhost:8900 (Web UI)
-```
-
 ## Services
 
 | Service | Port | Opis |
@@ -21,9 +16,6 @@ docker compose up -d
 | `test-stream-audio` | — | FFmpeg → 300Hz sine wave |
 | `toonic-server` | 8900 | Toonic Server + Web UI |
 
-## Test Streams
-
-```bash
 # Only RTSP test streams (without Toonic server)
 docker compose up -d rtsp-server test-stream-video test-stream-cam2
 

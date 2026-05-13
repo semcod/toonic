@@ -7,12 +7,11 @@ against the ConversationHistory SQLite database.
 
 from __future__ import annotations
 
-import json
 import logging
 import os
 import re
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 from toonic.server.core.history import ConversationHistory
 
@@ -90,10 +89,16 @@ class QueryAdapter:
         start = time.time()
         # Safety: only allow SELECT
         if not sql.strip().upper().startswith("SELECT"):
-            return {"error": "Only SELECT queries are allowed", "sql": sql, "results": []}
+            return {
+                "error": "Only SELECT queries are allowed",
+                "sql": sql,
+                "results": [],
+            }
         return self._execute_query(sql, sql, start)
 
-    def _execute_query(self, sql: str, original_query: str, start: float) -> Dict[str, Any]:
+    def _execute_query(
+        self, sql: str, original_query: str, start: float
+    ) -> Dict[str, Any]:
         """Execute SQL and return formatted results."""
         try:
             results = self.history.execute_sql(sql)
@@ -118,21 +123,30 @@ class QueryAdapter:
         q = question.lower().strip()
 
         # "last N" or "recent N"
-        m = re.search(r'(?:last|recent)\s+(\d+)', q)
+        m = re.search(r"(?:last|recent)\s+(\d+)", q)
         limit = int(m.group(1)) if m else 50
 
         # Time filters
         time_filter = ""
         if "last hour" in q or "past hour" in q:
-            time_filter = f"timestamp > (strftime('%s','now') - 3600)"
+            time_filter = "timestamp > (strftime('%s','now') - 3600)"
         elif "last day" in q or "today" in q:
-            time_filter = f"timestamp > (strftime('%s','now') - 86400)"
+            time_filter = "timestamp > (strftime('%s','now') - 86400)"
         elif "last week" in q:
-            time_filter = f"timestamp > (strftime('%s','now') - 604800)"
+            time_filter = "timestamp > (strftime('%s','now') - 604800)"
 
         # Category filters
         cat_filter = ""
-        for cat in ["video", "audio", "code", "config", "logs", "document", "data", "database"]:
+        for cat in [
+            "video",
+            "audio",
+            "code",
+            "config",
+            "logs",
+            "document",
+            "data",
+            "database",
+        ]:
             if cat in q:
                 cat_filter = f"category = '{cat}'"
                 break
@@ -170,7 +184,17 @@ class QueryAdapter:
 
         # Aggregate queries
         if any(w in q for w in ["count", "how many", "total"]):
-            conditions = [f for f in [time_filter, cat_filter, status_filter, action_filter, model_filter] if f]
+            conditions = [
+                f
+                for f in [
+                    time_filter,
+                    cat_filter,
+                    status_filter,
+                    action_filter,
+                    model_filter,
+                ]
+                if f
+            ]
             where = " AND ".join(conditions) if conditions else "1=1"
             return f"SELECT COUNT(*) as total, category, status FROM exchanges WHERE {where} GROUP BY category, status"
 
@@ -180,7 +204,18 @@ class QueryAdapter:
             return f"SELECT model, SUM(tokens_used) as total_tokens, COUNT(*) as calls FROM exchanges WHERE {where} GROUP BY model"
 
         # Build standard SELECT
-        conditions = [f for f in [time_filter, cat_filter, status_filter, action_filter, model_filter, content_filter] if f]
+        conditions = [
+            f
+            for f in [
+                time_filter,
+                cat_filter,
+                status_filter,
+                action_filter,
+                model_filter,
+                content_filter,
+            ]
+            if f
+        ]
         if not conditions and not m:
             return ""  # Can't parse, fall through to LLM
 
@@ -192,9 +227,13 @@ class QueryAdapter:
         try:
             import litellm
 
-            api_key = os.environ.get("LLM_API_KEY", os.environ.get("OPENROUTER_API_KEY", ""))
+            api_key = os.environ.get(
+                "LLM_API_KEY", os.environ.get("OPENROUTER_API_KEY", "")
+            )
             provider = (os.environ.get("LLM_PROVIDER", "openrouter") or "").strip()
-            llm_model = (model or os.environ.get("LLM_MODEL", "google/gemini-3-flash-preview")).strip()
+            llm_model = (
+                model or os.environ.get("LLM_MODEL", "google/gemini-3-flash-preview")
+            ).strip()
             if provider and llm_model and not llm_model.startswith(provider + "/"):
                 llm_model = f"{provider}/{llm_model}"
 
@@ -211,7 +250,7 @@ class QueryAdapter:
             sql = response.choices[0].message.content.strip()
             # Extract SQL from markdown code block if present
             if "```" in sql:
-                m = re.search(r'```(?:sql)?\s*\n?(.*?)\n?```', sql, re.DOTALL)
+                m = re.search(r"```(?:sql)?\s*\n?(.*?)\n?```", sql, re.DOTALL)
                 if m:
                     sql = m.group(1).strip()
 

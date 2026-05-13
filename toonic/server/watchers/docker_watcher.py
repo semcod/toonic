@@ -11,8 +11,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-import time
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from toonic.server.models import ContextChunk, SourceCategory
 from toonic.server.watchers.base import BaseWatcher, WatcherRegistry
@@ -63,7 +62,10 @@ class DockerWatcher(BaseWatcher):
         """Check if Docker CLI is available."""
         try:
             proc = await asyncio.create_subprocess_exec(
-                "docker", "version", "--format", "{{.Server.Version}}",
+                "docker",
+                "version",
+                "--format",
+                "{{.Server.Version}}",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -88,13 +90,15 @@ class DockerWatcher(BaseWatcher):
 
         if not self._docker_available:
             if self._check_count == 1:
-                await self.emit(ContextChunk(
-                    source_id=self.source_id,
-                    category=SourceCategory.CONTAINER,
-                    toon_spec=f"# {self.source_id} | docker | UNAVAILABLE | Docker CLI not found",
-                    is_delta=False,
-                    metadata={"error": "docker_not_available"},
-                ))
+                await self.emit(
+                    ContextChunk(
+                        source_id=self.source_id,
+                        category=SourceCategory.CONTAINER,
+                        toon_spec=f"# {self.source_id} | docker | UNAVAILABLE | Docker CLI not found",
+                        is_delta=False,
+                        metadata={"error": "docker_not_available"},
+                    )
+                )
             return
 
         containers = await self._list_containers()
@@ -111,8 +115,12 @@ class DockerWatcher(BaseWatcher):
         result = {
             "check_number": self._check_count,
             "container_count": len(containers),
-            "running": sum(1 for c in containers.values() if c.get("state") == "running"),
-            "stopped": sum(1 for c in containers.values() if c.get("state") != "running"),
+            "running": sum(
+                1 for c in containers.values() if c.get("state") == "running"
+            ),
+            "stopped": sum(
+                1 for c in containers.values() if c.get("state") != "running"
+            ),
             "changes": changes,
             "has_changes": len(changes) > 0,
             "containers": containers,
@@ -121,19 +129,19 @@ class DockerWatcher(BaseWatcher):
         toon = self._to_toon(result)
         is_delta = self._check_count > 1
         should_emit = (
-            not is_delta
-            or result["has_changes"]
-            or self._check_count % 10 == 0
+            not is_delta or result["has_changes"] or self._check_count % 10 == 0
         )
 
         if should_emit:
-            await self.emit(ContextChunk(
-                source_id=self.source_id,
-                category=SourceCategory.CONTAINER,
-                toon_spec=toon,
-                is_delta=is_delta,
-                metadata=result,
-            ))
+            await self.emit(
+                ContextChunk(
+                    source_id=self.source_id,
+                    category=SourceCategory.CONTAINER,
+                    toon_spec=toon,
+                    is_delta=is_delta,
+                    metadata=result,
+                )
+            )
 
         self._prev_containers = containers
 
@@ -142,8 +150,11 @@ class DockerWatcher(BaseWatcher):
         containers: Dict[str, Dict[str, Any]] = {}
         try:
             cmd = [
-                "docker", "ps", "-a",
-                "--format", '{"id":"{{.ID}}","name":"{{.Names}}","image":"{{.Image}}",'
+                "docker",
+                "ps",
+                "-a",
+                "--format",
+                '{"id":"{{.ID}}","name":"{{.Names}}","image":"{{.Image}}",'
                 '"status":"{{.Status}}","state":"{{.State}}","ports":"{{.Ports}}",'
                 '"created":"{{.CreatedAt}}","size":"{{.Size}}"}',
             ]
@@ -174,14 +185,19 @@ class DockerWatcher(BaseWatcher):
 
     async def _fetch_stats(self, containers: Dict[str, Dict[str, Any]]) -> None:
         """Fetch resource stats for running containers."""
-        running = [name for name, info in containers.items() if info.get("state") == "running"]
+        running = [
+            name for name, info in containers.items() if info.get("state") == "running"
+        ]
         if not running:
             return
 
         try:
             cmd = [
-                "docker", "stats", "--no-stream",
-                "--format", '{"name":"{{.Name}}","cpu":"{{.CPUPerc}}","mem":"{{.MemUsage}}",'
+                "docker",
+                "stats",
+                "--no-stream",
+                "--format",
+                '{"name":"{{.Name}}","cpu":"{{.CPUPerc}}","mem":"{{.MemUsage}}",'
                 '"mem_perc":"{{.MemPerc}}","net":"{{.NetIO}}","block":"{{.BlockIO}}","pids":"{{.PIDs}}"}',
             ]
             cmd.extend(running[:20])
@@ -208,17 +224,27 @@ class DockerWatcher(BaseWatcher):
 
     async def _fetch_logs(self, containers: Dict[str, Dict[str, Any]]) -> None:
         """Fetch recent log lines for running containers."""
-        running = [name for name, info in containers.items() if info.get("state") == "running"]
+        running = [
+            name for name, info in containers.items() if info.get("state") == "running"
+        ]
 
         for name in running[:5]:
             try:
                 proc = await asyncio.create_subprocess_exec(
-                    "docker", "logs", "--tail", str(self.log_tail), name,
+                    "docker",
+                    "logs",
+                    "--tail",
+                    str(self.log_tail),
+                    name,
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.STDOUT,
                 )
                 stdout, _ = await asyncio.wait_for(proc.communicate(), timeout=5.0)
-                containers[name]["recent_logs"] = stdout.decode(errors="replace").strip().splitlines()[-self.log_tail:]
+                containers[name]["recent_logs"] = (
+                    stdout.decode(errors="replace")
+                    .strip()
+                    .splitlines()[-self.log_tail :]
+                )
             except (FileNotFoundError, asyncio.TimeoutError):
                 pass
 
@@ -280,7 +306,11 @@ class DockerWatcher(BaseWatcher):
 
             # Include recent error logs
             logs = info.get("recent_logs", [])
-            error_logs = [l for l in logs if any(x in l.upper() for x in ["ERROR", "FATAL", "PANIC"])]
+            error_logs = [
+                l
+                for l in logs
+                if any(x in l.upper() for x in ["ERROR", "FATAL", "PANIC"])
+            ]
             for log_line in error_logs[-3:]:
                 parts.append(f"    ERR: {log_line[:150]}")
 

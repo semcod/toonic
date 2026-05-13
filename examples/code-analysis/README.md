@@ -34,9 +34,6 @@ python -m toonic.server \
   --interval 0
 ```
 
-## Continuous Analysis (watch mode)
-
-```bash
 # Re-analyze every 60s — detects file changes via delta TOON
 python -m toonic.server \
   --source file:./examples/code-analysis/sample-project/ \

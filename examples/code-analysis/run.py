@@ -5,6 +5,7 @@ Code Analysis — run with: python examples/code-analysis/run.py
 Before (manual): ~15 lines of ServerConfig + ToonicServer setup.
 After (preset):  2 lines.
 """
+
 from toonic.server.quick import code_review
 from examples._helpers import print_config_summary, print_to_run_hint
 

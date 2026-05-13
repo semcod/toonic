@@ -5,6 +5,7 @@ Log Monitoring — run with: python examples/log-monitoring/run.py
 Before: ~20 lines of manual ServerConfig + trigger setup.
 After:  2 lines with preset.
 """
+
 from toonic.server.quick import log_monitor
 from examples._helpers import print_config_summary, print_to_run_hint
 

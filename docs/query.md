@@ -1,5 +1,3 @@
-# NLP/SQL Query
-
 ## Przegląd
 
 Przeszukuj historię wymian z LLM za pomocą:
@@ -38,9 +36,6 @@ toonic> sql SELECT * FROM exchanges WHERE content LIKE '%authentication%'
 toonic> sql SELECT date(timestamp, 'unixepoch') as day, COUNT(*) FROM exchanges GROUP BY day
 ```
 
-## REST API
-
-```bash
 # NLP query
 curl -X POST http://localhost:8900/api/query \
   -H "Content-Type: application/json" \

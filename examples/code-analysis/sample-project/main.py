@@ -1,7 +1,5 @@
 """Sample project for Toonic code analysis demo."""
 
-import os
-import sys
 from typing import List, Optional
 
 

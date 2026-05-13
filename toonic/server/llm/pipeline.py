@@ -6,10 +6,10 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 from toonic.server.models import ActionResponse, ContextChunk
-from toonic.server.llm.prompts import PromptBuilder, GenericPrompt, select_prompt_builder
+from toonic.server.llm.prompts import PromptBuilder, select_prompt_builder
 from toonic.server.llm.caller import LLMCaller
 from toonic.server.llm.parser import ResponseParser
 
@@ -48,7 +48,9 @@ class LLMPipeline:
             category=category,
             has_images=bool(prompt["images"]),
         )
-        logger.info(f"LLM pipeline: model={model}, chunks={len(chunks)}, images={len(images)}")
+        logger.info(
+            f"LLM pipeline: model={model}, chunks={len(chunks)}, images={len(images)}"
+        )
 
         # Stage 4: Call LLM
         raw_response = await self.caller.call(

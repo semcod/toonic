@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Any, Dict, Union
+from typing import Dict, Union
 
 from toonic.server.config import SourceConfig
 from toonic.server.quick.builder import ConfigBuilder
@@ -59,7 +59,7 @@ async def _serve_web(
     """Run server with Web UI enabled."""
     import uvicorn
 
-    print(f"\n  Toonic Server")
+    print("\n  Toonic Server")
     print(f"  Web UI:  http://{host}:{port}/")
     print(f"  Goal:    {server.config.goal}")
     print(f"  Sources: {len(server.config.sources)}")
@@ -75,7 +75,7 @@ async def _serve_web(
 
 async def _serve_headless(server) -> None:
     """Run server in headless mode (no Web UI)."""
-    print(f"  Toonic Server (headless)")
+    print("  Toonic Server (headless)")
     print(f"  Goal:    {server.config.goal}")
     print(f"  Sources: {len(server.config.sources)}")
     try:

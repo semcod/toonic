@@ -17,9 +17,8 @@ import importlib
 import os
 import subprocess
 import sys
-import textwrap
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 EXAMPLES_DIR = Path(__file__).parent
 DEFAULT_SCRIPT_TIMEOUT_S = 30
@@ -28,6 +27,7 @@ PROGRAMMATIC_API_DEMOS = ["demo_quick.py", "demo_accumulator.py", "demo_pipeline
 
 # ── Helper functions ─────────────────────────────────────────
 
+
 def _repo_root() -> Path:
     return EXAMPLES_DIR.parent
 
@@ -35,14 +35,18 @@ def _repo_root() -> Path:
 def _example_env() -> Dict[str, str]:
     env = dict(os.environ)
     # Make examples runnable without editable install
-    env["PYTHONPATH"] = f"{_repo_root()}:{env.get('PYTHONPATH','')}".rstrip(":")
+    env["PYTHONPATH"] = f"{_repo_root()}:{env.get('PYTHONPATH', '')}".rstrip(":")
     return env
 
 
-def _run_py(script: Path, *, timeout_s: int = DEFAULT_SCRIPT_TIMEOUT_S) -> subprocess.CompletedProcess:
+def _run_py(
+    script: Path, *, timeout_s: int = DEFAULT_SCRIPT_TIMEOUT_S
+) -> subprocess.CompletedProcess:
     return subprocess.run(
         [sys.executable, str(script)],
-        capture_output=True, text=True, timeout=timeout_s,
+        capture_output=True,
+        text=True,
+        timeout=timeout_s,
         env=_example_env(),
         cwd=str(_repo_root()),
     )
@@ -113,7 +117,10 @@ EXAMPLES: Dict[str, Dict[str, Any]] = {
         "desc": "Combined code + logs + video + infra monitoring",
         "quick": 'from toonic.server.quick import full_stack\nfull_stack("./src/", "log:./app.log", "docker:*")',
         "preset": "full-stack",
-        "sources": ["./examples/code-analysis/sample-project/", "log:./docker/test-data/sample.logfile"],
+        "sources": [
+            "./examples/code-analysis/sample-project/",
+            "log:./docker/test-data/sample.logfile",
+        ],
         "has_demo": False,
     },
     "data-formats": {
@@ -201,6 +208,7 @@ EXAMPLES: Dict[str, Dict[str, Any]] = {
 
 # ── Verification (import + build_config only, no server start) ──
 
+
 def verify_imports() -> List[str]:
     """Verify all toonic modules import correctly."""
     errors = []
@@ -231,6 +239,7 @@ def verify_presets() -> List[str]:
     """Verify all presets build without error."""
     errors = []
     from toonic.server.quick import PRESETS
+
     for name, info in PRESETS.items():
         try:
             builder = info["fn"]("./examples/code-analysis/sample-project/")
@@ -246,6 +255,7 @@ def verify_config_builds() -> List[str]:
     """Verify each example can build a ServerConfig."""
     errors = []
     from toonic.server.quick import watch
+
     for name, ex in EXAMPLES.items():
         if not ex["sources"]:
             continue
@@ -271,7 +281,9 @@ def verify_demos() -> List[str]:
             continue
         result = _run_py(path, timeout_s=DEFAULT_SCRIPT_TIMEOUT_S)
         if result.returncode != 0:
-            errors.append(f"  FAIL: {script} — {(result.stderr or result.stdout)[:200]}")
+            errors.append(
+                f"  FAIL: {script} — {(result.stderr or result.stdout)[:200]}"
+            )
     return errors
 
 
@@ -330,6 +342,7 @@ def verify_all() -> bool:
 
 # ── Execute examples (sequential) ─────────────────────────────
 
+
 def execute_all(*, continue_on_error: bool = True) -> bool:
     """Execute local-safe example scripts sequentially.
 
@@ -342,31 +355,37 @@ def execute_all(*, continue_on_error: bool = True) -> bool:
     # Standard run.py entrypoints
     for run_py in sorted(EXAMPLES_DIR.glob("*/run.py")):
         example_name = run_py.parent.name
-        scripts.append({
-            "name": f"{example_name}/run.py",
-            "path": run_py,
-            "timeout": DEFAULT_SCRIPT_TIMEOUT_S,
-        })
+        scripts.append(
+            {
+                "name": f"{example_name}/run.py",
+                "path": run_py,
+                "timeout": DEFAULT_SCRIPT_TIMEOUT_S,
+            }
+        )
 
     # Security audit quick demo (dry build)
     quick_audit = EXAMPLES_DIR / "security-audit" / "quick_audit.py"
     if quick_audit.exists():
-        scripts.append({
-            "name": "security-audit/quick_audit.py",
-            "path": quick_audit,
-            "timeout": DEFAULT_SCRIPT_TIMEOUT_S,
-        })
+        scripts.append(
+            {
+                "name": "security-audit/quick_audit.py",
+                "path": quick_audit,
+                "timeout": DEFAULT_SCRIPT_TIMEOUT_S,
+            }
+        )
 
     # Programmatic API demos (should run offline)
     demo_dir = EXAMPLES_DIR / "programmatic-api"
     for script in PROGRAMMATIC_API_DEMOS:
         p = demo_dir / script
         if p.exists():
-            scripts.append({
-                "name": f"programmatic-api/{script}",
-                "path": p,
-                "timeout": DEFAULT_SCRIPT_TIMEOUT_S,
-            })
+            scripts.append(
+                {
+                    "name": f"programmatic-api/{script}",
+                    "path": p,
+                    "timeout": DEFAULT_SCRIPT_TIMEOUT_S,
+                }
+            )
 
     skipped = {
         # Requires RTSP stream to actually do something meaningful (we keep run.py dry), but might still import OpenCV.
@@ -389,7 +408,9 @@ def execute_all(*, continue_on_error: bool = True) -> bool:
             continue
         print(f"\nRUN: {name}")
         try:
-            result = _run_py(path, timeout_s=int(item.get("timeout", DEFAULT_SCRIPT_TIMEOUT_S)))
+            result = _run_py(
+                path, timeout_s=int(item.get("timeout", DEFAULT_SCRIPT_TIMEOUT_S))
+            )
         except subprocess.TimeoutExpired:
             ok = False
             print(f"  FAIL (timeout): {name}")
@@ -399,8 +420,8 @@ def execute_all(*, continue_on_error: bool = True) -> bool:
 
         if result.returncode != 0:
             ok = False
-            out = (result.stdout or "")
-            err = (result.stderr or "")
+            out = result.stdout or ""
+            err = result.stderr or ""
             tail = (err or out).splitlines()[-25:]
             print(f"  FAIL (exit={result.returncode}): {name}")
             if tail:
@@ -420,6 +441,7 @@ def execute_all(*, continue_on_error: bool = True) -> bool:
 
 # ── List / Show ──────────────────────────────────────────────
 
+
 def list_examples():
     """List all available examples."""
     print("=" * 60)
@@ -428,6 +450,7 @@ def list_examples():
 
     print("\n  Presets (1-liner monitoring):\n")
     from toonic.server.quick import PRESETS
+
     for name, info in PRESETS.items():
         print(f"    {name:20s}  {info['desc']}")
 
@@ -453,7 +476,7 @@ def show_example(name: str):
     ex = EXAMPLES[name]
     print(f"\n  Example: {name}")
     print(f"  {ex['desc']}")
-    print(f"\n  Quick start:")
+    print("\n  Quick start:")
     for line in ex["quick"].split("\n"):
         print(f"    {line}")
 
@@ -467,14 +490,24 @@ def show_example(name: str):
 
 # ── Main ─────────────────────────────────────────────────────
 
+
 def main():
     import argparse
+
     parser = argparse.ArgumentParser(description="Toonic examples runner")
     parser.add_argument("--list", action="store_true", help="List examples")
     parser.add_argument("--show", type=str, help="Show example details")
     parser.add_argument("--verify", action="store_true", help="Verify all examples")
-    parser.add_argument("--execute", action="store_true", help="Execute local-safe example scripts sequentially")
-    parser.add_argument("--fail-fast", action="store_true", help="Stop on first execution failure (with --execute)")
+    parser.add_argument(
+        "--execute",
+        action="store_true",
+        help="Execute local-safe example scripts sequentially",
+    )
+    parser.add_argument(
+        "--fail-fast",
+        action="store_true",
+        help="Stop on first execution failure (with --execute)",
+    )
     parser.add_argument("--run", type=str, help="Run a demo script")
     parser.add_argument("--preset", type=str, help="Run a preset (dry config build)")
     parser.add_argument("sources", nargs="*", help="Sources for preset")
@@ -498,6 +531,7 @@ def main():
             print(f"Script not found: {args.run}")
     elif args.preset:
         from toonic.server.quick import PRESETS
+
         if args.preset in PRESETS:
             sources = args.sources or ["./examples/code-analysis/sample-project/"]
             builder = PRESETS[args.preset]["fn"](*sources)

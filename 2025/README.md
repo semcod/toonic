@@ -49,8 +49,6 @@ service UserService @base("/api/users"):
 | LLM-friendly | ✅ Designed for | ❌ Not designed | ❌ Code parsing | ❌ Not designed |
 | Human-readable | ✅ Compact | ⚠️ YAML/JSON | ✅ Code | ✅ Schema |
 
-## Quick Start
-
 ### Installation
 
 **Python:**
@@ -112,8 +110,6 @@ toon generate todo.toon -t zod -o schemas.ts
 # OpenAPI
 toon generate todo.toon -t openapi -o openapi.json
 ```
-
-## Syntax Reference
 
 ### Header & Metadata
 
@@ -227,8 +223,6 @@ config AppConfig @extends(DatabaseConfig):
   port: int = 8000 @env("PORT")
 ```
 
-## Language-Specific Usage
-
 ### Python
 
 ```python
@@ -322,8 +316,6 @@ fn main() -> Result<(), toon_sdk::ToonError> {
 }
 ```
 
-## IDE Support
-
 ### VS Code Extension
 
 Install from marketplace or manually:
@@ -353,8 +345,6 @@ See the `examples/` directory:
 - `blog-api.toon` - Simple blog with posts and comments
 - `ecommerce-api.toon` - Full e-commerce with products, orders, payments
 
-## API Reference
-
 ### ToonSchema Structure
 
 ```typescript
@@ -370,21 +360,11 @@ interface ToonSchema {
 }
 ```
 
-### CLI Commands
-
-```bash
 # Parse and validate
 toon validate schema.toon
 
 # Generate code
 toon generate schema.toon -t <target> -o <output>
-
-# Available targets:
-#   pydantic, fastapi, dataclasses (Python)
-#   zod, io-ts, hono (TypeScript)
-#   php, laravel (PHP)
-#   rust, serde (Rust)
-#   openapi, jsonschema (Specs)
 
 # Export to JSON
 toon export schema.toon -o schema.json

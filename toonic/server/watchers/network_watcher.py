@@ -11,7 +11,7 @@ import asyncio
 import logging
 import socket
 import time
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List
 
 from toonic.server.models import ContextChunk, SourceCategory
 from toonic.server.watchers.base import BaseWatcher, WatcherRegistry
@@ -43,7 +43,9 @@ class NetworkWatcher(BaseWatcher):
         self.targets: List[str] = [t.strip() for t in target.split(",") if t.strip()]
         # Ports to check per target (optional)
         self.check_ports: List[int] = [
-            int(p) for p in str(options.get("ports", "")).split(",") if p.strip().isdigit()
+            int(p)
+            for p in str(options.get("ports", "")).split(",")
+            if p.strip().isdigit()
         ]
         self.check_dns = options.get("check_dns", True)
         self.check_ping = options.get("check_ping", True)
@@ -97,8 +99,12 @@ class NetworkWatcher(BaseWatcher):
         summary = {
             "check_number": self._check_count,
             "targets": len(self.targets),
-            "reachable": sum(1 for r in all_results.values() if r.get("reachable", False)),
-            "unreachable": sum(1 for r in all_results.values() if not r.get("reachable", False)),
+            "reachable": sum(
+                1 for r in all_results.values() if r.get("reachable", False)
+            ),
+            "unreachable": sum(
+                1 for r in all_results.values() if not r.get("reachable", False)
+            ),
             "results": all_results,
             "changes": changes,
             "has_changes": len(changes) > 0,
@@ -107,19 +113,19 @@ class NetworkWatcher(BaseWatcher):
         toon = self._to_toon(summary)
         is_delta = self._check_count > 1
         should_emit = (
-            not is_delta
-            or summary["has_changes"]
-            or self._check_count % 10 == 0
+            not is_delta or summary["has_changes"] or self._check_count % 10 == 0
         )
 
         if should_emit:
-            await self.emit(ContextChunk(
-                source_id=self.source_id,
-                category=SourceCategory.NETWORK,
-                toon_spec=toon,
-                is_delta=is_delta,
-                metadata=summary,
-            ))
+            await self.emit(
+                ContextChunk(
+                    source_id=self.source_id,
+                    category=SourceCategory.NETWORK,
+                    toon_spec=toon,
+                    is_delta=is_delta,
+                    metadata=summary,
+                )
+            )
 
         self._prev_results = all_results
 
@@ -174,7 +180,9 @@ class NetworkWatcher(BaseWatcher):
         def _resolve():
             start = time.monotonic()
             try:
-                results = socket.getaddrinfo(host, None, socket.AF_UNSPEC, socket.SOCK_STREAM)
+                results = socket.getaddrinfo(
+                    host, None, socket.AF_UNSPEC, socket.SOCK_STREAM
+                )
                 elapsed = time.monotonic() - start
                 ips = list(set(r[4][0] for r in results))
                 return {
@@ -197,7 +205,11 @@ class NetworkWatcher(BaseWatcher):
         """Ping a host using system ping command."""
         try:
             proc = await asyncio.create_subprocess_exec(
-                "ping", "-c", str(self.ping_count), "-W", str(int(self.timeout)),
+                "ping",
+                "-c",
+                str(self.ping_count),
+                "-W",
+                str(int(self.timeout)),
                 host,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
@@ -224,7 +236,8 @@ class NetworkWatcher(BaseWatcher):
                 elif "packet loss" in line:
                     # Extract packet loss percentage
                     import re
-                    m = re.search(r'(\d+(?:\.\d+)?)%\s*packet loss', line)
+
+                    m = re.search(r"(\d+(?:\.\d+)?)%\s*packet loss", line)
                     if m:
                         result["packet_loss_pct"] = float(m.group(1))
 
@@ -247,7 +260,11 @@ class NetworkWatcher(BaseWatcher):
                     sock.connect((host, port))
                     elapsed = time.monotonic() - start
                     sock.close()
-                    return {"reachable": True, "avg_ms": round(elapsed * 1000, 1), "method": "tcp"}
+                    return {
+                        "reachable": True,
+                        "avg_ms": round(elapsed * 1000, 1),
+                        "method": "tcp",
+                    }
                 except (socket.timeout, ConnectionRefusedError, OSError):
                     continue
                 finally:
@@ -256,7 +273,9 @@ class NetworkWatcher(BaseWatcher):
 
         return await loop.run_in_executor(None, _try_connect)
 
-    async def _check_ports(self, host: str, ports: List[int]) -> Dict[int, Dict[str, Any]]:
+    async def _check_ports(
+        self, host: str, ports: List[int]
+    ) -> Dict[int, Dict[str, Any]]:
         """Check if TCP ports are open."""
         results: Dict[int, Dict[str, Any]] = {}
         loop = asyncio.get_event_loop()
@@ -363,8 +382,12 @@ class NetworkWatcher(BaseWatcher):
             # Port details
             port_results = result.get("ports", {})
             if port_results:
-                open_ports = [str(p) for p, r in sorted(port_results.items()) if r.get("open")]
-                closed_ports = [str(p) for p, r in sorted(port_results.items()) if not r.get("open")]
+                open_ports = [
+                    str(p) for p, r in sorted(port_results.items()) if r.get("open")
+                ]
+                closed_ports = [
+                    str(p) for p, r in sorted(port_results.items()) if not r.get("open")
+                ]
                 if open_ports:
                     parts.append(f"    OPEN: {','.join(open_ports)}")
                 if closed_ports:

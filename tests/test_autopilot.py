@@ -5,12 +5,9 @@ Tests for toonic.autopilot — scaffold, executor, prompts, loop.
 from __future__ import annotations
 
 import json
-import pytest
-import tempfile
-from pathlib import Path
 
 from toonic.autopilot.scaffold import ProjectScaffold, ProjectSpec
-from toonic.autopilot.executor import ActionExecutor, ExecutionResult
+from toonic.autopilot.executor import ActionExecutor
 from toonic.autopilot.prompts import AutopilotPrompt, ScaffoldPrompt, FixPrompt
 from toonic.server.models import ContextChunk, SourceCategory
 
@@ -204,10 +201,12 @@ class TestActionExecutor:
     def test_delete_file(self, tmp_path):
         (tmp_path / "to_delete.py").write_text("old code")
         executor = ActionExecutor(project_dir=tmp_path)
-        result = executor.execute({
-            "action_type": "delete_file",
-            "target_path": "to_delete.py",
-        })
+        result = executor.execute(
+            {
+                "action_type": "delete_file",
+                "target_path": "to_delete.py",
+            }
+        )
         assert result.success
         assert not (tmp_path / "to_delete.py").exists()
 
@@ -220,7 +219,13 @@ class TestAutopilotPrompt:
         prompt = AutopilotPrompt()
         result = prompt.build(
             goal="build MVP",
-            chunks=[ContextChunk(source_id="main.py", category=SourceCategory.CODE, toon_spec="def main(): pass")],
+            chunks=[
+                ContextChunk(
+                    source_id="main.py",
+                    category=SourceCategory.CODE,
+                    toon_spec="def main(): pass",
+                )
+            ],
             images=[],
         )
         assert "system" in result
@@ -250,9 +255,7 @@ class TestAutopilotPrompt:
 
     def test_build_with_iteration(self):
         prompt = AutopilotPrompt()
-        result = prompt.build(
-            goal="build", chunks=[], images=[], iteration=5
-        )
+        result = prompt.build(goal="build", chunks=[], images=[], iteration=5)
         assert "Iteration #5" in result["user"]
 
 
@@ -273,7 +276,8 @@ class TestFixPrompt:
     def test_build(self):
         prompt = FixPrompt()
         chunk = ContextChunk(
-            source_id="main.py", category=SourceCategory.CODE,
+            source_id="main.py",
+            category=SourceCategory.CODE,
             toon_spec="def foo(): return 1",
         )
         result = prompt.build(
@@ -291,6 +295,7 @@ class TestFixPrompt:
 class TestParserRawToDict:
     def test_parse_json_fenced(self):
         from toonic.server.llm.parser import ResponseParser
+
         parser = ResponseParser()
         content = '```json\n{"action": "implement", "files": []}\n```'
         result = parser.parse_raw_to_dict(content)
@@ -299,6 +304,7 @@ class TestParserRawToDict:
 
     def test_parse_json_with_preamble(self):
         from toonic.server.llm.parser import ResponseParser
+
         parser = ResponseParser()
         content = 'Here is the result:\n{"action": "report", "content": "all good"}'
         result = parser.parse_raw_to_dict(content)
@@ -307,23 +313,28 @@ class TestParserRawToDict:
 
     def test_parse_nested_json(self):
         from toonic.server.llm.parser import ResponseParser
+
         parser = ResponseParser()
-        content = json.dumps({
-            "action": "implement",
-            "files": [{"path": "a.py", "content": "x = {'key': 'val'}"}],
-        })
+        content = json.dumps(
+            {
+                "action": "implement",
+                "files": [{"path": "a.py", "content": "x = {'key': 'val'}"}],
+            }
+        )
         result = parser.parse_raw_to_dict(content)
         assert result is not None
         assert len(result["files"]) == 1
 
     def test_parse_empty(self):
         from toonic.server.llm.parser import ResponseParser
+
         parser = ResponseParser()
         assert parser.parse_raw_to_dict("") is None
         assert parser.parse_raw_to_dict("no json here") is None
 
     def test_parse_trailing_comma(self):
         from toonic.server.llm.parser import ResponseParser
+
         parser = ResponseParser()
         content = '{"action": "report", "content": "test",}'
         result = parser.parse_raw_to_dict(content)

@@ -86,7 +86,9 @@ class HttpWatcher(BaseWatcher):
 
         try:
             status, response_time, body, headers, redirect_chain = await self._fetch()
-            self._update_result_with_fetch(result, status, response_time, body, headers, redirect_chain)
+            self._update_result_with_fetch(
+                result, status, response_time, body, headers, redirect_chain
+            )
             self._detect_changes(result, status, response_time, body)
             self._check_keywords(result, body)
             await self._check_ssl_and_update(result)
@@ -97,9 +99,15 @@ class HttpWatcher(BaseWatcher):
         self._update_history(result)
         await self._emit_if_needed(result)
 
-    def _update_result_with_fetch(self, result: Dict[str, Any], status: int, 
-                                   response_time: float, body: bytes, 
-                                   headers: Dict[str, str], redirect_chain: List[Dict]) -> None:
+    def _update_result_with_fetch(
+        self,
+        result: Dict[str, Any],
+        status: int,
+        response_time: float,
+        body: bytes,
+        headers: Dict[str, str],
+        redirect_chain: List[Dict],
+    ) -> None:
         """Update result dict with fetch response data."""
         result["status_code"] = status
         result["response_time_ms"] = round(response_time * 1000, 1)
@@ -109,8 +117,9 @@ class HttpWatcher(BaseWatcher):
             result["redirects"] = redirect_chain
         result["content_hash"] = hashlib.sha256(body).hexdigest()[:16]
 
-    def _detect_changes(self, result: Dict[str, Any], status: int, 
-                        response_time: float, body: bytes) -> None:
+    def _detect_changes(
+        self, result: Dict[str, Any], status: int, response_time: float, body: bytes
+    ) -> None:
         """Detect various types of changes from previous check."""
         changes: List[str] = []
         content_hash = result["content_hash"]
@@ -146,7 +155,9 @@ class HttpWatcher(BaseWatcher):
             result["keywords_found"] = found
         if missing:
             result["keywords_missing"] = missing
-            result["changes"] = result.get("changes", []) + [f"missing_keywords:{len(missing)}"]
+            result["changes"] = result.get("changes", []) + [
+                f"missing_keywords:{len(missing)}"
+            ]
             result["has_changes"] = True
 
     async def _check_ssl_and_update(self, result: Dict[str, Any]) -> None:
@@ -157,7 +168,9 @@ class HttpWatcher(BaseWatcher):
         if ssl_info:
             result["ssl"] = ssl_info
             if ssl_info.get("days_until_expiry", 999) < 30:
-                result["changes"] = result.get("changes", []) + [f"ssl_expiring:{ssl_info['days_until_expiry']}d"]
+                result["changes"] = result.get("changes", []) + [
+                    f"ssl_expiring:{ssl_info['days_until_expiry']}d"
+                ]
                 result["has_changes"] = True
 
     def _update_state(self, status: int, response_time: float, body: bytes) -> None:
@@ -191,13 +204,15 @@ class HttpWatcher(BaseWatcher):
         )
 
         if should_emit:
-            await self.emit(ContextChunk(
-                source_id=self.source_id,
-                category=SourceCategory.WEB,
-                toon_spec=toon,
-                is_delta=is_delta,
-                metadata=result,
-            ))
+            await self.emit(
+                ContextChunk(
+                    source_id=self.source_id,
+                    category=SourceCategory.WEB,
+                    toon_spec=toon,
+                    is_delta=is_delta,
+                    metadata=result,
+                )
+            )
 
     async def _fetch(self):
         """Perform HTTP request. Uses httpx if available, falls back to urllib."""
@@ -205,6 +220,7 @@ class HttpWatcher(BaseWatcher):
 
         try:
             import httpx
+
             async with httpx.AsyncClient(
                 follow_redirects=self.follow_redirects,
                 timeout=self.timeout,
@@ -269,6 +285,7 @@ class HttpWatcher(BaseWatcher):
 
             def _get_cert():
                 import socket
+
                 ctx = ssl.create_default_context()
                 with ctx.wrap_socket(socket.socket(), server_hostname=hostname) as s:
                     s.settimeout(self.timeout)
@@ -326,7 +343,9 @@ class HttpWatcher(BaseWatcher):
         if result.get("ssl"):
             ssl_info = result["ssl"]
             if "days_until_expiry" in ssl_info:
-                parts.append(f"SSL: expires in {ssl_info['days_until_expiry']}d ({ssl_info.get('expires', '')})")
+                parts.append(
+                    f"SSL: expires in {ssl_info['days_until_expiry']}d ({ssl_info.get('expires', '')})"
+                )
             elif "error" in ssl_info:
                 parts.append(f"SSL_ERROR: {ssl_info['error']}")
 

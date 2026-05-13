@@ -17,9 +17,16 @@ from toonic.server.models import ContextChunk, SourceCategory
 class AutopilotPrompt:
     """Prompt that instructs LLM to generate concrete file changes for the project."""
 
-    def build(self, goal: str, chunks: List[ContextChunk], images: List[str],
-              roadmap: str = "", iteration: int = 0,
-              test_output: str = "", previous_actions: str = "") -> Dict[str, Any]:
+    def build(
+        self,
+        goal: str,
+        chunks: List[ContextChunk],
+        images: List[str],
+        roadmap: str = "",
+        iteration: int = 0,
+        test_output: str = "",
+        previous_actions: str = "",
+    ) -> Dict[str, Any]:
 
         system = (
             "You are Toonic Autopilot — an autonomous software development agent.\n"
@@ -32,17 +39,17 @@ class AutopilotPrompt:
             "5. Keep changes small and focused (1-3 files per iteration).\n"
             "6. If tests failed, fix the failing code first.\n\n"
             "RESPONSE FORMAT (JSON):\n"
-            '{\n'
+            "{\n"
             '  "action": "implement",\n'
             '  "description": "what you did and why",\n'
             '  "files": [\n'
             '    {"path": "relative/path/file.py", "content": "full file content"},\n'
             '    {"path": "tests/test_file.py", "content": "test code"}\n'
-            '  ],\n'
+            "  ],\n"
             '  "roadmap_update": "- [x] task completed\\n- [ ] next task",\n'
             '  "next_step": "what should be done next",\n'
             '  "confidence": 0.8\n'
-            '}\n\n'
+            "}\n\n"
             "IMPORTANT:\n"
             "- Each file in 'files' must contain the COMPLETE file content.\n"
             "- Use proper imports, type hints, docstrings.\n"
@@ -62,16 +69,20 @@ class AutopilotPrompt:
 
         # Add test output if tests failed
         if test_output:
-            user_parts.append(f"## Test Output (fix these first!)\n```\n{test_output[-1500:]}\n```\n")
+            user_parts.append(
+                f"## Test Output (fix these first!)\n```\n{test_output[-1500:]}\n```\n"
+            )
 
         # Add previous actions summary
         if previous_actions:
             user_parts.append(f"## Previous Actions\n{previous_actions}\n")
 
         # Add current project code
-        code_chunks = [c for c in chunks if c.category in (
-            SourceCategory.CODE, SourceCategory.CONFIG
-        )]
+        code_chunks = [
+            c
+            for c in chunks
+            if c.category in (SourceCategory.CODE, SourceCategory.CONFIG)
+        ]
         if code_chunks:
             user_parts.append("## Current Project Code (TOON format)")
             for c in code_chunks:
@@ -81,9 +92,11 @@ class AutopilotPrompt:
                     user_parts.append(spec[:3000])
 
         # Other chunks (logs, data)
-        other_chunks = [c for c in chunks if c.category not in (
-            SourceCategory.CODE, SourceCategory.CONFIG
-        )]
+        other_chunks = [
+            c
+            for c in chunks
+            if c.category not in (SourceCategory.CODE, SourceCategory.CONFIG)
+        ]
         if other_chunks:
             user_parts.append("\n## Other Context")
             for c in other_chunks[-5:]:
@@ -99,19 +112,24 @@ class ScaffoldPrompt:
     Used when the project is empty and needs initial structure.
     """
 
-    def build(self, description: str, name: str, language: str = "python",
-              project_type: str = "cli") -> Dict[str, Any]:
+    def build(
+        self,
+        description: str,
+        name: str,
+        language: str = "python",
+        project_type: str = "cli",
+    ) -> Dict[str, Any]:
 
         system = (
             "You are a project architect. Generate a complete project scaffold.\n\n"
             "RESPONSE FORMAT (JSON):\n"
-            '{\n'
+            "{\n"
             '  "files": [\n'
             '    {"path": "relative/path", "content": "full content"}\n'
-            '  ],\n'
+            "  ],\n"
             '  "roadmap": "markdown roadmap with phases and tasks",\n'
             '  "description": "refined project description"\n'
-            '}\n\n'
+            "}\n\n"
             "Include: models, core logic, CLI/API entry point, tests, README, config."
         )
 
@@ -130,20 +148,21 @@ class ScaffoldPrompt:
 class FixPrompt:
     """Prompt specifically for fixing test failures."""
 
-    def build(self, goal: str, test_output: str,
-              chunks: List[ContextChunk]) -> Dict[str, Any]:
+    def build(
+        self, goal: str, test_output: str, chunks: List[ContextChunk]
+    ) -> Dict[str, Any]:
 
         system = (
             "You are a debugging agent. Fix the failing tests.\n\n"
             "RESPONSE FORMAT (JSON):\n"
-            '{\n'
+            "{\n"
             '  "action": "code_fix",\n'
             '  "description": "what was wrong and how you fixed it",\n'
             '  "files": [\n'
             '    {"path": "file.py", "content": "full corrected content"}\n'
-            '  ],\n'
+            "  ],\n"
             '  "confidence": 0.9\n'
-            '}\n\n'
+            "}\n\n"
             "RULES:\n"
             "- Fix the ROOT CAUSE, not symptoms.\n"
             "- Include the COMPLETE file content, not just the changed lines.\n"

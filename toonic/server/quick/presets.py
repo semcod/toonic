@@ -170,11 +170,29 @@ def full_stack(*sources: str, **overrides) -> "ConfigBuilder":
 
 # Registry of all presets (for CLI discovery)
 PRESETS: Dict[str, Any] = {
-    "security-audit": {"fn": security_audit, "desc": "Security audit: secrets, injections, OWASP Top 10"},
+    "security-audit": {
+        "fn": security_audit,
+        "desc": "Security audit: secrets, injections, OWASP Top 10",
+    },
     "code-review": {"fn": code_review, "desc": "Code review: bugs, SOLID, performance"},
-    "log-monitor": {"fn": log_monitor, "desc": "Log monitoring: error spikes, anomalies"},
-    "infra-health": {"fn": infra_health, "desc": "Infrastructure: Docker, DB, network, processes"},
-    "cctv-monitor": {"fn": cctv_monitor, "desc": "CCTV/video: intrusion detection, event analysis"},
-    "web-monitor": {"fn": web_monitor, "desc": "Web/API: uptime, response times, SSL, headers"},
-    "full-stack": {"fn": full_stack, "desc": "Full-stack: code + logs + infra + network"},
+    "log-monitor": {
+        "fn": log_monitor,
+        "desc": "Log monitoring: error spikes, anomalies",
+    },
+    "infra-health": {
+        "fn": infra_health,
+        "desc": "Infrastructure: Docker, DB, network, processes",
+    },
+    "cctv-monitor": {
+        "fn": cctv_monitor,
+        "desc": "CCTV/video: intrusion detection, event analysis",
+    },
+    "web-monitor": {
+        "fn": web_monitor,
+        "desc": "Web/API: uptime, response times, SSL, headers",
+    },
+    "full-stack": {
+        "fn": full_stack,
+        "desc": "Full-stack: code + logs + infra + network",
+    },
 }

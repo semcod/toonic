@@ -1,0 +1,80 @@
+# code2llm/evolution | 556 func | 62f | 2026-04-19
+
+NEXT[10] (ranked by impact):
+  [1] !! SPLIT           toonic/autopilot/scaffold.py
+      WHY: 580L, 2 classes, max CC=23
+      EFFORT: ~4h  IMPACT: 13340
+
+  [2] !  SPLIT-FUNC      check_event_and_emit  CC=19  fan=27
+      WHY: CC=19 exceeds 15
+      EFFORT: ~1h  IMPACT: 513
+
+  [3] !  SPLIT-FUNC      AutopilotLoop.run  CC=18  fan=26
+      WHY: CC=18 exceeds 15
+      EFFORT: ~1h  IMPACT: 468
+
+  [4] !  SPLIT-FUNC      capture_opencv  CC=16  fan=28
+      WHY: CC=16 exceeds 15
+      EFFORT: ~1h  IMPACT: 448
+
+  [5] !  SPLIT-FUNC      ProjectScaffold.generate  CC=20  fan=21
+      WHY: CC=20 exceeds 15
+      EFFORT: ~1h  IMPACT: 420
+
+  [6] !  SPLIT-FUNC      get_events_file  CC=19  fan=19
+      WHY: CC=19 exceeds 15
+      EFFORT: ~1h  IMPACT: 361
+
+  [7] !  SPLIT-FUNC      DirectoryWatcher._check_changes  CC=18  fan=20
+      WHY: CC=18 exceeds 15
+      EFFORT: ~1h  IMPACT: 360
+
+  [8] !  SPLIT-FUNC      CsvHandler.parse  CC=16  fan=19
+      WHY: CC=16 exceeds 15
+      EFFORT: ~1h  IMPACT: 304
+
+  [9] !  SPLIT-FUNC      ProjectScaffold.detect_spec  CC=23  fan=13
+      WHY: CC=23 exceeds 15
+      EFFORT: ~1h  IMPACT: 299
+
+  [10] !! SPLIT-FUNC      ActionExecutor._execute_code_change  CC=27  fan=11
+      WHY: CC=27 exceeds 15
+      EFFORT: ~1h  IMPACT: 297
+
+
+RISKS[1]:
+  ⚠ Splitting toonic/autopilot/scaffold.py may break 5 import paths
+
+METRICS-TARGET:
+  CC̄:          4.4 → ≤3.1
+  max-CC:      38 → ≤19
+  god-modules: 1 → 0
+  high-CC(≥15): 18 → ≤9
+  hub-types:   0 → ≤0
+
+PATTERNS (language parser shared logic):
+  _extract_declarations() in base.py — unified extraction for:
+    - TypeScript: interfaces, types, classes, functions, arrow funcs
+    - PHP: namespaces, traits, classes, functions, includes
+    - Ruby: modules, classes, methods, requires
+    - C++: classes, structs, functions, #includes
+    - C#: classes, interfaces, methods, usings
+    - Java: classes, interfaces, methods, imports
+    - Go: packages, functions, structs
+    - Rust: modules, functions, traits, use statements
+
+  Shared regex patterns per language:
+    - import: language-specific import/require/using patterns
+    - class: class/struct/trait declarations with inheritance
+    - function: function/method signatures with visibility
+    - brace_tracking: for C-family languages ({ })
+    - end_keyword_tracking: for Ruby (module/class/def...end)
+
+  Benefits:
+    - Consistent extraction logic across all languages
+    - Reduced code duplication (~70% reduction in parser LOC)
+    - Easier maintenance: fix once, apply everywhere
+    - Standardized FunctionInfo/ClassInfo models
+
+HISTORY:
+  (first run — no previous data)

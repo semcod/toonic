@@ -13,7 +13,7 @@ from __future__ import annotations
 
 # Re-export all public API from the new stream package
 from toonic.server.watchers.stream.models import Detection, FrameRecord
-from toonic.server.watchers.stream.watcher import StreamWatcher, _bool
+from toonic.server.watchers.stream.watcher import StreamWatcher
 
 __all__ = [
     "Detection",

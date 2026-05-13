@@ -5,6 +5,7 @@ Infrastructure Monitoring — run with: python examples/infra-monitoring/run.py
 Before: ~25 lines of manual config + trigger YAML loading.
 After:  3 lines with preset.
 """
+
 from toonic.server.quick import infra_health
 from examples._helpers import print_config_summary, print_to_run_hint
 

@@ -2,11 +2,6 @@
 
 Base URL: `http://localhost:8900`
 
-## Endpoints
-
-### GET /
-Web UI dashboard.
-
 ### WebSocket /ws
 Real-time event stream. Messages are JSON:
 ```json
@@ -19,17 +14,11 @@ Server status.
 {"running": true, "uptime_s": 120.5, "goal": "...", "sources": {...}, "total_chunks": 42}
 ```
 
-### GET /api/actions?limit=20
-Recent LLM actions.
-
 ### POST /api/analyze
 Trigger analysis. Body: `{"goal": "...", "model": "..."}`
 
 ### POST /api/sources
 Add source. Body: `{"path_or_url": "./src/", "category": "code"}`
-
-### DELETE /api/sources/{source_id}
-Remove source.
 
 ### POST /api/convert
 Convert file. Body: `{"path": "./main.py", "format": "toon"}`

@@ -28,11 +28,13 @@ class LLMCaller:
     base_url: str = ""
 
     # Model routing per category
-    model_map: Dict[str, str] = field(default_factory=lambda: {
-        "code": "google/gemini-3-flash-preview",
-        "text": "google/gemini-3-flash-preview",
-        "multimodal": "google/gemini-3-flash-preview",
-    })
+    model_map: Dict[str, str] = field(
+        default_factory=lambda: {
+            "code": "google/gemini-3-flash-preview",
+            "text": "google/gemini-3-flash-preview",
+            "multimodal": "google/gemini-3-flash-preview",
+        }
+    )
 
     def __post_init__(self):
         if not self.api_key:
@@ -49,10 +51,16 @@ class LLMCaller:
             return self.model_map.get("multimodal", self.default_model)
 
         category_to_type = {
-            "code": "code", "config": "code", "database": "code",
-            "api": "code", "infra": "code",
-            "logs": "text", "document": "text", "data": "text",
-            "video": "multimodal", "audio": "multimodal",
+            "code": "code",
+            "config": "code",
+            "database": "code",
+            "api": "code",
+            "infra": "code",
+            "logs": "text",
+            "document": "text",
+            "data": "text",
+            "video": "multimodal",
+            "audio": "multimodal",
         }
         model_type = category_to_type.get(category, "text")
         return self.model_map.get(model_type, self.default_model)
@@ -79,6 +87,7 @@ class LLMCaller:
         """Call LLM with retry and exponential backoff."""
         try:
             import litellm
+
             litellm.set_verbose = False
         except ImportError:
             return self._mock_response(model, system, user)
@@ -93,10 +102,12 @@ class LLMCaller:
         if images:
             content_parts = [{"type": "text", "text": user}]
             for img_b64 in images[:8]:
-                content_parts.append({
-                    "type": "image_url",
-                    "image_url": {"url": f"data:image/jpeg;base64,{img_b64}"},
-                })
+                content_parts.append(
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/jpeg;base64,{img_b64}"},
+                    }
+                )
             messages.append({"role": "user", "content": content_parts})
         else:
             messages.append({"role": "user", "content": user})
@@ -117,9 +128,13 @@ class LLMCaller:
                 )
                 duration = time.time() - t0
                 content = response.choices[0].message.content or ""
-                tokens = int(getattr(getattr(response, "usage", None), "total_tokens", 0) or 0)
+                tokens = int(
+                    getattr(getattr(response, "usage", None), "total_tokens", 0) or 0
+                )
 
-                logger.info(f"LLM call: model={model_id}, tokens={tokens}, duration={duration:.1f}s")
+                logger.info(
+                    f"LLM call: model={model_id}, tokens={tokens}, duration={duration:.1f}s"
+                )
 
                 return {
                     "content": content,
@@ -132,7 +147,7 @@ class LLMCaller:
                 last_error = str(e)
                 logger.warning(f"LLM call attempt {attempt + 1} failed: {e}")
                 if attempt < self.max_retries:
-                    await asyncio.sleep(2 ** attempt)
+                    await asyncio.sleep(2**attempt)
 
         return {"content": "", "error": last_error, "model": model_id, "tokens_used": 0}
 
@@ -141,22 +156,30 @@ class LLMCaller:
         model_id = self._litellm_model_id(model)
 
         # For autopilot prompts, generate a structured mock with file changes
-        if "implement" in system.lower() or "autopilot" in system.lower() or "files" in system.lower():
-            mock_content = json.dumps({
-                "action": "implement",
-                "description": "[MOCK] Autopilot iteration — set OPENROUTER_API_KEY for real LLM. "
-                               f"Context: {len(user)} chars analyzed.",
-                "files": [],
-                "next_step": "Set OPENROUTER_API_KEY environment variable to enable real code generation",
-                "confidence": 0.0,
-            })
+        if (
+            "implement" in system.lower()
+            or "autopilot" in system.lower()
+            or "files" in system.lower()
+        ):
+            mock_content = json.dumps(
+                {
+                    "action": "implement",
+                    "description": "[MOCK] Autopilot iteration — set OPENROUTER_API_KEY for real LLM. "
+                    f"Context: {len(user)} chars analyzed.",
+                    "files": [],
+                    "next_step": "Set OPENROUTER_API_KEY environment variable to enable real code generation",
+                    "confidence": 0.0,
+                }
+            )
         else:
-            mock_content = json.dumps({
-                "action": "report",
-                "content": f"[MOCK] Analysis received. Context: {len(user)} chars. "
-                           f"Set OPENROUTER_API_KEY for real LLM integration.",
-                "confidence": 0.0,
-            })
+            mock_content = json.dumps(
+                {
+                    "action": "report",
+                    "content": f"[MOCK] Analysis received. Context: {len(user)} chars. "
+                    f"Set OPENROUTER_API_KEY for real LLM integration.",
+                    "confidence": 0.0,
+                }
+            )
 
         return {
             "content": mock_content,

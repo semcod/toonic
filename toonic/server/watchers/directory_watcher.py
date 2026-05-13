@@ -10,13 +10,11 @@ structural changes and metadata.
 from __future__ import annotations
 
 import asyncio
-import hashlib
 import logging
 import os
 import stat
-import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Set, Tuple
 
 from toonic.server.models import ContextChunk, SourceCategory
 from toonic.server.watchers.base import BaseWatcher, WatcherRegistry
@@ -41,10 +39,21 @@ class DirectoryWatcher(BaseWatcher):
         self.include_hidden = options.get("include_hidden", False)
         self.track_sizes = options.get("track_sizes", True)
         self.track_permissions = options.get("track_permissions", False)
-        self.ignore_patterns: List[str] = options.get("ignore_patterns", [
-            ".git", "__pycache__", "node_modules", ".venv", "venv",
-            ".idea", ".vscode", "dist", "build", ".DS_Store",
-        ])
+        self.ignore_patterns: List[str] = options.get(
+            "ignore_patterns",
+            [
+                ".git",
+                "__pycache__",
+                "node_modules",
+                ".venv",
+                "venv",
+                ".idea",
+                ".vscode",
+                "dist",
+                "build",
+                ".DS_Store",
+            ],
+        )
 
         self._task: asyncio.Task | None = None
         self._snapshot: Dict[str, Dict[str, Any]] = {}  # path -> file info
@@ -75,18 +84,22 @@ class DirectoryWatcher(BaseWatcher):
 
         # Emit initial structure
         toon = self._build_tree_toon(self._snapshot)
-        await self.emit(ContextChunk(
-            source_id=self.source_id,
-            category=SourceCategory.DATA,
-            toon_spec=toon,
-            is_delta=False,
-            metadata={
-                "path": self.path_or_url,
-                "total_files": len(self._snapshot),
-                "total_size": sum(f.get("size", 0) for f in self._snapshot.values()),
-                "scan": "initial",
-            },
-        ))
+        await self.emit(
+            ContextChunk(
+                source_id=self.source_id,
+                category=SourceCategory.DATA,
+                toon_spec=toon,
+                is_delta=False,
+                metadata={
+                    "path": self.path_or_url,
+                    "total_files": len(self._snapshot),
+                    "total_size": sum(
+                        f.get("size", 0) for f in self._snapshot.values()
+                    ),
+                    "scan": "initial",
+                },
+            )
+        )
         logger.info(f"[{self.source_id}] Initial scan: {len(self._snapshot)} entries")
 
     async def _poll_loop(self) -> None:
@@ -117,15 +130,23 @@ class DirectoryWatcher(BaseWatcher):
             new_info = current[path]
             changes = []
             if self.track_sizes and old_info.get("size") != new_info.get("size"):
-                changes.append(f"size:{old_info.get('size', 0)}->{new_info.get('size', 0)}")
+                changes.append(
+                    f"size:{old_info.get('size', 0)}->{new_info.get('size', 0)}"
+                )
             if old_info.get("mtime", 0) != new_info.get("mtime", 0):
                 changes.append("mtime_changed")
             if self.track_permissions and old_info.get("mode") != new_info.get("mode"):
-                changes.append(f"perms:{old_info.get('mode_str', '')}->{new_info.get('mode_str', '')}")
+                changes.append(
+                    f"perms:{old_info.get('mode_str', '')}->{new_info.get('mode_str', '')}"
+                )
             if old_info.get("type") != new_info.get("type"):
-                changes.append(f"type:{old_info.get('type', '')}->{new_info.get('type', '')}")
+                changes.append(
+                    f"type:{old_info.get('type', '')}->{new_info.get('type', '')}"
+                )
             if changes:
-                modified.append((path, {"changes": changes, "old": old_info, "new": new_info}))
+                modified.append(
+                    (path, {"changes": changes, "old": old_info, "new": new_info})
+                )
 
         # Detect possible renames (same size + close mtime)
         renames: List[Tuple[str, str]] = []
@@ -135,15 +156,19 @@ class DirectoryWatcher(BaseWatcher):
             d_info = self._snapshot[d_path]
             for c_path in list(unmatched_created):
                 c_info = current[c_path]
-                if (d_info.get("size") == c_info.get("size") and
-                        d_info.get("type") == c_info.get("type") and
-                        abs(d_info.get("mtime", 0) - c_info.get("mtime", 0)) < 2):
+                if (
+                    d_info.get("size") == c_info.get("size")
+                    and d_info.get("type") == c_info.get("type")
+                    and abs(d_info.get("mtime", 0) - c_info.get("mtime", 0)) < 2
+                ):
                     renames.append((d_path, c_path))
                     unmatched_created.discard(c_path)
                     unmatched_deleted.discard(d_path)
                     break
 
-        has_changes = bool(unmatched_created or unmatched_deleted or modified or renames)
+        has_changes = bool(
+            unmatched_created or unmatched_deleted or modified or renames
+        )
 
         if has_changes:
             self._total_created += len(unmatched_created)
@@ -158,20 +183,22 @@ class DirectoryWatcher(BaseWatcher):
                 current=current,
             )
 
-            await self.emit(ContextChunk(
-                source_id=self.source_id,
-                category=SourceCategory.DATA,
-                toon_spec=toon,
-                is_delta=True,
-                metadata={
-                    "created": len(unmatched_created),
-                    "deleted": len(unmatched_deleted),
-                    "modified": len(modified),
-                    "renamed": len(renames),
-                    "total_files": len(current),
-                    "scan_number": self._scan_count,
-                },
-            ))
+            await self.emit(
+                ContextChunk(
+                    source_id=self.source_id,
+                    category=SourceCategory.DATA,
+                    toon_spec=toon,
+                    is_delta=True,
+                    metadata={
+                        "created": len(unmatched_created),
+                        "deleted": len(unmatched_deleted),
+                        "modified": len(modified),
+                        "renamed": len(renames),
+                        "total_files": len(current),
+                        "scan_number": self._scan_count,
+                    },
+                )
+            )
 
         # Update snapshot
         self._snapshot = current

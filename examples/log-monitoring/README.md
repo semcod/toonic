@@ -89,11 +89,6 @@ echo "2026-02-26 12:00:01 CRITICAL [db] Connection pool exhausted — 0/100 avai
 
 ---
 
-## Event-Driven with Triggers
-
-### Using `--when` (NLP → YAML)
-
-```bash
 # Natural language trigger — auto-generates triggers.yaml
 python -m toonic.server \
   --source log:./docker/test-data/sample.logfile \
@@ -101,9 +96,6 @@ python -m toonic.server \
   --when "when error occurs 5 times in 60 seconds"
 ```
 
-### Using YAML trigger rules
-
-```bash
 # Use the included multi-rule trigger config
 python -m toonic.server \
   --source log:./docker/test-data/sample.logfile \

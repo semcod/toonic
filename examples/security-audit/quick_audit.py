@@ -19,6 +19,7 @@ def audit_code(path: str = "./examples/code-analysis/sample-project/"):
     After: 2 lines using Toonic preset.
     """
     from toonic.server.quick import security_audit
+
     # One-liner: builds ServerConfig with security-focused goal + one-shot interval
     return security_audit(path)
 
@@ -30,11 +31,14 @@ def audit_website(url: str = "http://obywatel.bielik.ai/"):
     After: 5 lines using Toonic's built-in watchers.
     """
     from toonic.server.quick import security_audit
+
     return (
         security_audit(url)
         .network(url.split("//")[1].rstrip("/"))
-        .goal("web security audit: OWASP Top 10, security headers, "
-              "TLS config, exposed endpoints, input validation")
+        .goal(
+            "web security audit: OWASP Top 10, security headers, "
+            "TLS config, exposed endpoints, input validation"
+        )
     )
 
 
@@ -45,13 +49,16 @@ def continuous_monitoring(path: str = "./src/", log: str = "log:./app.log"):
     After: Toonic's built-in trigger scheduler + watchers handle everything.
     """
     from toonic.server.quick import security_audit
+
     return (
         security_audit(path, log)
         .network("api.example.com")
         .process("port:5432")
         .interval(300)
-        .goal("continuous security monitoring: detect new vulnerabilities, "
-              "suspicious log patterns, unauthorized access attempts")
+        .goal(
+            "continuous security monitoring: detect new vulnerabilities, "
+            "suspicious log patterns, unauthorized access attempts"
+        )
     )
 
 
@@ -68,13 +75,16 @@ def full_stack_audit(
     After: 8 lines, all watchers built-in.
     """
     from toonic.server.quick import security_audit
+
     return (
         security_audit(code, logs)
         .network(network)
         .database(db)
         .process("port:5432")
-        .goal("comprehensive security audit: code vulnerabilities, "
-              "auth log failures, exposed services, database security")
+        .goal(
+            "comprehensive security audit: code vulnerabilities, "
+            "auth log failures, exposed services, database security"
+        )
     )
 
 

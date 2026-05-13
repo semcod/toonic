@@ -16,9 +16,12 @@ class FileLogic(Protocol):
     Każdy model logiki (CodeLogic, DocumentLogic, SqlSchemaLogic...)
     implementuje ten protokół.
     """
+
     source_file: str
     source_hash: str
-    file_category: str  # "code" | "document" | "data" | "config" | "api" | "infra" | ...
+    file_category: (
+        str  # "code" | "document" | "data" | "config" | "api" | "infra" | ...
+    )
 
     def to_dict(self) -> dict:
         """Serializacja do dict (dla generatorów YAML/TOON/JSON)."""
@@ -40,9 +43,9 @@ class FileHandler(Protocol):
     """
 
     # Które pliki obsługuje?
-    extensions: frozenset[str]      # np. {'.md', '.markdown'}
-    category: str                   # np. 'document'
-    requires: tuple[str, ...]       # np. ('python-docx',) lub ()
+    extensions: frozenset[str]  # np. {'.md', '.markdown'}
+    category: str  # np. 'document'
+    requires: tuple[str, ...]  # np. ('python-docx',) lub ()
 
     def parse(self, path: Path) -> FileLogic:
         """Kierunek A: plik źródłowy → logika."""

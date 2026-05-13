@@ -12,8 +12,15 @@ from toonic.server.watchers.database_watcher import DatabaseWatcher
 from toonic.server.watchers.network_watcher import NetworkWatcher
 
 __all__ = [
-    "BaseWatcher", "WatcherRegistry",
-    "FileWatcher", "LogWatcher", "StreamWatcher",
-    "HttpWatcher", "ProcessWatcher", "DirectoryWatcher",
-    "DockerWatcher", "DatabaseWatcher", "NetworkWatcher",
+    "BaseWatcher",
+    "WatcherRegistry",
+    "FileWatcher",
+    "LogWatcher",
+    "StreamWatcher",
+    "HttpWatcher",
+    "ProcessWatcher",
+    "DirectoryWatcher",
+    "DockerWatcher",
+    "DatabaseWatcher",
+    "NetworkWatcher",
 ]

@@ -9,29 +9,26 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import asyncio
 import json
-import sys
-import threading
 from typing import Optional, Callable, Dict, List
 
 import datetime
 
 try:
     import websockets
+
     HAS_WS = True
 except ImportError:
     HAS_WS = False
 
 try:
     import httpx
+
     HAS_HTTPX = True
 except ImportError:
     HAS_HTTPX = False
 
 # Fallback: use urllib for basic HTTP
-import urllib.request
-import urllib.error
 
 
 class ToonicClient:
@@ -39,7 +36,10 @@ class ToonicClient:
 
     def __init__(self, base_url: str = "http://localhost:8900"):
         self.base_url = base_url.rstrip("/")
-        self.ws_url = self.base_url.replace("http://", "ws://").replace("https://", "wss://") + "/ws"
+        self.ws_url = (
+            self.base_url.replace("http://", "ws://").replace("https://", "wss://")
+            + "/ws"
+        )
 
     def get_status(self) -> dict:
         return self._get("/api/status")
@@ -54,7 +54,9 @@ class ToonicClient:
         return self._post("/api/analyze", {"goal": goal, "model": model})
 
     def add_source(self, path_or_url: str, category: str = "code") -> dict:
-        return self._post("/api/sources", {"path_or_url": path_or_url, "category": category})
+        return self._post(
+            "/api/sources", {"path_or_url": path_or_url, "category": category}
+        )
 
     def convert(self, path: str, fmt: str = "toon") -> dict:
         return self._post("/api/convert", {"path": path, "format": fmt})
@@ -77,6 +79,7 @@ class ToonicClient:
         url = self.base_url + path
         if HAS_HTTPX:
             import httpx
+
             r = httpx.get(url, timeout=30)
             return r.json()
         req = urllib.request.Request(url)
@@ -87,10 +90,13 @@ class ToonicClient:
         url = self.base_url + path
         if HAS_HTTPX:
             import httpx
+
             r = httpx.post(url, json=data, timeout=60)
             return r.json()
         body = json.dumps(data).encode()
-        req = urllib.request.Request(url, data=body, headers={"Content-Type": "application/json"})
+        req = urllib.request.Request(
+            url, data=body, headers={"Content-Type": "application/json"}
+        )
         with urllib.request.urlopen(req, timeout=60) as resp:
             return json.loads(resp.read())
 
@@ -136,7 +142,9 @@ def _print_status(client: ToonicClient) -> None:
     acc = data.get("accumulator", {})
     print(f"  Tokens:   {acc.get('total_tokens', 0)} / {acc.get('max_tokens', 0)}")
     router = data.get("router", {})
-    print(f"  LLM:      {router.get('total_requests', 0)} requests, {router.get('total_tokens', 0)} tokens")
+    print(
+        f"  LLM:      {router.get('total_requests', 0)} requests, {router.get('total_tokens', 0)} tokens"
+    )
     print()
 
 
@@ -147,7 +155,9 @@ def _print_actions(client: ToonicClient, parts: List[str]) -> None:
     if not actions:
         print("  No actions yet")
     for a in actions:
-        print(f"\n  [{a.get('action_type', '?')}] {a.get('model_used', '')} ({a.get('duration_s', 0):.1f}s)")
+        print(
+            f"\n  [{a.get('action_type', '?')}] {a.get('model_used', '')} ({a.get('duration_s', 0):.1f}s)"
+        )
         content = a.get("content", "")
         print(f"  {content[:300]}")
     print()
@@ -166,7 +176,9 @@ def _cmd_analyze(client: ToonicClient, parts: List[str], current_model: str) -> 
     goal = " ".join(parts[1:]) if len(parts) > 1 else ""
     print(f"  Analyzing... (model: {current_model or 'default'})")
     data = client.analyze(goal=goal, model=current_model)
-    print(f"\n  [{data.get('action_type', '?')}] confidence={data.get('confidence', 0):.1%}")
+    print(
+        f"\n  [{data.get('action_type', '?')}] confidence={data.get('confidence', 0):.1%}"
+    )
     print(f"  Model: {data.get('model_used', '')}")
     content = data.get("content", "")
     for line in content.split("\n"):
@@ -222,8 +234,10 @@ def _print_history(client: ToonicClient, parts: List[str]) -> None:
         print("  No history yet")
     for r in records:
         ts = datetime.datetime.fromtimestamp(r.get("timestamp", 0)).strftime("%H:%M:%S")
-        print(f"  [{ts}] {r.get('model', '?'):40s} [{r.get('action_type', '?')}] "
-              f"conf={r.get('confidence', 0):.0%} {r.get('duration_s', 0):.1f}s")
+        print(
+            f"  [{ts}] {r.get('model', '?'):40s} [{r.get('action_type', '?')}] "
+            f"conf={r.get('confidence', 0):.0%} {r.get('duration_s', 0):.1f}s"
+        )
         content = r.get("content", "")[:150]
         if content:
             print(f"         {content}")
@@ -358,7 +372,7 @@ def run_shell(base_url: str = "http://localhost:8900"):
     client = ToonicClient(base_url)
 
     print(f"\n  Toonic Shell — connected to {base_url}")
-    print(f"  Type 'help' for commands, 'quit' to exit\n")
+    print("  Type 'help' for commands, 'quit' to exit\n")
 
     current_model = ""
 
@@ -388,10 +402,14 @@ def run_shell(base_url: str = "http://localhost:8900"):
 
 
 def main():
-    parser = argparse.ArgumentParser(prog="toonic-client", description="Toonic CLI Shell")
+    parser = argparse.ArgumentParser(
+        prog="toonic-client", description="Toonic CLI Shell"
+    )
     parser.add_argument("--url", default="http://localhost:8900", help="Server URL")
     parser.add_argument("--status", action="store_true", help="Show status and exit")
-    parser.add_argument("--analyze", nargs="?", const="", help="Trigger analysis and exit")
+    parser.add_argument(
+        "--analyze", nargs="?", const="", help="Trigger analysis and exit"
+    )
     parser.add_argument("--convert", help="Convert file and exit")
     parser.add_argument("--format", default="toon", help="Output format for --convert")
     args = parser.parse_args()

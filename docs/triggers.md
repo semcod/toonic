@@ -1,22 +1,9 @@
-# Trigger System — Event-Driven LLM Dispatch
-
 ## Przegląd
 
 System triggerów kontroluje **kiedy** dane są wysyłane do LLM:
 - **periodic** — co N sekund (niezależnie od zdarzeń)
 - **on_event** — tylko gdy warunek jest spełniony (np. wykryto ruch, osobę)
 - **hybrid** — na zdarzenie LUB co N sekund (co pierwsze nastąpi)
-
-## Użycie z CLI
-
-### `--when` — opis w języku naturalnym
-
-```bash
-# Osoba wykryta przez 1s, inaczej co 60s
-python -m toonic.server \
-  --source "rtsp://admin:123456@192.168.188.146:554/h264Preview_01_main" \
-  --goal "describe what you see in each video frame" \
-  --when "the object person will be detected for 1 second, if not send frame min. every 1 minute"
 
 # Ruch wykryty, albo co 2 minuty
 python -m toonic.server \

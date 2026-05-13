@@ -12,7 +12,6 @@ from __future__ import annotations
 import argparse
 import asyncio
 import logging
-import signal
 import socket
 import subprocess
 import sys
@@ -35,10 +34,7 @@ def stop_process_using_port(host: str, port: int) -> bool:
     try:
         # Find process ID using the port
         result = subprocess.run(
-            ["lsof", "-ti", f"{host}:{port}"],
-            capture_output=True,
-            text=True,
-            timeout=5
+            ["lsof", "-ti", f"{host}:{port}"], capture_output=True, text=True, timeout=5
         )
         if result.returncode == 0 and result.stdout.strip():
             pids = result.stdout.strip().split()
@@ -70,6 +66,7 @@ def ensure_port_available(host: str, port: int) -> None:
         if stop_process_using_port(host, port):
             # Wait a moment for the process to fully stop
             import time
+
             time.sleep(1)
             if check_port_occupied(host, port):
                 print(f"Warning: Port {port} still occupied after stopping process")
@@ -85,39 +82,76 @@ def parse_args():
         description="Toonic Server — bidirectional TOON streaming for LLM analysis",
     )
     parser.add_argument("--config", "-c", help="Config YAML file")
-    parser.add_argument("--source", "-s", action="append", default=[],
-                        help="Data source (file:path, log:path, rtsp://url)")
-    parser.add_argument("--goal", "-g", default="analyze project structure and suggest improvements",
-                        help="Analysis goal")
+    parser.add_argument(
+        "--source",
+        "-s",
+        action="append",
+        default=[],
+        help="Data source (file:path, log:path, rtsp://url)",
+    )
+    parser.add_argument(
+        "--goal",
+        "-g",
+        default="analyze project structure and suggest improvements",
+        help="Analysis goal",
+    )
     parser.add_argument("--model", "-m", default="", help="LLM model override")
-    parser.add_argument("--interval", "-i", type=float, default=30.0,
-                        help="Analysis interval seconds (0=one-shot)")
-    parser.add_argument("--when", "-w", default="",
-                        help='Trigger condition in natural language, e.g. '
-                             '"person detected for 1s, otherwise every 60s"')
-    parser.add_argument("--triggers", "-t", default="",
-                        help="YAML file with trigger rules")
+    parser.add_argument(
+        "--interval",
+        "-i",
+        type=float,
+        default=30.0,
+        help="Analysis interval seconds (0=one-shot)",
+    )
+    parser.add_argument(
+        "--when",
+        "-w",
+        default="",
+        help="Trigger condition in natural language, e.g. "
+        '"person detected for 1s, otherwise every 60s"',
+    )
+    parser.add_argument(
+        "--triggers", "-t", default="", help="YAML file with trigger rules"
+    )
     parser.add_argument("--host", default=None, help="Server host")
     parser.add_argument("--port", "-p", type=int, default=None, help="HTTP/WS port")
     parser.add_argument("--no-web", action="store_true", help="Disable web UI")
-    parser.add_argument("--log-level", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"])
+    parser.add_argument(
+        "--log-level", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"]
+    )
     return parser.parse_args()
 
 
 # Protocols that have a matching watcher and work out of the box.
 _SUPPORTED_PROTOCOLS = {
     # HttpWatcher (incl. WebSocket/gRPC probe via HTTP)
-    "http", "https", "ws", "wss", "grpc",
+    "http",
+    "https",
+    "ws",
+    "wss",
+    "grpc",
     # StreamWatcher
-    "rtsp", "rtsps", "rtmp",
+    "rtsp",
+    "rtsps",
+    "rtmp",
     # DatabaseWatcher
-    "postgresql", "postgres", "mysql", "redis", "mongodb",
+    "postgresql",
+    "postgres",
+    "mysql",
+    "redis",
+    "mongodb",
 }
 
 # Protocols recognised but without a dedicated watcher yet.
 _UNSUPPORTED_PROTOCOLS = {
-    "ftp", "sftp", "ssh",
-    "mqtt", "amqp", "kafka", "nats", "stomp",
+    "ftp",
+    "sftp",
+    "ssh",
+    "mqtt",
+    "amqp",
+    "kafka",
+    "nats",
+    "stomp",
     "ldap",
 }
 
@@ -144,7 +178,9 @@ def parse_source_string(source_str: str):
             )
 
         src = quick_parse_source(source_str)
-        return SourceConfig(path_or_url=src.path_or_url, category=src.category, options=src.options)
+        return SourceConfig(
+            path_or_url=src.path_or_url, category=src.category, options=src.options
+        )
 
     # ── Prefixed: log:path, docker:*, db:./app.db, etc. ─────────
     if ":" in source_str:
@@ -152,12 +188,28 @@ def parse_source_string(source_str: str):
 
         # Prefixes that watchers require as part of the source string.
         keep_prefixes = {
-            "log", "logs",
-            "dir", "directory",
-            "docker", "container",
-            "db", "sqlite", "postgres", "postgresql", "mysql", "redis", "mongodb", "mongo",
-            "net", "ping", "dns",
-            "proc", "pid", "port", "tcp", "service",
+            "log",
+            "logs",
+            "dir",
+            "directory",
+            "docker",
+            "container",
+            "db",
+            "sqlite",
+            "postgres",
+            "postgresql",
+            "mysql",
+            "redis",
+            "mongodb",
+            "mongo",
+            "net",
+            "ping",
+            "dns",
+            "proc",
+            "pid",
+            "port",
+            "tcp",
+            "service",
         }
 
         src = quick_parse_source(source_str)
@@ -168,7 +220,9 @@ def parse_source_string(source_str: str):
             # For file-like prefixes normalize to raw path for FileWatcher.
             normalized = path
 
-        return SourceConfig(path_or_url=normalized, category=src.category, options=src.options)
+        return SourceConfig(
+            path_or_url=normalized, category=src.category, options=src.options
+        )
 
     # ── Plain path ──────────────────────────────────────────────
     return SourceConfig(path_or_url=source_str, category="code")
@@ -213,12 +267,15 @@ async def _build_trigger_config(args) -> "TriggerConfig | None":
         # Load from YAML file
         yaml_str = Path(args.triggers).read_text()
         trigger_config = load_triggers(yaml_str)
-        print(f"  Triggers: loaded {len(trigger_config.triggers)} rule(s) from {args.triggers}")
+        print(
+            f"  Triggers: loaded {len(trigger_config.triggers)} rule(s) from {args.triggers}"
+        )
         return trigger_config
 
     elif args.when:
         # Generate from natural language via NLP2YAML
         from toonic.server.triggers.nlp2yaml import NLP2YAML
+
         nlp = NLP2YAML(model=args.model)
         # Detect source type from --source args
         source_hint = ""
@@ -230,7 +287,9 @@ async def _build_trigger_config(args) -> "TriggerConfig | None":
                 source_hint = "logs"
                 break
         print(f"  Generating triggers from: {args.when}")
-        trigger_config = await nlp.generate(args.when, source=source_hint, goal=args.goal)
+        trigger_config = await nlp.generate(
+            args.when, source=source_hint, goal=args.goal
+        )
         yaml_out = dump_triggers(trigger_config)
         print(f"  Generated YAML:\n{yaml_out}")
         # Save to CWD so user can inspect/edit
@@ -245,7 +304,7 @@ async def _build_trigger_config(args) -> "TriggerConfig | None":
 async def _run_no_web_mode(server: "ToonicServer", config: "ServerConfig") -> None:
     """Run server without web UI."""
     await server.start()
-    print(f"Toonic Server running (no-web mode)")
+    print("Toonic Server running (no-web mode)")
     print(f"  Goal: {config.goal}")
     print(f"  Sources: {len(config.sources)}")
     print(f"  Interval: {config.interval}s")
@@ -274,8 +333,8 @@ async def _run_web_mode(server: "ToonicServer", config: "ServerConfig", args) ->
     # Start server in background
     await server.start()
 
-    print(f"\n  Toonic Server")
-    print(f"  ─────────────────────────────────")
+    print("\n  Toonic Server")
+    print("  ─────────────────────────────────")
     print(f"  Web UI:   http://{config.host}:{config.port}/")
     print(f"  API:      http://{config.host}:{config.port}/api/status")
     print(f"  WS:       ws://{config.host}:{config.port}/ws")
@@ -291,7 +350,9 @@ async def _run_web_mode(server: "ToonicServer", config: "ServerConfig", args) ->
     print()
 
     uvi_config = uvicorn.Config(
-        app, host=config.host, port=config.port,
+        app,
+        host=config.host,
+        port=config.port,
         log_level=config.log_level.lower(),
     )
     uvi_server = uvicorn.Server(uvi_config)
@@ -321,6 +382,7 @@ async def run_server(args):
 def main():
     args = parse_args()
     import os
+
     data_dir = Path(os.environ.get("TOONIC_DATA_DIR", "./toonic_data"))
     data_dir.mkdir(parents=True, exist_ok=True)
     log_file = data_dir / "server.log"

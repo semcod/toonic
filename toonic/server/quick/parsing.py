@@ -18,75 +18,142 @@ logger = logging.getLogger("toonic.quick.parsing")
 
 _PREFIX_CATEGORY = {
     # Code / files
-    "file": "code", "code": "code", "src": "code",
+    "file": "code",
+    "code": "code",
+    "src": "code",
     # Logs
-    "log": "logs", "logs": "logs",
+    "log": "logs",
+    "logs": "logs",
     # Config
-    "config": "config", "cfg": "config",
+    "config": "config",
+    "cfg": "config",
     # Data / archives
-    "data": "data", "csv": "data", "json": "data", "archive": "data",
+    "data": "data",
+    "csv": "data",
+    "json": "data",
+    "archive": "data",
     # Documents
-    "doc": "document", "document": "document", "pdf": "document",
+    "doc": "document",
+    "document": "document",
+    "pdf": "document",
     # Video / audio
-    "video": "video", "cam": "video",
-    "audio": "audio", "mic": "audio",
+    "video": "video",
+    "cam": "video",
+    "audio": "audio",
+    "mic": "audio",
     # Containers
-    "docker": "container", "container": "container",
+    "docker": "container",
+    "container": "container",
     # Databases
-    "db": "database", "sqlite": "database", "postgres": "database",
-    "postgresql": "database", "mysql": "database", "redis": "database",
-    "mongodb": "database", "mongo": "database",
+    "db": "database",
+    "sqlite": "database",
+    "postgres": "database",
+    "postgresql": "database",
+    "mysql": "database",
+    "redis": "database",
+    "mongodb": "database",
+    "mongo": "database",
     # Network
-    "net": "network", "ping": "network", "dns": "network",
+    "net": "network",
+    "ping": "network",
+    "dns": "network",
     # Process
-    "proc": "process", "pid": "process", "port": "process",
-    "tcp": "process", "service": "process",
+    "proc": "process",
+    "pid": "process",
+    "port": "process",
+    "tcp": "process",
+    "service": "process",
     # Web / API
-    "http": "web", "https": "web", "api": "api", "web": "web",
-    "ws": "api", "wss": "api", "grpc": "api",
+    "http": "web",
+    "https": "web",
+    "api": "api",
+    "web": "web",
+    "ws": "api",
+    "wss": "api",
+    "grpc": "api",
     # Infrastructure
-    "dir": "infra", "directory": "infra",
+    "dir": "infra",
+    "directory": "infra",
     # Messaging (IoT / queues)
-    "mqtt": "data", "amqp": "data", "kafka": "data",
-    "nats": "data", "stomp": "data",
+    "mqtt": "data",
+    "amqp": "data",
+    "kafka": "data",
+    "nats": "data",
+    "stomp": "data",
     # Remote access
-    "ssh": "infra", "ftp": "data", "sftp": "data", "ldap": "network",
+    "ssh": "infra",
+    "ftp": "data",
+    "sftp": "data",
+    "ldap": "network",
 }
 
 # 20 popular protocols — mapped to SourceCategory values.
 _PROTO_CATEGORY = {
     # Web / HTTP  →  HttpWatcher
-    "http": "web", "https": "web",
+    "http": "web",
+    "https": "web",
     # WebSocket   →  HttpWatcher (HTTP upgrade probe)
-    "ws": "api", "wss": "api",
+    "ws": "api",
+    "wss": "api",
     # gRPC          →  HttpWatcher (HTTP/2-based)
     "grpc": "api",
     # Video streaming  →  StreamWatcher
-    "rtsp": "video", "rtsps": "video", "rtmp": "video",
+    "rtsp": "video",
+    "rtsps": "video",
+    "rtmp": "video",
     # Databases  →  DatabaseWatcher
-    "postgresql": "database", "postgres": "database",
-    "mysql": "database", "redis": "database", "mongodb": "database",
+    "postgresql": "database",
+    "postgres": "database",
+    "mysql": "database",
+    "redis": "database",
+    "mongodb": "database",
     # File transfer (no watcher yet)
-    "ftp": "data", "sftp": "data",
+    "ftp": "data",
+    "sftp": "data",
     # SSH (no watcher yet)
     "ssh": "infra",
     # Messaging / IoT (no watcher yet)
-    "mqtt": "data", "amqp": "data", "kafka": "data", "nats": "data",
+    "mqtt": "data",
+    "amqp": "data",
+    "kafka": "data",
+    "nats": "data",
     # Bonus
-    "ldap": "network", "stomp": "data",
+    "ldap": "network",
+    "stomp": "data",
 }
 
 
 _EXT_MAP = {
-    ".log": "logs", ".logs": "logs",
-    ".db": "database", ".sqlite": "database", ".sqlite3": "database",
-    ".csv": "data", ".tsv": "data", ".parquet": "data",
-    ".json": "data", ".jsonl": "data", ".ndjson": "data",
-    ".yaml": "config", ".yml": "config", ".toml": "config", ".ini": "config", ".env": "config",
-    ".md": "document", ".rst": "document", ".txt": "document", ".pdf": "document",
-    ".mp4": "video", ".avi": "video", ".mkv": "video", ".mov": "video",
-    ".mp3": "audio", ".wav": "audio", ".flac": "audio", ".ogg": "audio",
-    ".zip": "data", ".tar": "data",
+    ".log": "logs",
+    ".logs": "logs",
+    ".db": "database",
+    ".sqlite": "database",
+    ".sqlite3": "database",
+    ".csv": "data",
+    ".tsv": "data",
+    ".parquet": "data",
+    ".json": "data",
+    ".jsonl": "data",
+    ".ndjson": "data",
+    ".yaml": "config",
+    ".yml": "config",
+    ".toml": "config",
+    ".ini": "config",
+    ".env": "config",
+    ".md": "document",
+    ".rst": "document",
+    ".txt": "document",
+    ".pdf": "document",
+    ".mp4": "video",
+    ".avi": "video",
+    ".mkv": "video",
+    ".mov": "video",
+    ".mp3": "audio",
+    ".wav": "audio",
+    ".flac": "audio",
+    ".ogg": "audio",
+    ".zip": "data",
+    ".tar": "data",
 }
 
 
@@ -152,7 +219,9 @@ def parse_source(source: Union[str, SourceConfig, Dict[str, Any]]) -> SourceConf
         return source
 
     if isinstance(source, dict):
-        return SourceConfig(**{k: v for k, v in source.items() if hasattr(SourceConfig, k)})
+        return SourceConfig(
+            **{k: v for k, v in source.items() if hasattr(SourceConfig, k)}
+        )
 
     source_str = str(source).strip()
 

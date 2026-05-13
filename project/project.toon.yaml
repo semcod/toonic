@@ -1,0 +1,51 @@
+# toonic | 556 func | 62f | 18419L | python | 2026-04-19
+
+HEALTH:
+  CC̄=4.4  critical=53 (limit:10)  dup=1  cycles=0
+
+ALERTS[20]:
+  !!! high_fan_out     register_broxeen_routes = 44 (limit:10)
+  !!! cc_exceeded      QueryAdapter._try_local_parse = 38 (limit:15)
+  !!! high_fan_out     capture_opencv = 28 (limit:10)
+  !!! cc_exceeded      ActionExecutor._execute_code_change = 27 (limit:15)
+  !!! high_fan_out     check_event_and_emit = 27 (limit:10)
+  !!! high_fan_out     AutopilotLoop.run = 26 (limit:10)
+  !!! high_fan_out     DatabaseWatcher._check_sqlite = 24 (limit:10)
+  !!! high_fan_out     AudioFileHandler.parse = 23 (limit:10)
+  !!! high_fan_out     ProcessWatcher._find_processes = 21 (limit:10)
+  !!! high_fan_out     ProjectScaffold.generate = 21 (limit:10)
+
+MODULES[80] (top by size):
+  M[toonic/autopilot/scaffold.py] 580L C:2 F:5 CC↑23 D:0 (python)
+  M[toonic/server/client.py] 418L C:1 F:30 CC↑11 D:0 (python)
+  M[toonic/formats/document.py] 404L C:5 F:22 CC↑9 D:1 (python)
+  M[toonic/server/watchers/database_watcher.py] 387L C:1 F:11 CC↑18 D:0 (python)
+  M[toonic/server/watchers/network_watcher.py] 386L C:1 F:13 CC↑15 D:0 (python)
+  M[toonic/server/watchers/process_watcher.py] 386L C:1 F:16 CC↑14 D:0 (python)
+  M[toonic/server/main.py] 381L C:1 F:21 CC↑11 D:0 (python)
+  M[toonic/server/watchers/http_watcher.py] 358L C:1 F:17 CC↑11 D:0 (python)
+  M[toonic/autopilot/loop.py] 356L C:2 F:10 CC↑18 D:0 (python)
+  M[toonic/server/__main__.py] 345L C:0 F:11 CC↑9 D:0 (python)
+  M[toonic/server/core/history.py] 344L C:2 F:14 CC↑8 D:0 (python)
+  M[toonic/formats/data.py] 343L C:5 F:18 CC↑16 D:1 (python)
+  M[toonic/server/watchers/directory_watcher.py] 337L C:1 F:12 CC↑18 D:0 (python)
+  M[toonic/server/triggers/nlp2yaml.py] 336L C:1 F:13 CC↑13 D:0 (python)
+  M[toonic/formats/audio.py] 335L C:6 F:14 CC↑11 D:1 (python)
+  LANGS: python:78/shell:2
+
+HOTSPOTS[10]:
+  ★ register_broxeen_routes fan=44  // Register Broxeen-specific API routes on the FastAPI app.
+  ★ capture_opencv fan=28  // Capture from RTSP/file using OpenCV with optional YOLO detection.
+  ★ check_event_and_emit fan=27  // Check buffered frames for a confirmed event and emit multi-frame chunk.
+  ★ AutopilotLoop.run fan=26  // Run the full autopilot loop. Returns action log.
+  ★ DatabaseWatcher._check_sqlite fan=24  // Check SQLite database.
+
+REFACTOR[15]:
+  [1] H/L Split QueryAdapter._try_local_parse (CC=38)
+  [2] H/L Split ActionExecutor._execute_code_change (CC=27)
+  [3] H/H Split god module toonic/autopilot/scaffold.py (580L, 2 classes)
+  [4] M/L Split SpecDetector.detect (CC=23)
+  [5] M/L Split SqlHandler._extract_columns (CC=15)
+
+EVOLUTION:
+  2026-04-19 CC̄=4.4 crit=53 18419L // Automated analysis

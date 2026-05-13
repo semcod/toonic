@@ -68,9 +68,6 @@ python -m toonic.server \
 
 ---
 
-## Quick Start — Database Monitoring
-
-```bash
 # Monitor SQLite database
 python -m toonic.server \
   --source db:./app.db \
@@ -103,9 +100,6 @@ python -m toonic.server \
 
 ---
 
-## Quick Start — Network Monitoring
-
-```bash
 # Monitor multiple endpoints
 python -m toonic.server \
   --source "net:8.8.8.8,1.1.1.1,cloudflare.com" \
@@ -132,9 +126,6 @@ python -m toonic.server \
 
 ---
 
-## Quick Start — Process / Service Monitoring
-
-```bash
 # Monitor a process by name
 python -m toonic.server \
   --source proc:nginx \
@@ -166,9 +157,6 @@ python -m toonic.server \
 
 ---
 
-## Combined Infrastructure Monitoring
-
-```bash
 # Monitor everything: Docker + DB + Network + Processes
 python -m toonic.server \
   --source docker:* \

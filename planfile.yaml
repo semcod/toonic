@@ -1,0 +1,3217 @@
+name: Code Quality Improvement
+project_name: ''
+project_type: prefactoring
+domain: dev-tools
+goal: Improve code quality using prefact
+goals:
+- Fix all prefact-detected issues
+- Improve code maintainability
+- Ensure consistent code style
+quality_gates:
+- metric: Prefact Issues
+  threshold: '0'
+sprints:
+- id: sprint-1
+  name: Code Quality Improvements
+  duration: 2 weeks
+  objectives:
+  - Fix code quality issues
+  task_patterns:
+  - id: ticket-f5d51511
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in examples/archive-monitoring/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/archive-monitoring/run.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b76e7416
+    name: Fix llm-hallucinations issues
+    description: Resolve 1 llm-hallucinations issues in examples/archive-monitoring/run.py
+    task_type: bugfix
+    priority: critical
+    estimate: 1d
+    files:
+    - examples/archive-monitoring/run.py
+    rule_id: llm-hallucinations
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-991a6678
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in examples/archive-monitoring/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/archive-monitoring/run.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-70ff6933
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/archive-monitoring/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/archive-monitoring/run.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4dc32f1f
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in examples/_helpers.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/_helpers.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-6a5ae25f
+    name: Fix llm-hallucinations issues
+    description: Resolve 1 llm-hallucinations issues in examples/code-analysis/run.py
+    task_type: bugfix
+    priority: critical
+    estimate: 1d
+    files:
+    - examples/code-analysis/run.py
+    rule_id: llm-hallucinations
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-181ed384
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/code-analysis/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/code-analysis/run.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f67dafdc
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in examples/code-analysis/sample-project/config.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/code-analysis/sample-project/config.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f77a9c79
+    name: Fix llm-hallucinations issues
+    description: Resolve 1 llm-hallucinations issues in examples/data-formats/run.py
+    task_type: bugfix
+    priority: critical
+    estimate: 1d
+    files:
+    - examples/data-formats/run.py
+    rule_id: llm-hallucinations
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ac8f0847
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in examples/data-formats/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/data-formats/run.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-04f86f21
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/data-formats/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/data-formats/run.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-faa43576
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in examples/code-analysis/sample-project/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/code-analysis/sample-project/main.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-53af1e8f
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in examples/code-analysis/sample-project/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/code-analysis/sample-project/main.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8bf9f5ee
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in examples/code-analysis/sample-project/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - examples/code-analysis/sample-project/main.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e663edc6
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in examples/code-analysis/sample-project/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/code-analysis/sample-project/main.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d20d53d2
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/code-analysis/sample-project/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/code-analysis/sample-project/main.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9403e746
+    name: Fix llm-hallucinations issues
+    description: Resolve 1 llm-hallucinations issues in examples/directory-watching/run.py
+    task_type: bugfix
+    priority: critical
+    estimate: 1d
+    files:
+    - examples/directory-watching/run.py
+    rule_id: llm-hallucinations
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2e0315c5
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in examples/directory-watching/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/directory-watching/run.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ac1966b0
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/directory-watching/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/directory-watching/run.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-bcb6d6ba
+    name: Fix llm-hallucinations issues
+    description: Resolve 1 llm-hallucinations issues in examples/db-archive-triage/run.py
+    task_type: bugfix
+    priority: critical
+    estimate: 1d
+    files:
+    - examples/db-archive-triage/run.py
+    rule_id: llm-hallucinations
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-66be2b3b
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/db-archive-triage/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/db-archive-triage/run.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1fed29a0
+    name: Fix llm-hallucinations issues
+    description: Resolve 1 llm-hallucinations issues in examples/http-monitoring/run.py
+    task_type: bugfix
+    priority: critical
+    estimate: 1d
+    files:
+    - examples/http-monitoring/run.py
+    rule_id: llm-hallucinations
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-bbc7ddd0
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in examples/http-monitoring/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/http-monitoring/run.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a8dee869
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/http-monitoring/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/http-monitoring/run.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d12ad532
+    name: Fix llm-hallucinations issues
+    description: Resolve 1 llm-hallucinations issues in examples/infra-monitoring/run.py
+    task_type: bugfix
+    priority: critical
+    estimate: 1d
+    files:
+    - examples/infra-monitoring/run.py
+    rule_id: llm-hallucinations
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4d8e4f5c
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in examples/infra-monitoring/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/infra-monitoring/run.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-6357cf1d
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/infra-monitoring/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/infra-monitoring/run.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9f2aafcf
+    name: Fix smart-return-type issues
+    description: Resolve 4 smart-return-type issues in examples/log-monitoring/generate_logs.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - examples/log-monitoring/generate_logs.py
+    rule_id: smart-return-type
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d20609c6
+    name: Fix string-concat issues
+    description: Resolve 9 string-concat issues in examples/log-monitoring/generate_logs.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - examples/log-monitoring/generate_logs.py
+    rule_id: string-concat
+    count: 9
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-acaef5ed
+    name: Fix magic-numbers issues
+    description: Resolve 17 magic-numbers issues in examples/log-monitoring/generate_logs.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - examples/log-monitoring/generate_logs.py
+    rule_id: magic-numbers
+    count: 17
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0ea7cbf6
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/log-monitoring/generate_logs.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/log-monitoring/generate_logs.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-565bb519
+    name: Fix llm-hallucinations issues
+    description: Resolve 1 llm-hallucinations issues in examples/infra-triage/run.py
+    task_type: bugfix
+    priority: critical
+    estimate: 1d
+    files:
+    - examples/infra-triage/run.py
+    rule_id: llm-hallucinations
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-56e64f46
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in examples/infra-triage/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/infra-triage/run.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-90e0cdb1
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/infra-triage/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/infra-triage/run.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1557c142
+    name: Fix llm-hallucinations issues
+    description: Resolve 1 llm-hallucinations issues in examples/log-monitoring/run.py
+    task_type: bugfix
+    priority: critical
+    estimate: 1d
+    files:
+    - examples/log-monitoring/run.py
+    rule_id: llm-hallucinations
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-aa461ace
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in examples/log-monitoring/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/log-monitoring/run.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-176a08c4
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/log-monitoring/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/log-monitoring/run.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-41bc6374
+    name: Fix llm-hallucinations issues
+    description: Resolve 1 llm-hallucinations issues in examples/multi-source/run.py
+    task_type: bugfix
+    priority: critical
+    estimate: 1d
+    files:
+    - examples/multi-source/run.py
+    rule_id: llm-hallucinations
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-82c8ad0f
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in examples/multi-source/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/multi-source/run.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-15c41c57
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/multi-source/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/multi-source/run.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b9624bd9
+    name: Fix smart-return-type issues
+    description: Resolve 4 smart-return-type issues in examples/programmatic-api/demo_pipeline.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - examples/programmatic-api/demo_pipeline.py
+    rule_id: smart-return-type
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-78241b05
+    name: Fix string-concat issues
+    description: Resolve 4 string-concat issues in examples/programmatic-api/demo_pipeline.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - examples/programmatic-api/demo_pipeline.py
+    rule_id: string-concat
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c9aabdef
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in examples/programmatic-api/demo_pipeline.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - examples/programmatic-api/demo_pipeline.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1ef133dc
+    name: Fix magic-numbers issues
+    description: Resolve 4 magic-numbers issues in examples/programmatic-api/demo_pipeline.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - examples/programmatic-api/demo_pipeline.py
+    rule_id: magic-numbers
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1df63dde
+    name: Fix llm-generated-code issues
+    description: Resolve 4 llm-generated-code issues in examples/programmatic-api/demo_pipeline.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - examples/programmatic-api/demo_pipeline.py
+    rule_id: llm-generated-code
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4537d26f
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/programmatic-api/demo_pipeline.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/programmatic-api/demo_pipeline.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-5835e5bc
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in examples/programmatic-api/demo_accumulator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/programmatic-api/demo_accumulator.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9dff159c
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in examples/programmatic-api/demo_accumulator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/programmatic-api/demo_accumulator.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2f280a58
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in examples/programmatic-api/demo_accumulator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/programmatic-api/demo_accumulator.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a10906ef
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/programmatic-api/demo_accumulator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/programmatic-api/demo_accumulator.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d65dd801
+    name: Fix smart-return-type issues
+    description: Resolve 5 smart-return-type issues in examples/programmatic-api/demo_quick.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - examples/programmatic-api/demo_quick.py
+    rule_id: smart-return-type
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-07d6dbfd
+    name: Fix string-concat issues
+    description: Resolve 4 string-concat issues in examples/programmatic-api/demo_quick.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - examples/programmatic-api/demo_quick.py
+    rule_id: string-concat
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b4d9ce29
+    name: Fix magic-numbers issues
+    description: Resolve 6 magic-numbers issues in examples/programmatic-api/demo_quick.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - examples/programmatic-api/demo_quick.py
+    rule_id: magic-numbers
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f7d1ae17
+    name: Fix llm-generated-code issues
+    description: Resolve 4 llm-generated-code issues in examples/programmatic-api/demo_quick.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - examples/programmatic-api/demo_quick.py
+    rule_id: llm-generated-code
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d3fc210e
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/programmatic-api/demo_quick.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/programmatic-api/demo_quick.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f1e1f3b9
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in examples/protocol-recipes/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/protocol-recipes/run.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-99e453ae
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/protocol-recipes/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/protocol-recipes/run.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a7fff7ce
+    name: Fix llm-hallucinations issues
+    description: Resolve 1 llm-hallucinations issues in examples/realtime-api/run.py
+    task_type: bugfix
+    priority: critical
+    estimate: 1d
+    files:
+    - examples/realtime-api/run.py
+    rule_id: llm-hallucinations
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-cfdacd32
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in examples/realtime-api/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/realtime-api/run.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c06a4c05
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/realtime-api/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/realtime-api/run.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2a503729
+    name: Fix wildcard-imports issues
+    description: Resolve 2 wildcard-imports issues in examples/run_all.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/run_all.py
+    rule_id: wildcard-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-6f7997ef
+    name: Fix ai-boilerplate issues
+    description: Resolve 3 ai-boilerplate issues in examples/run_all.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/run_all.py
+    rule_id: ai-boilerplate
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-572d2b8b
+    name: Fix wildcard-imports issues
+    description: Resolve 1 wildcard-imports issues in examples/security-audit/continuous_monitoring.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/security-audit/continuous_monitoring.py
+    rule_id: wildcard-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0f07e70e
+    name: Fix ai-boilerplate issues
+    description: Resolve 3 ai-boilerplate issues in examples/security-audit/continuous_monitoring.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/security-audit/continuous_monitoring.py
+    rule_id: ai-boilerplate
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e5834070
+    name: Fix wildcard-imports issues
+    description: Resolve 1 wildcard-imports issues in examples/security-audit/enterprise_features.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/security-audit/enterprise_features.py
+    rule_id: wildcard-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9dc2487e
+    name: Fix ai-boilerplate issues
+    description: Resolve 3 ai-boilerplate issues in examples/security-audit/enterprise_features.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/security-audit/enterprise_features.py
+    rule_id: ai-boilerplate
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f2c9a604
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in examples/security-audit/generate_report.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/security-audit/generate_report.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-bc7b2dda
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in examples/security-audit/generate_report.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/security-audit/generate_report.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-df8d89ab
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in examples/security-audit/generate_report.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/security-audit/generate_report.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0ca2666d
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in examples/security-audit/generate_report.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/security-audit/generate_report.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b1daa42e
+    name: Fix smart-return-type issues
+    description: Resolve 5 smart-return-type issues in examples/security-audit/quick_audit.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - examples/security-audit/quick_audit.py
+    rule_id: smart-return-type
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-64a06ce1
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in examples/security-audit/quick_audit.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/security-audit/quick_audit.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b0f5f7a4
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in examples/security-audit/quick_audit.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/security-audit/quick_audit.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9e3f1bb2
+    name: Fix duplicate-imports issues
+    description: Resolve 3 duplicate-imports issues in examples/security-audit/quick_audit.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/security-audit/quick_audit.py
+    rule_id: duplicate-imports
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-de85c7b0
+    name: Fix magic-numbers issues
+    description: Resolve 5 magic-numbers issues in examples/security-audit/quick_audit.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - examples/security-audit/quick_audit.py
+    rule_id: magic-numbers
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-88324754
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/security-audit/quick_audit.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/security-audit/quick_audit.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2313e72c
+    name: Fix llm-hallucinations issues
+    description: Resolve 1 llm-hallucinations issues in examples/security-audit-web/run.py
+    task_type: bugfix
+    priority: critical
+    estimate: 1d
+    files:
+    - examples/security-audit-web/run.py
+    rule_id: llm-hallucinations
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-21595241
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/security-audit-web/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/security-audit-web/run.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e8d8e6c5
+    name: Fix llm-hallucinations issues
+    description: Resolve 1 llm-hallucinations issues in examples/security-audit-fullstack/run.py
+    task_type: bugfix
+    priority: critical
+    estimate: 1d
+    files:
+    - examples/security-audit-fullstack/run.py
+    rule_id: llm-hallucinations
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3cf3c368
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/security-audit-fullstack/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/security-audit-fullstack/run.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-900c30b2
+    name: Fix llm-hallucinations issues
+    description: Resolve 1 llm-hallucinations issues in examples/security-audit-code/run.py
+    task_type: bugfix
+    priority: critical
+    estimate: 1d
+    files:
+    - examples/security-audit-code/run.py
+    rule_id: llm-hallucinations
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7113fb98
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/security-audit-code/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/security-audit-code/run.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-26ce2772
+    name: Fix llm-hallucinations issues
+    description: Resolve 1 llm-hallucinations issues in examples/security-audit-continuous/run.py
+    task_type: bugfix
+    priority: critical
+    estimate: 1d
+    files:
+    - examples/security-audit-continuous/run.py
+    rule_id: llm-hallucinations
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b952458f
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in examples/security-audit-continuous/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/security-audit-continuous/run.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-5edd3739
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/security-audit-continuous/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/security-audit-continuous/run.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9be2bbbe
+    name: Fix llm-hallucinations issues
+    description: Resolve 1 llm-hallucinations issues in examples/video-captioning/run.py
+    task_type: bugfix
+    priority: critical
+    estimate: 1d
+    files:
+    - examples/video-captioning/run.py
+    rule_id: llm-hallucinations
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8e094f90
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/video-captioning/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/video-captioning/run.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8948dbb2
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in toonic/__main__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/__main__.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ffc62a0a
+    name: Fix llm-hallucinations issues
+    description: Resolve 1 llm-hallucinations issues in examples/video-monitoring/run.py
+    task_type: bugfix
+    priority: critical
+    estimate: 1d
+    files:
+    - examples/video-monitoring/run.py
+    rule_id: llm-hallucinations
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7e077742
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in examples/video-monitoring/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/video-monitoring/run.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ddbb3f1a
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in examples/video-monitoring/run.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - examples/video-monitoring/run.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8f42eeb6
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in toonic/autopilot/executor.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/autopilot/executor.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0b42f815
+    name: Fix unused-imports issues
+    description: Resolve 6 unused-imports issues in toonic/autopilot/executor.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/autopilot/executor.py
+    rule_id: unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-eca64f3e
+    name: Fix magic-numbers issues
+    description: Resolve 4 magic-numbers issues in toonic/autopilot/executor.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/autopilot/executor.py
+    rule_id: magic-numbers
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2f7a50fc
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/autopilot/prompts.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/autopilot/prompts.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1a66a481
+    name: Fix magic-numbers issues
+    description: Resolve 5 magic-numbers issues in toonic/autopilot/prompts.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/autopilot/prompts.py
+    rule_id: magic-numbers
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9f5f1826
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in toonic/autopilot/loop.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/autopilot/loop.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a9467e26
+    name: Fix string-concat issues
+    description: Resolve 3 string-concat issues in toonic/autopilot/loop.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/autopilot/loop.py
+    rule_id: string-concat
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-af469665
+    name: Fix unused-imports issues
+    description: Resolve 8 unused-imports issues in toonic/autopilot/loop.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/autopilot/loop.py
+    rule_id: unused-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-548a8db8
+    name: Fix magic-numbers issues
+    description: Resolve 5 magic-numbers issues in toonic/autopilot/loop.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/autopilot/loop.py
+    rule_id: magic-numbers
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-80d0d5b9
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in toonic/autopilot/scaffold.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/autopilot/scaffold.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-6aaf2885
+    name: Fix llm-generated-code issues
+    description: Resolve 1 llm-generated-code issues in toonic/autopilot/scaffold.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/autopilot/scaffold.py
+    rule_id: llm-generated-code
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-383f6f9c
+    name: Fix ai-boilerplate issues
+    description: Resolve 4 ai-boilerplate issues in toonic/autopilot/scaffold.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/autopilot/scaffold.py
+    rule_id: ai-boilerplate
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3a7f39ab
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/core/base.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/core/base.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1f2957e2
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in toonic/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/cli.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-15408398
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/cli.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e080fc66
+    name: Fix llm-hallucinations issues
+    description: Resolve 3 llm-hallucinations issues in toonic/cli.py
+    task_type: bugfix
+    priority: critical
+    estimate: 1d
+    files:
+    - toonic/cli.py
+    rule_id: llm-hallucinations
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9e72d06a
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in toonic/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/cli.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-bc77750e
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in toonic/cli.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/cli.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e3b689a9
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/core/detector.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/core/detector.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4fe06423
+    name: Fix magic-numbers issues
+    description: Resolve 10 magic-numbers issues in toonic/core/detector.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/core/detector.py
+    rule_id: magic-numbers
+    count: 10
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-876f8ef8
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in toonic/core/models.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/core/models.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3fc1e683
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/core/models.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/core/models.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-698bc7ba
+    name: Fix unused-imports issues
+    description: Resolve 6 unused-imports issues in toonic/core/registry.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/core/registry.py
+    rule_id: unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-82098355
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/core/protocols.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/core/protocols.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-6a45264c
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in toonic/formats/api.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/formats/api.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a3ab6837
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/formats/api.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/formats/api.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-042b72ea
+    name: Fix magic-numbers issues
+    description: Resolve 5 magic-numbers issues in toonic/formats/api.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/formats/api.py
+    rule_id: magic-numbers
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-777750a2
+    name: Fix string-concat issues
+    description: Resolve 6 string-concat issues in toonic/formats/audio.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/formats/audio.py
+    rule_id: string-concat
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-de36680c
+    name: Fix unused-imports issues
+    description: Resolve 10 unused-imports issues in toonic/formats/audio.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/formats/audio.py
+    rule_id: unused-imports
+    count: 10
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-185fb67b
+    name: Fix duplicate-imports issues
+    description: Resolve 3 duplicate-imports issues in toonic/formats/audio.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/formats/audio.py
+    rule_id: duplicate-imports
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d78dbb1f
+    name: Fix magic-numbers issues
+    description: Resolve 16 magic-numbers issues in toonic/formats/audio.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - toonic/formats/audio.py
+    rule_id: magic-numbers
+    count: 16
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f01e5ce7
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/formats/config.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/formats/config.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-94b03ecd
+    name: Fix magic-numbers issues
+    description: Resolve 6 magic-numbers issues in toonic/formats/config.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/formats/config.py
+    rule_id: magic-numbers
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-17dfc2cc
+    name: Fix string-concat issues
+    description: Resolve 7 string-concat issues in toonic/formats/data.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/formats/data.py
+    rule_id: string-concat
+    count: 7
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e90f12c9
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/formats/data.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/formats/data.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8fb2a3a9
+    name: Fix magic-numbers issues
+    description: Resolve 5 magic-numbers issues in toonic/formats/data.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/formats/data.py
+    rule_id: magic-numbers
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1db9c863
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in toonic/formats/database.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/formats/database.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-bc2f3562
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/formats/database.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/formats/database.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-225ba97b
+    name: Fix string-concat issues
+    description: Resolve 5 string-concat issues in toonic/formats/document.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/formats/document.py
+    rule_id: string-concat
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d1a917b1
+    name: Fix magic-numbers issues
+    description: Resolve 14 magic-numbers issues in toonic/formats/document.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - toonic/formats/document.py
+    rule_id: magic-numbers
+    count: 14
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-6a9a441d
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in toonic/formats/document.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/formats/document.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-6388c5e4
+    name: Fix string-concat issues
+    description: Resolve 4 string-concat issues in toonic/formats/evidence.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/formats/evidence.py
+    rule_id: string-concat
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-090e5e91
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/formats/evidence.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/formats/evidence.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c71dd92b
+    name: Fix magic-numbers issues
+    description: Resolve 12 magic-numbers issues in toonic/formats/evidence.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - toonic/formats/evidence.py
+    rule_id: magic-numbers
+    count: 12
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-cfed67f7
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in toonic/formats/infra.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/formats/infra.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-eee3dda7
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/formats/infra.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/formats/infra.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a472549f
+    name: Fix magic-numbers issues
+    description: Resolve 4 magic-numbers issues in toonic/formats/infra.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/formats/infra.py
+    rule_id: magic-numbers
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-189493e2
+    name: Fix string-concat issues
+    description: Resolve 3 string-concat issues in toonic/formats/video.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/formats/video.py
+    rule_id: string-concat
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ad177d27
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in toonic/formats/video.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/formats/video.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c80ee809
+    name: Fix duplicate-imports issues
+    description: Resolve 4 duplicate-imports issues in toonic/formats/video.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/formats/video.py
+    rule_id: duplicate-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e37873ae
+    name: Fix magic-numbers issues
+    description: Resolve 14 magic-numbers issues in toonic/formats/video.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - toonic/formats/video.py
+    rule_id: magic-numbers
+    count: 14
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0c91825c
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in toonic/pipeline.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/pipeline.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-5b0c87c7
+    name: Fix wildcard-imports issues
+    description: Resolve 5 wildcard-imports issues in toonic/server/client.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/client.py
+    rule_id: wildcard-imports
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-662921a6
+    name: Fix ai-boilerplate issues
+    description: Resolve 3 ai-boilerplate issues in toonic/server/client.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/client.py
+    rule_id: ai-boilerplate
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-fa386816
+    name: Fix smart-return-type issues
+    description: Resolve 3 smart-return-type issues in toonic/server/__main__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/__main__.py
+    rule_id: smart-return-type
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f0b02d38
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in toonic/server/__main__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/__main__.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-df3bb3b5
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in toonic/server/__main__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/__main__.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-91bf2d24
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in toonic/server/__main__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/__main__.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3bffa5fa
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in toonic/server/__main__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/__main__.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-47d17d1b
+    name: Fix unused-imports issues
+    description: Resolve 6 unused-imports issues in toonic/server/config.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/server/config.py
+    rule_id: unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-14a0c793
+    name: Fix magic-numbers issues
+    description: Resolve 4 magic-numbers issues in toonic/server/config.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/config.py
+    rule_id: magic-numbers
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-68c3d907
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in toonic/server/core/accumulator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/core/accumulator.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b989d30b
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in toonic/server/core/accumulator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/core/accumulator.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-16760ef1
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in toonic/server/core/accumulator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/core/accumulator.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8457282f
+    name: Fix magic-numbers issues
+    description: Resolve 5 magic-numbers issues in toonic/server/core/history.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/core/history.py
+    rule_id: magic-numbers
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-5ef7e33f
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in toonic/server/core/history.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/core/history.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-61319698
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in toonic/server/core/query.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/core/query.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c062d6a4
+    name: Fix unused-imports issues
+    description: Resolve 8 unused-imports issues in toonic/server/core/query.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/server/core/query.py
+    rule_id: unused-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b3571f55
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in toonic/server/core/query.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/core/query.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3e7fb4e0
+    name: Fix unused-imports issues
+    description: Resolve 8 unused-imports issues in toonic/server/core/router.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/server/core/router.py
+    rule_id: unused-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8d837a8d
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in toonic/server/core/router.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/core/router.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-822b361c
+    name: Fix string-concat issues
+    description: Resolve 4 string-concat issues in toonic/server/llm/caller.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/llm/caller.py
+    rule_id: string-concat
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-beb8f21f
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/server/llm/caller.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/llm/caller.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-dfe6ecd8
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in toonic/server/llm/parser.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/llm/parser.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4ea095b9
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/server/llm/parser.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/llm/parser.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-764b5854
+    name: Fix unused-imports issues
+    description: Resolve 8 unused-imports issues in toonic/server/llm/pipeline.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/server/llm/pipeline.py
+    rule_id: unused-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f3ff1cf3
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/server/llm/prompts.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/llm/prompts.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ff5221b6
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in toonic/server/llm/prompts.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/llm/prompts.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-663ff38a
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in toonic/server/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/main.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-cfbf6bcc
+    name: Fix magic-numbers issues
+    description: Resolve 9 magic-numbers issues in toonic/server/main.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/server/main.py
+    rule_id: magic-numbers
+    count: 9
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-36cde1f4
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in toonic/server/main.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/main.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-18276444
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in toonic/server/models.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/models.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a5c562bd
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in toonic/server/quick/archive.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/quick/archive.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-acc146b3
+    name: Fix duplicate-imports issues
+    description: Resolve 1 duplicate-imports issues in toonic/server/quick/archive.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/quick/archive.py
+    rule_id: duplicate-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-69a8a44f
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in toonic/server/quick/archive.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/quick/archive.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-bcf27843
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in toonic/server/quick/builder.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/quick/builder.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-297aad95
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in toonic/server/quick/builder.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/quick/builder.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f056b66e
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in toonic/server/quick/builder.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/quick/builder.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-5b579107
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/server/quick/presets.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/quick/presets.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-217d643e
+    name: Fix duplicate-imports issues
+    description: Resolve 6 duplicate-imports issues in toonic/server/quick/presets.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/server/quick/presets.py
+    rule_id: duplicate-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-31fa8cbf
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in toonic/server/quick/presets.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/quick/presets.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8cb3bae4
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/server/quick/parsing.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/quick/parsing.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-da1a7d5b
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in toonic/server/quick/runtime.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/quick/runtime.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-5adc650c
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in toonic/server/quick/runtime.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/quick/runtime.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-bab9c646
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in toonic/server/transport/app.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/transport/app.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b005bb3d
+    name: Fix unused-imports issues
+    description: Resolve 12 unused-imports issues in toonic/server/transport/broxeen_bridge.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - toonic/server/transport/broxeen_bridge.py
+    rule_id: unused-imports
+    count: 12
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9abb216c
+    name: Fix magic-numbers issues
+    description: Resolve 11 magic-numbers issues in toonic/server/transport/broxeen_bridge.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - toonic/server/transport/broxeen_bridge.py
+    rule_id: magic-numbers
+    count: 11
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-737ddfdd
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in toonic/server/transport/routes/api.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/transport/routes/api.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-dd3c37d9
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in toonic/server/transport/routes/api.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/transport/routes/api.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d979faad
+    name: Fix duplicate-imports issues
+    description: Resolve 1 duplicate-imports issues in toonic/server/transport/routes/api.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/transport/routes/api.py
+    rule_id: duplicate-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1de3f8b6
+    name: Fix magic-numbers issues
+    description: Resolve 26 magic-numbers issues in toonic/server/transport/routes/api.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - toonic/server/transport/routes/api.py
+    rule_id: magic-numbers
+    count: 26
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ff71491c
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/server/transport/routes/history.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/transport/routes/history.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-94a0caa9
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in toonic/server/transport/routes/history.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/transport/routes/history.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-05a29493
+    name: Fix unused-imports issues
+    description: Resolve 10 unused-imports issues in toonic/server/transport/routes/sources.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/server/transport/routes/sources.py
+    rule_id: unused-imports
+    count: 10
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-fabf0101
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in toonic/server/transport/routes/websocket.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/transport/routes/websocket.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b1680ec2
+    name: Fix unused-imports issues
+    description: Resolve 6 unused-imports issues in toonic/server/triggers/dsl.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/server/triggers/dsl.py
+    rule_id: unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b4e57ee2
+    name: Fix duplicate-imports issues
+    description: Resolve 1 duplicate-imports issues in toonic/server/triggers/dsl.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/triggers/dsl.py
+    rule_id: duplicate-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0487b98a
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in toonic/server/triggers/dsl.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/triggers/dsl.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4e59dc8d
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in toonic/server/triggers/detectors.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/triggers/detectors.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a2af4b1a
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in toonic/server/triggers/detectors.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/triggers/detectors.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0c963030
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in toonic/server/triggers/nlp2yaml.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/triggers/nlp2yaml.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7c3e915c
+    name: Fix unused-imports issues
+    description: Resolve 8 unused-imports issues in toonic/server/triggers/nlp2yaml.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/server/triggers/nlp2yaml.py
+    rule_id: unused-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4860ef5c
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in toonic/server/triggers/nlp2yaml.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/triggers/nlp2yaml.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-88fde94f
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in toonic/server/triggers/scheduler.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/triggers/scheduler.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-864d9164
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in toonic/server/triggers/scheduler.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/triggers/scheduler.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c961eb2c
+    name: Fix unused-imports issues
+    description: Resolve 6 unused-imports issues in toonic/server/watchers/base.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/server/watchers/base.py
+    rule_id: unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e947805c
+    name: Fix magic-numbers issues
+    description: Resolve 7 magic-numbers issues in toonic/server/watchers/database_watcher.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/server/watchers/database_watcher.py
+    rule_id: magic-numbers
+    count: 7
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-af7bb873
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in toonic/server/watchers/database_watcher.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/watchers/database_watcher.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2c0fbf31
+    name: Fix string-concat issues
+    description: Resolve 4 string-concat issues in toonic/server/watchers/directory_watcher.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/watchers/directory_watcher.py
+    rule_id: string-concat
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3e3e8283
+    name: Fix unused-imports issues
+    description: Resolve 8 unused-imports issues in toonic/server/watchers/directory_watcher.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/server/watchers/directory_watcher.py
+    rule_id: unused-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-aae8ab1a
+    name: Fix magic-numbers issues
+    description: Resolve 4 magic-numbers issues in toonic/server/watchers/directory_watcher.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/watchers/directory_watcher.py
+    rule_id: magic-numbers
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e35f88d3
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in toonic/server/watchers/file_watcher.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/watchers/file_watcher.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2cb3fb34
+    name: Fix unused-imports issues
+    description: Resolve 8 unused-imports issues in toonic/server/watchers/file_watcher.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/server/watchers/file_watcher.py
+    rule_id: unused-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-12366f7f
+    name: Fix magic-numbers issues
+    description: Resolve 4 magic-numbers issues in toonic/server/watchers/file_watcher.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/watchers/file_watcher.py
+    rule_id: magic-numbers
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b0c1ccf8
+    name: Fix unused-imports issues
+    description: Resolve 6 unused-imports issues in toonic/server/watchers/docker_watcher.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/server/watchers/docker_watcher.py
+    rule_id: unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-eec78296
+    name: Fix magic-numbers issues
+    description: Resolve 5 magic-numbers issues in toonic/server/watchers/docker_watcher.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/watchers/docker_watcher.py
+    rule_id: magic-numbers
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9b2147a3
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in toonic/server/watchers/http_watcher.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/watchers/http_watcher.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-6d24fcfd
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/server/watchers/http_watcher.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/watchers/http_watcher.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a7015b33
+    name: Fix duplicate-imports issues
+    description: Resolve 1 duplicate-imports issues in toonic/server/watchers/http_watcher.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/watchers/http_watcher.py
+    rule_id: duplicate-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-80b6861c
+    name: Fix magic-numbers issues
+    description: Resolve 9 magic-numbers issues in toonic/server/watchers/http_watcher.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/server/watchers/http_watcher.py
+    rule_id: magic-numbers
+    count: 9
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b0079c58
+    name: Fix unused-imports issues
+    description: Resolve 8 unused-imports issues in toonic/server/watchers/log_watcher.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/server/watchers/log_watcher.py
+    rule_id: unused-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-bf552062
+    name: Fix magic-numbers issues
+    description: Resolve 4 magic-numbers issues in toonic/server/watchers/log_watcher.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/watchers/log_watcher.py
+    rule_id: magic-numbers
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4389b191
+    name: Fix magic-numbers issues
+    description: Resolve 19 magic-numbers issues in toonic/server/watchers/process_watcher.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - toonic/server/watchers/process_watcher.py
+    rule_id: magic-numbers
+    count: 19
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0e7bfaed
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in toonic/server/watchers/process_watcher.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/watchers/process_watcher.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1a9cca43
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in toonic/server/watchers/network_watcher.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/watchers/network_watcher.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ecebb239
+    name: Fix unused-imports issues
+    description: Resolve 6 unused-imports issues in toonic/server/watchers/network_watcher.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/server/watchers/network_watcher.py
+    rule_id: unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a4296aa5
+    name: Fix magic-numbers issues
+    description: Resolve 5 magic-numbers issues in toonic/server/watchers/network_watcher.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/watchers/network_watcher.py
+    rule_id: magic-numbers
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-690bb97b
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/server/watchers/stream/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/watchers/stream/__init__.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8228c093
+    name: Fix relative-imports issues
+    description: Resolve 12 relative-imports issues in toonic/server/watchers/stream/capture.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - toonic/server/watchers/stream/capture.py
+    rule_id: relative-imports
+    count: 12
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2cc62a87
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/server/watchers/stream/capture.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/watchers/stream/capture.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3c9ab384
+    name: Fix duplicate-imports issues
+    description: Resolve 4 duplicate-imports issues in toonic/server/watchers/stream/capture.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/watchers/stream/capture.py
+    rule_id: duplicate-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a21fec8e
+    name: Fix magic-numbers issues
+    description: Resolve 4 magic-numbers issues in toonic/server/watchers/stream/capture.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/watchers/stream/capture.py
+    rule_id: magic-numbers
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-eb99f999
+    name: Fix relative-imports issues
+    description: Resolve 4 relative-imports issues in toonic/server/watchers/stream/detection.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/watchers/stream/detection.py
+    rule_id: relative-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-aba867ab
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/server/watchers/stream/detection.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/watchers/stream/detection.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e31b03fb
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/server/watchers/stream/models.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/watchers/stream/models.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c7421436
+    name: Fix relative-imports issues
+    description: Resolve 4 relative-imports issues in toonic/server/watchers/stream/events.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/watchers/stream/events.py
+    rule_id: relative-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9c6fe638
+    name: Fix string-concat issues
+    description: Resolve 4 string-concat issues in toonic/server/watchers/stream/events.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - toonic/server/watchers/stream/events.py
+    rule_id: string-concat
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-72098229
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/server/watchers/stream/events.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/watchers/stream/events.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-030a4833
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in toonic/server/watchers/stream/events.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/watchers/stream/events.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-6263ad89
+    name: Fix unused-imports issues
+    description: Resolve 6 unused-imports issues in toonic/server/watchers/stream/watcher.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/server/watchers/stream/watcher.py
+    rule_id: unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-329ce578
+    name: Fix magic-numbers issues
+    description: Resolve 6 magic-numbers issues in toonic/server/watchers/stream/watcher.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - toonic/server/watchers/stream/watcher.py
+    rule_id: magic-numbers
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ba953c68
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in unified_toon.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - unified_toon.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-cc34921c
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in unified_toon.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - unified_toon.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-112f6e25
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in unified_toon.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - unified_toon.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-932470e3
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in toonic/server/watchers/stream_watcher.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - toonic/server/watchers/stream_watcher.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced

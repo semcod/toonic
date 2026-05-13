@@ -3,9 +3,6 @@ Shared fixtures for toonic tests
 """
 
 import pytest
-import tempfile
-import os
-from pathlib import Path
 
 from toonic.core.registry import FormatRegistry
 from toonic.formats import initialize_all_handlers
@@ -53,7 +50,9 @@ Run the command and see results.
 def tmp_csv(tmp_path):
     """Create a temp CSV file."""
     p = tmp_path / "data.csv"
-    p.write_text("id,name,email,age\n1,Alice,alice@ex.com,30\n2,Bob,bob@ex.com,25\n3,Carol,carol@ex.com,35\n")
+    p.write_text(
+        "id,name,email,age\n1,Alice,alice@ex.com,30\n2,Bob,bob@ex.com,25\n3,Carol,carol@ex.com,35\n"
+    )
     return p
 
 
@@ -61,7 +60,9 @@ def tmp_csv(tmp_path):
 def tmp_env(tmp_path):
     """Create a temp .env file."""
     p = tmp_path / "config.env"
-    p.write_text("DB_HOST=localhost\nDB_PORT=5432\nAPI_SECRET_KEY=mysecret123\nDEBUG=true\n")
+    p.write_text(
+        "DB_HOST=localhost\nDB_PORT=5432\nAPI_SECRET_KEY=mysecret123\nDEBUG=true\n"
+    )
     return p
 
 
@@ -93,6 +94,7 @@ CREATE VIEW active_users AS SELECT * FROM users WHERE created_at > NOW() - INTER
 def tmp_json(tmp_path):
     """Create a temp JSON data file."""
     import json
+
     p = tmp_path / "data.json"
     p.write_text(json.dumps({"users": [{"id": 1, "name": "Alice"}], "total": 100}))
     return p

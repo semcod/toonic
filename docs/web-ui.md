@@ -1,5 +1,3 @@
-# Web UI
-
 ## Dostęp
 
 Start serwera → otwórz http://localhost:8900

@@ -1,8 +1,3 @@
-# Toonic Server
-
-## Uruchamianie
-
-```bash
 # Minimalne
 python -m toonic.server --source file:./src/ --goal "analyze code"
 
@@ -100,9 +95,6 @@ Logs:     /path/to/toonic_data/events.jsonl
 Triggers: 2 rule(s)
 ```
 
-## Konfiguracja YAML
-
-```yaml
 # toonic-server.yaml
 host: "0.0.0.0"
 port: 8900

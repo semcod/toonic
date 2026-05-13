@@ -19,6 +19,7 @@ from toonic.server.config import ServerConfig, SourceConfig
 # parse_source
 # ══════════════════════════════════════════════════════════════
 
+
 class TestParseSource:
     """Tests for the universal source parser."""
 
@@ -33,50 +34,56 @@ class TestParseSource:
 
     # ── Prefix detection ──
 
-    @pytest.mark.parametrize("input_str,expected_cat", [
-        ("log:./app.log", "logs"),
-        ("logs:./err.log", "logs"),
-        ("code:./src/", "code"),
-        ("file:./main.py", "code"),
-        ("src:./lib/", "code"),
-        ("config:./settings.yaml", "config"),
-        ("cfg:./app.ini", "config"),
-        ("data:./metrics.csv", "data"),
-        ("csv:./data.csv", "data"),
-        ("json:./events.json", "data"),
-        ("doc:./readme.md", "document"),
-        ("docker:*", "container"),
-        ("docker:my-app", "container"),
-        ("container:web", "container"),
-        ("db:./app.db", "database"),
-        ("sqlite:./data.sqlite", "database"),
-        ("postgres:localhost", "database"),
-        ("postgresql:localhost", "database"),
-        ("mysql:localhost", "database"),
-        ("net:8.8.8.8", "network"),
-        ("ping:google.com", "network"),
-        ("dns:cloudflare.com", "network"),
-        ("proc:nginx", "process"),
-        ("pid:1234", "process"),
-        ("port:8080", "process"),
-        ("tcp:db:5432", "process"),
-        ("service:postgresql", "process"),
-        ("dir:./data/", "infra"),
-    ])
+    @pytest.mark.parametrize(
+        "input_str,expected_cat",
+        [
+            ("log:./app.log", "logs"),
+            ("logs:./err.log", "logs"),
+            ("code:./src/", "code"),
+            ("file:./main.py", "code"),
+            ("src:./lib/", "code"),
+            ("config:./settings.yaml", "config"),
+            ("cfg:./app.ini", "config"),
+            ("data:./metrics.csv", "data"),
+            ("csv:./data.csv", "data"),
+            ("json:./events.json", "data"),
+            ("doc:./readme.md", "document"),
+            ("docker:*", "container"),
+            ("docker:my-app", "container"),
+            ("container:web", "container"),
+            ("db:./app.db", "database"),
+            ("sqlite:./data.sqlite", "database"),
+            ("postgres:localhost", "database"),
+            ("postgresql:localhost", "database"),
+            ("mysql:localhost", "database"),
+            ("net:8.8.8.8", "network"),
+            ("ping:google.com", "network"),
+            ("dns:cloudflare.com", "network"),
+            ("proc:nginx", "process"),
+            ("pid:1234", "process"),
+            ("port:8080", "process"),
+            ("tcp:db:5432", "process"),
+            ("service:postgresql", "process"),
+            ("dir:./data/", "infra"),
+        ],
+    )
     def test_prefix_detection(self, input_str, expected_cat):
         src = parse_source(input_str)
         assert src.category == expected_cat
 
     # ── Protocol URL detection ──
 
-    @pytest.mark.parametrize("url,expected_cat", [
-        ("rtsp://192.168.1.1:554/stream", "video"),
-        ("http://api.example.com/health", "web"),
-        ("https://api.example.com/v2", "web"),
-        ("postgresql://user:pass@db:5432/mydb", "database"),
-        ("redis://cache:6379", "database"),
-        ("mqtt://broker:1883/topic", "data"),
-    ])
+    @pytest.mark.parametrize(
+        "url,expected_cat",
+        [
+            ("rtsp://192.168.1.1:554/stream", "video"),
+            ("http://api.example.com/health", "web"),
+            ("https://api.example.com/v2", "web"),
+            ("postgresql://user:pass@db:5432/mydb", "database"),
+            ("redis://cache:6379", "database"),
+            ("mqtt://broker:1883/topic", "data"),
+        ],
+    )
     def test_protocol_detection(self, url, expected_cat):
         src = parse_source(url)
         assert src.path_or_url == url
@@ -84,22 +91,25 @@ class TestParseSource:
 
     # ── Extension detection (plain paths) ──
 
-    @pytest.mark.parametrize("path,expected_cat", [
-        ("./app.log", "logs"),
-        ("./data.db", "database"),
-        ("./data.sqlite3", "database"),
-        ("./metrics.csv", "data"),
-        ("./events.jsonl", "data"),
-        ("./config.yaml", "config"),
-        ("./config.toml", "config"),
-        ("./readme.md", "document"),
-        ("./video.mp4", "video"),
-        ("./audio.wav", "audio"),
-        ("./src/main.py", "code"),
-        ("./bundle.zip", "data"),
-        ("./bundle.tar", "data"),
-        ("./bundle.tar.gz", "data"),
-    ])
+    @pytest.mark.parametrize(
+        "path,expected_cat",
+        [
+            ("./app.log", "logs"),
+            ("./data.db", "database"),
+            ("./data.sqlite3", "database"),
+            ("./metrics.csv", "data"),
+            ("./events.jsonl", "data"),
+            ("./config.yaml", "config"),
+            ("./config.toml", "config"),
+            ("./readme.md", "document"),
+            ("./video.mp4", "video"),
+            ("./audio.wav", "audio"),
+            ("./src/main.py", "code"),
+            ("./bundle.zip", "data"),
+            ("./bundle.tar", "data"),
+            ("./bundle.tar.gz", "data"),
+        ],
+    )
     def test_extension_detection(self, path, expected_cat):
         src = parse_source(path)
         assert src.category == expected_cat
@@ -152,10 +162,10 @@ class TestArchiveHelpers:
         assert len(b._sources) >= 2
 
 
-
 # ══════════════════════════════════════════════════════════════
 # ConfigBuilder
 # ══════════════════════════════════════════════════════════════
+
 
 class TestConfigBuilder:
     """Tests for fluent ConfigBuilder."""
@@ -255,6 +265,7 @@ class TestConfigBuilder:
     def test_build_server(self):
         """Build returns a ToonicServer instance."""
         from toonic.server.main import ToonicServer
+
         srv = ConfigBuilder().add("./src/").goal("test").build()
         assert isinstance(srv, ToonicServer)
         assert srv.config.goal == "test"
@@ -263,6 +274,7 @@ class TestConfigBuilder:
 # ══════════════════════════════════════════════════════════════
 # watch() helper
 # ══════════════════════════════════════════════════════════════
+
 
 class TestWatch:
     """Tests for the watch() convenience function."""
@@ -291,12 +303,8 @@ class TestWatch:
     def test_watch_chain_to_build(self):
         """Full chain: watch → config → server."""
         from toonic.server.main import ToonicServer
-        srv = (
-            watch("./src/", "log:./app.log")
-            .goal("test")
-            .interval(10)
-            .build()
-        )
+
+        srv = watch("./src/", "log:./app.log").goal("test").interval(10).build()
         assert isinstance(srv, ToonicServer)
         assert len(srv.config.sources) == 2
 
@@ -305,11 +313,13 @@ class TestWatch:
 # Presets
 # ══════════════════════════════════════════════════════════════
 
+
 class TestPresets:
     """Tests for pre-configured monitoring presets."""
 
     def test_security_audit_defaults(self):
         from toonic.server.quick import security_audit
+
         b = security_audit("./src/")
         cfg = b.build_config()
         assert "security" in cfg.goal.lower()
@@ -319,18 +329,21 @@ class TestPresets:
 
     def test_security_audit_multi_source(self):
         from toonic.server.quick import security_audit
+
         b = security_audit("./src/", "log:./auth.log")
         cfg = b.build_config()
         assert len(cfg.sources) == 2
 
     def test_security_audit_override_goal(self):
         from toonic.server.quick import security_audit
+
         b = security_audit("./src/", goal="custom goal")
         cfg = b.build_config()
         assert cfg.goal == "custom goal"
 
     def test_code_review_defaults(self):
         from toonic.server.quick import code_review
+
         b = code_review("./src/")
         cfg = b.build_config()
         assert "code review" in cfg.goal.lower()
@@ -339,12 +352,14 @@ class TestPresets:
 
     def test_code_review_override_interval(self):
         from toonic.server.quick import code_review
+
         b = code_review("./src/", interval=60)
         cfg = b.build_config()
         assert cfg.interval == 60
 
     def test_log_monitor_defaults(self):
         from toonic.server.quick import log_monitor
+
         b = log_monitor("log:./app.log")
         cfg = b.build_config()
         assert "log" in cfg.goal.lower()
@@ -353,6 +368,7 @@ class TestPresets:
 
     def test_infra_health_defaults(self):
         from toonic.server.quick import infra_health
+
         b = infra_health("docker:*", "net:8.8.8.8")
         cfg = b.build_config()
         assert "infrastructure" in cfg.goal.lower()
@@ -361,6 +377,7 @@ class TestPresets:
 
     def test_cctv_monitor_defaults(self):
         from toonic.server.quick import cctv_monitor
+
         b = cctv_monitor("rtsp://cam:554/stream")
         cfg = b.build_config()
         assert "cctv" in cfg.goal.lower()
@@ -368,6 +385,7 @@ class TestPresets:
 
     def test_web_monitor_defaults(self):
         from toonic.server.quick import web_monitor
+
         b = web_monitor("https://example.com/health")
         cfg = b.build_config()
         assert "web" in cfg.goal.lower()
@@ -376,12 +394,14 @@ class TestPresets:
 
     def test_web_monitor_multiple_urls(self):
         from toonic.server.quick import web_monitor
+
         b = web_monitor("https://a.com", "https://b.com", "https://c.com")
         cfg = b.build_config()
         assert len(cfg.sources) == 3
 
     def test_full_stack_defaults(self):
         from toonic.server.quick import full_stack
+
         b = full_stack("./src/", "log:./app.log", "docker:*")
         cfg = b.build_config()
         assert "full-stack" in cfg.goal.lower()
@@ -391,6 +411,7 @@ class TestPresets:
     def test_preset_chaining(self):
         """Presets return ConfigBuilder — can chain further."""
         from toonic.server.quick import security_audit
+
         b = security_audit("./src/").network("8.8.8.8").process("port:5432")
         cfg = b.build_config()
         assert len(cfg.sources) == 3
@@ -402,6 +423,7 @@ class TestPresets:
     def test_preset_no_sources(self):
         """Preset with no sources returns empty ConfigBuilder."""
         from toonic.server.quick import security_audit
+
         b = security_audit()
         cfg = b.build_config()
         assert len(cfg.sources) == 0
@@ -409,6 +431,7 @@ class TestPresets:
 
     def test_presets_registry(self):
         from toonic.server.quick import PRESETS
+
         assert len(PRESETS) == 7
         for name, info in PRESETS.items():
             assert "fn" in info
@@ -418,6 +441,7 @@ class TestPresets:
     def test_presets_registry_all_build(self):
         """Every preset in PRESETS registry builds a valid config."""
         from toonic.server.quick import PRESETS
+
         for name, info in PRESETS.items():
             builder = info["fn"]("./src/")
             cfg = builder.build_config()

@@ -20,9 +20,11 @@ from toonic.core.registry import FormatRegistry
 # Modele logiki — Dane
 # =============================================================================
 
+
 @dataclass
 class ColumnSpec:
     """Specyfikacja kolumny tabeli."""
+
     name: str
     dtype: str = "string"
     nullable: bool = True
@@ -33,6 +35,7 @@ class ColumnSpec:
 @dataclass
 class TableLogic:
     """Logika danych tabelarycznych — CSV, Excel, SQL wyniki."""
+
     source_file: str
     source_hash: str
     file_category: str = "data"
@@ -49,8 +52,12 @@ class TableLogic:
             "source_file": self.source_file,
             "rows": self.rows,
             "columns": [
-                {"name": c.name, "dtype": c.dtype, "nullable": c.nullable,
-                 "samples": c.sample_values[:3]}
+                {
+                    "name": c.name,
+                    "dtype": c.dtype,
+                    "nullable": c.nullable,
+                    "samples": c.sample_values[:3],
+                }
                 for c in self.columns
             ],
             "delimiter": self.delimiter,
@@ -64,6 +71,7 @@ class TableLogic:
 @dataclass
 class JsonSchemaLogic:
     """Logika danych JSON — schemat i struktura."""
+
     source_file: str
     source_hash: str
     file_category: str = "data"
@@ -92,15 +100,16 @@ class JsonSchemaLogic:
 # CSV Handler
 # =============================================================================
 
+
 class CsvHandler(BaseHandlerMixin):
     """Handler dla CSV/TSV."""
 
-    extensions = frozenset({'.csv', '.tsv'})
-    category = 'data'
+    extensions = frozenset({".csv", ".tsv"})
+    category = "data"
     requires = ()
 
     def parse(self, path: Path) -> TableLogic:
-        content = path.read_text(errors='replace')
+        content = path.read_text(errors="replace")
         source_hash = self._compute_hash(path)
 
         sniffer_sample = content[:4096]
@@ -108,7 +117,7 @@ class CsvHandler(BaseHandlerMixin):
             dialect = csv.Sniffer().sniff(sniffer_sample)
             delimiter = dialect.delimiter
         except csv.Error:
-            delimiter = '\t' if path.suffix == '.tsv' else ','
+            delimiter = "\t" if path.suffix == ".tsv" else ","
 
         reader = csv.reader(io.StringIO(content), delimiter=delimiter)
         rows_data = list(reader)
@@ -116,8 +125,14 @@ class CsvHandler(BaseHandlerMixin):
         if not rows_data:
             return TableLogic(source_file=path.name, source_hash=source_hash)
 
-        has_header = csv.Sniffer().has_header(sniffer_sample) if sniffer_sample else True
-        headers = rows_data[0] if has_header else [f"col_{i}" for i in range(len(rows_data[0]))]
+        has_header = (
+            csv.Sniffer().has_header(sniffer_sample) if sniffer_sample else True
+        )
+        headers = (
+            rows_data[0]
+            if has_header
+            else [f"col_{i}" for i in range(len(rows_data[0]))]
+        )
         data_rows = rows_data[1:] if has_header else rows_data
 
         columns = []
@@ -125,18 +140,20 @@ class CsvHandler(BaseHandlerMixin):
             col_values = [row[i] for row in data_rows if i < len(row)]
             dtype = self._infer_dtype(col_values[:100])
             samples = [v for v in col_values[:5] if v][:3]
-            nullable = any(v == '' or v is None for v in col_values[:100])
+            nullable = any(v == "" or v is None for v in col_values[:100])
             unique_count = len(set(col_values[:1000]))
             total = min(len(col_values), 1000)
             unique_ratio = unique_count / total if total > 0 else 0
 
-            columns.append(ColumnSpec(
-                name=name,
-                dtype=dtype,
-                nullable=nullable,
-                sample_values=samples,
-                unique_ratio=round(unique_ratio, 2),
-            ))
+            columns.append(
+                ColumnSpec(
+                    name=name,
+                    dtype=dtype,
+                    nullable=nullable,
+                    sample_values=samples,
+                    unique_ratio=round(unique_ratio, 2),
+                )
+            )
 
         return TableLogic(
             source_file=path.name,
@@ -151,20 +168,23 @@ class CsvHandler(BaseHandlerMixin):
         non_empty = [v for v in values if v.strip()]
         if not non_empty:
             return "null"
-        if all(re.match(r'^-?\d+$', v) for v in non_empty[:20]):
+        if all(re.match(r"^-?\d+$", v) for v in non_empty[:20]):
             return "int"
-        if all(re.match(r'^-?\d*\.?\d+$', v) for v in non_empty[:20]):
+        if all(re.match(r"^-?\d*\.?\d+$", v) for v in non_empty[:20]):
             return "float"
-        if all(v.lower() in ('true', 'false', '0', '1', 'yes', 'no') for v in non_empty[:20]):
+        if all(
+            v.lower() in ("true", "false", "0", "1", "yes", "no")
+            for v in non_empty[:20]
+        ):
             return "bool"
-        if all(re.match(r'^\d{4}[-/]\d{2}[-/]\d{2}', v) for v in non_empty[:20]):
+        if all(re.match(r"^\d{4}[-/]\d{2}[-/]\d{2}", v) for v in non_empty[:20]):
             return "date"
         return "string"
 
-    def to_spec(self, logic: TableLogic, fmt: str = 'toon') -> str:
-        if fmt == 'toon':
+    def to_spec(self, logic: TableLogic, fmt: str = "toon") -> str:
+        if fmt == "toon":
             return self._to_toon(logic)
-        elif fmt == 'yaml':
+        elif fmt == "yaml":
             return self._to_yaml(logic)
         return json.dumps(logic.to_dict(), indent=2, ensure_ascii=False)
 
@@ -181,14 +201,19 @@ class CsvHandler(BaseHandlerMixin):
             col_parts.append(part)
         lines.append("  " + ", ".join(col_parts))
 
-        max_samples = min(3, min(len(c.sample_values) for c in t.columns) if t.columns else 0)
+        max_samples = min(
+            3, min(len(c.sample_values) for c in t.columns) if t.columns else 0
+        )
         if max_samples > 0:
             lines.append(f"sample[{max_samples}]:")
             for i in range(max_samples):
-                row = [c.sample_values[i] if i < len(c.sample_values) else "" for c in t.columns]
+                row = [
+                    c.sample_values[i] if i < len(c.sample_values) else ""
+                    for c in t.columns
+                ]
                 lines.append("  " + t.delimiter.join(row))
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _to_yaml(self, t: TableLogic) -> str:
         lines = [f"# {t.source_file} | csv | {t.rows} rows"]
@@ -200,9 +225,11 @@ class CsvHandler(BaseHandlerMixin):
             lines.append(f"    type: {c.dtype}")
             if c.sample_values:
                 lines.append(f"    samples: {c.sample_values[:3]}")
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
-    def reproduce(self, logic: TableLogic, client: Any = None, target_fmt: str | None = None) -> str:
+    def reproduce(
+        self, logic: TableLogic, client: Any = None, target_fmt: str | None = None
+    ) -> str:
         header = logic.delimiter.join(c.name for c in logic.columns)
         rows = [header]
         for i in range(min(5, logic.rows)):
@@ -213,16 +240,16 @@ class CsvHandler(BaseHandlerMixin):
                 else:
                     row.append(f"sample_{c.name}_{i}")
             rows.append(logic.delimiter.join(row))
-        return '\n'.join(rows)
+        return "\n".join(rows)
 
     def sniff(self, path: Path, content: str) -> float:
         score = 0.0
-        first_lines = content.split('\n')[:5]
+        first_lines = content.split("\n")[:5]
         if first_lines:
-            delimiters = [line.count(',') for line in first_lines]
+            delimiters = [line.count(",") for line in first_lines]
             if delimiters and all(d == delimiters[0] and d > 0 for d in delimiters):
                 score += 0.6
-            tab_counts = [line.count('\t') for line in first_lines]
+            tab_counts = [line.count("\t") for line in first_lines]
             if tab_counts and all(t == tab_counts[0] and t > 0 for t in tab_counts):
                 score += 0.6
         return min(score, 1.0)
@@ -232,15 +259,16 @@ class CsvHandler(BaseHandlerMixin):
 # JSON Data Handler
 # =============================================================================
 
+
 class JsonDataHandler(BaseHandlerMixin):
     """Handler dla plików z danymi JSON (nie JSON Schema, nie package.json)."""
 
-    extensions = frozenset({'.json'})
-    category = 'data'
+    extensions = frozenset({".json"})
+    category = "data"
     requires = ()
 
     def parse(self, path: Path) -> JsonSchemaLogic:
-        content = path.read_text(errors='replace')
+        content = path.read_text(errors="replace")
         source_hash = self._compute_hash(path)
 
         try:
@@ -260,11 +288,13 @@ class JsonDataHandler(BaseHandlerMixin):
 
         if isinstance(data, dict):
             for k, v in list(data.items())[:50]:
-                keys.append({
-                    "name": str(k),
-                    "type": type(v).__name__,
-                    "nested": str(isinstance(v, (dict, list))),
-                })
+                keys.append(
+                    {
+                        "name": str(k),
+                        "type": type(v).__name__,
+                        "nested": str(isinstance(v, (dict, list))),
+                    }
+                )
 
         return JsonSchemaLogic(
             source_file=path.name,
@@ -293,19 +323,23 @@ class JsonDataHandler(BaseHandlerMixin):
             return sum(self._count_keys(v) for v in obj[:100])
         return 0
 
-    def to_spec(self, logic: JsonSchemaLogic, fmt: str = 'toon') -> str:
-        if fmt == 'toon':
-            lines = [f"# {logic.source_file} | json-data | {logic.total_keys} keys | depth:{logic.depth}"]
+    def to_spec(self, logic: JsonSchemaLogic, fmt: str = "toon") -> str:
+        if fmt == "toon":
+            lines = [
+                f"# {logic.source_file} | json-data | {logic.total_keys} keys | depth:{logic.depth}"
+            ]
             lines.append(f"root: {logic.root_type}")
             if logic.keys:
                 lines.append(f"K[{len(logic.keys)}]:")
                 for k in logic.keys:
                     nested = " →nested" if k.get("nested") == "True" else ""
                     lines.append(f"  {k['name']}:{k['type']}{nested}")
-            return '\n'.join(lines)
+            return "\n".join(lines)
         return json.dumps(logic.to_dict(), indent=2, ensure_ascii=False)
 
-    def reproduce(self, logic: JsonSchemaLogic, client: Any = None, target_fmt: str | None = None) -> str:
+    def reproduce(
+        self, logic: JsonSchemaLogic, client: Any = None, target_fmt: str | None = None
+    ) -> str:
         obj = {}
         for k in logic.keys:
             if k["type"] == "str":
@@ -323,11 +357,18 @@ class JsonDataHandler(BaseHandlerMixin):
     def sniff(self, path: Path, content: str) -> float:
         score = 0.0
         stripped = content.strip()
-        if stripped.startswith('{') or stripped.startswith('['):
+        if stripped.startswith("{") or stripped.startswith("["):
             score += 0.3
         name = path.name.lower()
-        config_names = {'package.json', 'tsconfig.json', 'tslint.json', 'eslint.json',
-                       'composer.json', '.babelrc', 'jest.config.json'}
+        config_names = {
+            "package.json",
+            "tsconfig.json",
+            "tslint.json",
+            "eslint.json",
+            "composer.json",
+            ".babelrc",
+            "jest.config.json",
+        }
         if name in config_names:
             score -= 0.5
         return max(score, 0.0)
@@ -336,6 +377,7 @@ class JsonDataHandler(BaseHandlerMixin):
 # =============================================================================
 # Rejestracja
 # =============================================================================
+
 
 def register_data_handlers() -> None:
     """Rejestruje handlery danych."""

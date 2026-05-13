@@ -15,8 +15,7 @@ import logging
 import sqlite3
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
-from urllib.parse import urlparse
+from typing import Any, Dict, List
 
 from toonic.server.models import ContextChunk, SourceCategory
 from toonic.server.watchers.base import BaseWatcher, WatcherRegistry
@@ -35,7 +34,7 @@ class DatabaseWatcher(BaseWatcher):
         self._dsn = path_or_url
         for prefix in ("db:", "sqlite:", "database:"):
             if self._dsn.startswith(prefix):
-                self._dsn = self._dsn[len(prefix):]
+                self._dsn = self._dsn[len(prefix) :]
                 break
 
         self.poll_interval = float(options.get("poll_interval", 30.0))
@@ -60,7 +59,11 @@ class DatabaseWatcher(BaseWatcher):
             return "postgresql"
         if dsn.startswith("mysql://"):
             return "mysql"
-        if Path(self._dsn).exists() and Path(self._dsn).suffix in (".db", ".sqlite", ".sqlite3"):
+        if Path(self._dsn).exists() and Path(self._dsn).suffix in (
+            ".db",
+            ".sqlite",
+            ".sqlite3",
+        ):
             return "sqlite"
         return "sqlite"
 
@@ -124,13 +127,15 @@ class DatabaseWatcher(BaseWatcher):
         )
 
         if should_emit:
-            await self.emit(ContextChunk(
-                source_id=self.source_id,
-                category=SourceCategory.DATABASE,
-                toon_spec=toon,
-                is_delta=is_delta,
-                metadata=result,
-            ))
+            await self.emit(
+                ContextChunk(
+                    source_id=self.source_id,
+                    category=SourceCategory.DATABASE,
+                    toon_spec=toon,
+                    is_delta=is_delta,
+                    metadata=result,
+                )
+            )
 
     async def _check_sqlite(self, result: Dict[str, Any]) -> None:
         """Check SQLite database."""
@@ -165,7 +170,9 @@ class DatabaseWatcher(BaseWatcher):
                     "SELECT sql FROM sqlite_master WHERE sql IS NOT NULL ORDER BY name"
                 )
                 schema_sql = "\n".join(row[0] for row in cursor.fetchall())
-                data["schema_hash"] = hashlib.sha256(schema_sql.encode()).hexdigest()[:16]
+                data["schema_hash"] = hashlib.sha256(schema_sql.encode()).hexdigest()[
+                    :16
+                ]
                 data["schema_sql"] = schema_sql
 
                 # Row counts
@@ -174,7 +181,9 @@ class DatabaseWatcher(BaseWatcher):
                     for table in tables:
                         if table["type"] == "table":
                             try:
-                                cursor = conn.execute(f'SELECT COUNT(*) FROM "{table["name"]}"')
+                                cursor = conn.execute(
+                                    f'SELECT COUNT(*) FROM "{table["name"]}"'
+                                )
                                 row_counts[table["name"]] = cursor.fetchone()[0]
                             except Exception:
                                 row_counts[table["name"]] = -1
@@ -193,7 +202,11 @@ class DatabaseWatcher(BaseWatcher):
                             cursor = conn.execute(sql)
                             rows = cursor.fetchall()
                             elapsed = time.monotonic() - start
-                            cols = [desc[0] for desc in cursor.description] if cursor.description else []
+                            cols = (
+                                [desc[0] for desc in cursor.description]
+                                if cursor.description
+                                else []
+                            )
                             row_data = [dict(zip(cols, row)) for row in rows[:50]]
                             result_hash = hashlib.sha256(
                                 json.dumps(row_data, default=str).encode()
@@ -231,6 +244,7 @@ class DatabaseWatcher(BaseWatcher):
         """Check PostgreSQL database (requires asyncpg or psycopg2)."""
         try:
             import asyncpg
+
             conn = await asyncio.wait_for(
                 asyncpg.connect(self._dsn),
                 timeout=self.timeout,
@@ -243,7 +257,9 @@ class DatabaseWatcher(BaseWatcher):
                     "SELECT table_name, table_type FROM information_schema.tables "
                     "WHERE table_schema = 'public' ORDER BY table_name"
                 )
-                tables = [{"name": r["table_name"], "type": r["table_type"]} for r in rows]
+                tables = [
+                    {"name": r["table_name"], "type": r["table_type"]} for r in rows
+                ]
                 result["tables"] = tables
 
                 # Row counts
@@ -251,7 +267,9 @@ class DatabaseWatcher(BaseWatcher):
                     row_counts: Dict[str, int] = {}
                     for table in tables:
                         try:
-                            row = await conn.fetchrow(f'SELECT COUNT(*) as cnt FROM "{table["name"]}"')
+                            row = await conn.fetchrow(
+                                f'SELECT COUNT(*) as cnt FROM "{table["name"]}"'
+                            )
                             row_counts[table["name"]] = row["cnt"]
                         except Exception:
                             row_counts[table["name"]] = -1

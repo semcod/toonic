@@ -10,9 +10,6 @@ from toonic.server.quick import run
 run("https://api.example.com/health", goal="monitor API uptime and response times")
 ```
 
-## Quick Start (CLI)
-
-```bash
 # Monitor a single endpoint
 python -m toonic.server \
   --source https://api.example.com/health \
@@ -87,9 +84,6 @@ server = (
 )
 ```
 
-## Combined with other sources
-
-```bash
 # API + logs + network — full service monitoring
 python -m toonic.server \
   --source https://api.example.com/health \

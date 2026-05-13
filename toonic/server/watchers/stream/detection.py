@@ -1,4 +1,5 @@
 """YOLO detection logic for stream watcher."""
+
 from __future__ import annotations
 
 import asyncio
@@ -19,10 +20,13 @@ def init_yolo(watcher: "StreamWatcher") -> bool:
         return False
     try:
         from ultralytics import YOLO
+
         watcher._yolo_model = YOLO(watcher.detect_model, verbose=False)
         # Build class filter set
         watcher._detect_class_set = {
-            c.strip().lower() for c in watcher.detect_classes_str.split(",") if c.strip()
+            c.strip().lower()
+            for c in watcher.detect_classes_str.split(",")
+            if c.strip()
         }
         logger.info(
             f"[{watcher.source_id}] YOLO loaded: {watcher.detect_model} "
@@ -47,6 +51,7 @@ async def run_detection(watcher: "StreamWatcher", frame) -> List[Detection]:
 def _detect_sync(watcher: "StreamWatcher", frame) -> List[Detection]:
     """Synchronous YOLO inference + filtering."""
     import cv2
+
     h, w = frame.shape[:2]
     # Resize for detection
     det_h = int(watcher.detect_resolution * h / w)
@@ -55,7 +60,9 @@ def _detect_sync(watcher: "StreamWatcher", frame) -> List[Detection]:
     scale_y = h / det_h
 
     try:
-        results = watcher._yolo_model(det_frame, conf=watcher.detect_conf, verbose=False)
+        results = watcher._yolo_model(
+            det_frame, conf=watcher.detect_conf, verbose=False
+        )
     except Exception as e:
         logger.debug(f"[{watcher.source_id}] YOLO inference error: {e}")
         return []
@@ -73,13 +80,17 @@ def _detect_sync(watcher: "StreamWatcher", frame) -> List[Detection]:
             conf = float(box.conf[0])
             x1, y1, x2, y2 = box.xyxy[0].tolist()
             # Scale back to original frame coordinates
-            detections.append(Detection(
-                label=label,
-                confidence=round(conf, 3),
-                bbox=(
-                    int(x1 * scale_x), int(y1 * scale_y),
-                    int(x2 * scale_x), int(y2 * scale_y),
-                ),
-                track_id=int(box.id[0]) if box.id is not None else -1,
-            ))
+            detections.append(
+                Detection(
+                    label=label,
+                    confidence=round(conf, 3),
+                    bbox=(
+                        int(x1 * scale_x),
+                        int(y1 * scale_y),
+                        int(x2 * scale_x),
+                        int(y2 * scale_y),
+                    ),
+                    track_id=int(box.id[0]) if box.id is not None else -1,
+                )
+            )
     return detections

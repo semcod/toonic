@@ -9,9 +9,6 @@ from toonic.server.quick import run
 run("rtsp://cam:554/stream", goal="describe video frames, caption each scene change")
 ```
 
-## Quick Start (CLI)
-
-```bash
 # With real camera
 python -m toonic.server \
   --source "rtsp://admin:123456@192.168.188.146:554/h264Preview_01_main" \
@@ -50,6 +47,3 @@ toonic> sql SELECT content FROM exchanges WHERE category='video' ORDER BY timest
 ```bash
 cd docker/
 docker compose up -d
-# Toonic server automatically watches test-cam1
-# Open http://localhost:8900 for live captioning events
-```

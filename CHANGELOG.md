@@ -1,4 +1,4 @@
-## [1.0.15] - 2026-03-01
+## [Unreleased]
 
 ### Summary
 
@@ -24,8 +24,6 @@ refactor(docs): code analysis engine
 - ... and 3 more
 
 
-## [1.0.14] - 2026-02-26
-
 ### Summary
 
 feat(docs): deep code analysis engine with 7 supporting modules
@@ -42,8 +40,6 @@ feat(docs): deep code analysis engine with 7 supporting modules
 - update unified_toon.py
 
 
-## [1.0.13] - 2026-02-26
-
 ### Summary
 
 feat(toonic): CLI interface with 2 supporting modules
@@ -52,8 +48,6 @@ feat(toonic): CLI interface with 2 supporting modules
 
 - update toonic/server/transport/rest_api.py
 
-
-## [1.0.12] - 2026-02-26
 
 ### Summary
 
@@ -76,8 +70,6 @@ feat(tests): configuration management system
 - update toonic/server/transport/broxeen_bridge.py
 
 
-## [1.0.11] - 2026-02-26
-
 ### Summary
 
 feat(docs): deep code analysis engine with 7 supporting modules
@@ -98,8 +90,6 @@ feat(docs): deep code analysis engine with 7 supporting modules
 - update toonic/server/main.py
 - update toonic/server/watchers/stream_watcher.py
 
-
-## [1.0.10] - 2026-02-26
 
 ### Summary
 
@@ -131,8 +121,6 @@ feat(docs): configuration management system
 - update toonic/server/watchers/database_watcher.py
 - ... and 6 more
 
-
-## [1.0.9] - 2026-02-26
 
 ### Summary
 
@@ -183,8 +171,6 @@ feat(watchers): 6 new data source watchers — HTTP, Process, Directory, Docker,
 - update pyproject.toml (monitoring extras, Python 3.13 classifier)
 - docker: fix libgl1-mesa-glx → libgl1 in Dockerfile and Dockerfile.test
 
-
-## [1.0.8] - 2026-02-26
 
 ### Summary
 
@@ -248,8 +234,6 @@ feat(triggers): Complete event-driven trigger system with NLP2YAML, 7 detectors,
 - New test coverage: triggers DSL, detectors, scheduler, NLP2YAML
 - Verified with real RTSP camera + OpenRouter
 
-## [1.0.7] - 2026-02-26
-
 ### Summary
 
 refactor(config): deep code analysis engine with 6 supporting modules
@@ -266,8 +250,6 @@ refactor(config): deep code analysis engine with 6 supporting modules
 - update toonic/server/main.py
 - update toonic/server/transport/rest_api.py
 
-
-## [1.0.6] - 2026-02-26
 
 ### Summary
 
@@ -298,8 +280,6 @@ feat(docs): configuration management system
 - update toonic/server/triggers/nlp2yaml.py
 - ... and 1 more
 
-
-## [1.0.5] - 2026-02-26
 
 ### Summary
 
@@ -333,8 +313,6 @@ feat(docs): CLI interface improvements
 - update toonic/server/core/router.py
 - update toonic/server/transport/rest_api.py
 
-
-## [1.0.4] - 2026-02-26
 
 ### Summary
 
@@ -371,8 +349,6 @@ feat(docs): CLI interface improvements
 - update toonic/server/client.py
 - ... and 13 more
 
-
-## [1.0.3] - 2026-02-26
 
 ### Summary
 
@@ -411,8 +387,6 @@ feat(tests): CLI interface improvements
 - ... and 11 more
 
 
-## [1.0.2] - 2026-02-26
-
 ### Summary
 
 feat(docs): configuration management system
@@ -430,8 +404,6 @@ feat(docs): configuration management system
 - update TODO/stage_6_audio_handler.py
 - update TODO/stage_7_evidence_graph.py
 
-
-## [1.0.1] - 2026-02-26
 
 ### Summary
 
@@ -465,4 +437,9 @@ refactor(docs): CLI interface improvements
 - update TODO/stage_4_pipeline_cli.py
 - scripts: update project.sh
 
+- feat(toonic): add CLI interface with 2 supporting modules
+- feat(docs): add deep code analysis engine with 7 supporting modules
+- feat(tests): add configuration management system
+- refactor(config): deep code analysis engine with 6 supporting modules
+- feat(docs): CLI interface improvements
 

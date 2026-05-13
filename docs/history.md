@@ -1,5 +1,3 @@
-# Conversation History
-
 ## Przegląd
 
 Każda wymiana z LLM jest automatycznie logowana w SQLite z pełnymi metadanymi.
@@ -9,9 +7,6 @@ Umożliwia to:
 - **Replay** — odtworzenie sesji analizy
 - **Analytics** — token usage, latencja, skuteczność modeli
 
-## Konfiguracja
-
-```bash
 # .env
 TOONIC_HISTORY_ENABLED=true
 TOONIC_DB_PATH=./toonic_history.db

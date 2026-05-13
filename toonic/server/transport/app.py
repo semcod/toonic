@@ -9,7 +9,6 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
-from typing import Any
 
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
@@ -84,6 +83,7 @@ def create_app(server) -> FastAPI:
 
     try:
         from toonic.server.transport.broxeen_bridge import register_broxeen_routes
+
         register_broxeen_routes(app, server)
     except Exception as e:
         logger.warning(f"Broxeen bridge not loaded: {e}")
