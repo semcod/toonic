@@ -1,0 +1,238 @@
+// LESS format — define @variables here as needed
+
+app {
+  name: toonic;
+  version: 1.0.16;
+  description: "Toonic — Universal TOON Format Platform for LLM-optimized file representations";
+  license: Apache-2.0;
+  authors: "Tom Sapletta <tom@sapletta.com>";
+  homepage: https://github.com/wronai/toonic;
+  repository: https://github.com/wronai/toonic;
+}
+
+dependencies {
+  video: opencv-python>=4.8;
+  audio: "numpy>=1.24, webrtcvad>=2.0";
+  server: "fastapi>=0.110, uvicorn>=0.27, pyyaml>=6.0, httpx>=0.27, websockets>=12.0";
+  llm: litellm>=1.30;
+  detection: "ultralytics>=8.0, opencv-python>=4.8";
+  monitoring: "httpx>=0.27, pyyaml>=6.0";
+  cctv: "opencv-python>=4.8, ultralytics>=8.0, fastapi>=0.110, uvicorn>=0.27, pyyaml>=6.0, httpx>=0.27, websockets>=12.0, litellm>=1.30";
+  all: "opencv-python>=4.8, numpy>=1.24, webrtcvad>=2.0, ultralytics>=8.0, fastapi>=0.110, uvicorn>=0.27, pyyaml>=6.0, httpx>=0.27, websockets>=12.0, litellm>=1.30";
+  dev: "pytest>=7.0, pytest-asyncio>=0.23, pytest-cov>=4.0, pyyaml>=6.0, numpy>=1.24, fastapi>=0.110, uvicorn>=0.27, httpx>=0.27, websockets>=12.0";
+}
+
+interface[type="api"] {
+  type: rest;
+  framework: fastapi;
+}
+
+interface[type="cli"] {
+  framework: argparse;
+}
+interface[type="cli"] page[name="toonic"] {
+  entry: toonic.cli:cli_main;
+}
+
+workflow[name="venv"] {
+  trigger: manual;
+  step-1: run cmd=python3 -m venv .venv;
+  step-2: run cmd=$(PIP) install --upgrade pip;
+}
+
+workflow[name="install"] {
+  trigger: manual;
+  step-1: run cmd=$(PIP) install -e .;
+}
+
+workflow[name="install-dev"] {
+  trigger: manual;
+  step-1: run cmd=$(PIP) install -e ".[dev,server]";
+}
+
+workflow[name="install-all"] {
+  trigger: manual;
+  step-1: run cmd=$(PIP) install -e ".[all]";
+}
+
+workflow[name="install-llm"] {
+  trigger: manual;
+  step-1: run cmd=$(PIP) install litellm;
+}
+
+workflow[name="test"] {
+  trigger: manual;
+  step-1: run cmd=$(PYTEST) tests/ -v;
+}
+
+workflow[name="test-server"] {
+  trigger: manual;
+  step-1: run cmd=$(PYTEST) tests/test_server.py -v;
+}
+
+workflow[name="test-cov"] {
+  trigger: manual;
+  step-1: run cmd=$(PYTEST) tests/ -v --cov=toonic --cov-report=html;
+}
+
+workflow[name="server"] {
+  trigger: manual;
+  step-1: run cmd=$(PYTHON) -m toonic.server --port $(PORT);
+}
+
+workflow[name="server-code"] {
+  trigger: manual;
+  step-1: run cmd=$(PYTHON) -m toonic.server \;
+  step-2: run cmd=--source file:./examples/code-analysis/sample-project/ \;
+  step-3: run cmd=--port $(PORT) \;
+  step-4: run cmd=--goal "find bugs, security issues, suggest improvements" \;
+  step-5: run cmd=--interval 0;
+}
+
+workflow[name="server-logs"] {
+  trigger: manual;
+  step-1: run cmd=$(PYTHON) -m toonic.server \;
+  step-2: run cmd=--source log:./docker/test-data/sample.logfile \;
+  step-3: run cmd=--port $(PORT) \;
+  step-4: run cmd=--goal "monitor logs, detect errors" \;
+  step-5: run cmd=--interval 10;
+}
+
+workflow[name="server-camera"] {
+  trigger: manual;
+  step-1: run cmd=$(PYTHON) -m toonic.server \;
+  step-2: run cmd=--source "rtsp://admin:123456@192.168.188.146:554/h264Preview_01_main" \;
+  step-3: run cmd=--port $(PORT) \;
+  step-4: run cmd=--goal "monitor video stream, detect changes" \;
+  step-5: run cmd=--interval 15;
+}
+
+workflow[name="server-multi"] {
+  trigger: manual;
+  step-1: run cmd=$(PYTHON) -m toonic.server \;
+  step-2: run cmd=--source file:./examples/code-analysis/sample-project/ \;
+  step-3: run cmd=--source log:./docker/test-data/sample.logfile \;
+  step-4: run cmd=--source "rtsp://admin:123456@192.168.188.146:554/h264Preview_01_main" \;
+  step-5: run cmd=--port $(PORT) \;
+  step-6: run cmd=--goal "comprehensive analysis: code + logs + video" \;
+  step-7: run cmd=--interval 30;
+}
+
+workflow[name="client"] {
+  trigger: manual;
+  step-1: run cmd=$(PYTHON) -m toonic.server.client;
+}
+
+workflow[name="status"] {
+  trigger: manual;
+  step-1: run cmd=$(PYTHON) -m toonic.server.client --status;
+}
+
+workflow[name="docker-build"] {
+  trigger: manual;
+  step-1: run cmd=docker compose -f docker/docker-compose.yml build;
+}
+
+workflow[name="docker-up"] {
+  trigger: manual;
+  step-1: run cmd=docker compose -f docker/docker-compose.yml up -d;
+}
+
+workflow[name="docker-down"] {
+  trigger: manual;
+  step-1: run cmd=docker compose -f docker/docker-compose.yml down;
+}
+
+workflow[name="docker-logs"] {
+  trigger: manual;
+  step-1: run cmd=docker compose -f docker/docker-compose.yml logs -f toonic-server;
+}
+
+workflow[name="docker-streams"] {
+  trigger: manual;
+  step-1: run cmd=docker compose -f docker/docker-compose.yml up -d rtsp-server test-stream-video test-stream-cam2 test-stream-audio;
+}
+
+workflow[name="convert"] {
+  trigger: manual;
+  step-1: run cmd=$(PYTHON) -m toonic spec $(FILE) --format $(FMT);
+}
+
+workflow[name="batch"] {
+  trigger: manual;
+  step-1: run cmd=$(PYTHON) -m toonic batch $(DIR);
+}
+
+workflow[name="clean"] {
+  trigger: manual;
+  step-1: run cmd=rm -rf build/ dist/ *.egg-info .pytest_cache htmlcov .coverage;
+  step-2: run cmd=find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true;
+}
+
+workflow[name="clean-docker"] {
+  trigger: manual;
+  step-1: run cmd=docker compose -f docker/docker-compose.yml down -v --rmi local;
+}
+
+workflow[name="build"] {
+  trigger: manual;
+  step-1: run cmd=python -m build;
+}
+
+workflow[name="help"] {
+  trigger: manual;
+  step-1: run cmd=echo "toonic — available tasks:";
+  step-2: run cmd=echo "";
+  step-3: run cmd=taskfile list;
+}
+
+workflow[name="health"] {
+  trigger: manual;
+  step-1: run cmd=docker compose ps;
+  step-2: run cmd=docker compose exec app echo "Health check passed";
+}
+
+workflow[name="import-makefile-hint"] {
+  trigger: manual;
+  step-1: run cmd=echo 'Run: taskfile import Makefile to import existing targets.';
+}
+
+workflow[name="all"] {
+  trigger: manual;
+  step-1: run cmd=taskfile run install;
+  step-2: run cmd=taskfile run lint;
+  step-3: run cmd=taskfile run test;
+}
+
+workflow[name="fmt"] {
+  trigger: manual;
+  step-1: run cmd=ruff format .;
+}
+
+workflow[name="lint"] {
+  trigger: manual;
+  step-1: run cmd=ruff check .;
+}
+
+workflow[name="format"] {
+  trigger: manual;
+  step-1: run cmd=ruff format .;
+}
+
+env_vars {
+  keys: LLM_API_KEY, LLM_MODEL, LLM_BASE_URL, OPENROUTER_API_KEY, TOONIC_HOST, TOONIC_PORT, TOONIC_LOG_LEVEL, TOONIC_INTERVAL, TOONIC_GOAL, RTSP_CAM1, RTSP_TEST_CAM1, RTSP_TEST_CAM2, RTSP_TEST_AUDIO, TOONIC_DB_PATH, TOONIC_HISTORY_ENABLED, COMPOSE_PROJECT_NAME;
+}
+
+deploy {
+  target: docker-compose;
+  compose_file: docker/docker-compose.yml;
+}
+
+environment[name="local"] {
+  runtime: docker-compose;
+  env_file: .env;
+  template_file: .env.example;
+  python_version: >=3.10;
+  vars: COMPOSE_PROJECT_NAME, LLM_API_KEY, LLM_BASE_URL, LLM_MODEL, OPENROUTER_API_KEY, RTSP_CAM1, RTSP_TEST_AUDIO, RTSP_TEST_CAM1, RTSP_TEST_CAM2, TOONIC_DB_PATH, TOONIC_GOAL, TOONIC_HISTORY_ENABLED, TOONIC_HOST, TOONIC_INTERVAL, TOONIC_LOG_LEVEL, TOONIC_PORT;
+  runtime_llm: OPENROUTER_API_KEY;
+}
