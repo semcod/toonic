@@ -22,7 +22,7 @@ TIMEOUT_5 = 5
 CONSTANT_9 = 9
 CONSTANT_14 = 14
 CONSTANT_15 = 15
-CONSTANT_15 = 15.2
+CONSTANT_15_2 = 15.2
 CONSTANT_50 = 50
 TIMEOUT_60 = 60
 PORT_80 = 80
@@ -43,7 +43,7 @@ TIMEOUT_5 = TIMEOUT_5
 CONSTANT_9 = CONSTANT_9
 CONSTANT_14 = CONSTANT_14
 CONSTANT_15 = CONSTANT_15
-CONSTANT_15 = CONSTANT_15
+CONSTANT_15_2 = CONSTANT_15_2
 CONSTANT_50 = CONSTANT_50
 TIMEOUT_60 = TIMEOUT_60
 PORT_80 = PORT_80
@@ -221,7 +221,7 @@ class TestHttpWatcher:
             "check_number": 2,
             "ssl": {
                 "days_until_expiry": CONSTANT_15,
-                "expires": "Mar CONSTANT_15 2026",
+                "expires": "Mar 15 2026",
             },
         }
         toon = w._to_toon(result)
@@ -738,7 +738,7 @@ class TestNetworkWatcher:
             "results": {
                 "8.8.8.8": {
                     "reachable": True,
-                    "latency_ms": CONSTANT_15,
+                    "latency_ms": CONSTANT_15_2,
                     "dns": {"ips": ["8.8.8.8"]},
                 },
             },

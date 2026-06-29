@@ -1,9 +1,21 @@
 # 🎵 Toonic — Universal TOON Format Platform
 
+## AI Cost Tracking
+
+![AI Cost](https://img.shields.io/badge/AI%20Cost-$11.92-orange) ![AI Model](https://img.shields.io/badge/AI%20Model-openrouter%2Fqwen%2Fqwen3-coder-next-lightgrey)
+
+This project uses AI-generated code. Total cost: **$11.9225** with **31** AI commits.
+
+Generated on 2026-06-29 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/models/openrouter/qwen/qwen3-coder-next)
+
+---
+
+
+
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://python.org)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Tests](https://img.shields.io/badge/tests-227%20passed-brightgreen.svg)](#testing)
-[![Version](https://img.shields.io/badge/version-1.0.15-orange.svg)](VERSION)
+[![Version](https://img.shields.io/badge/version-1.0.17-orange.svg)](VERSION)
 [![Docker](https://img.shields.io/badge/docker-compose-2496ED.svg)](#docker)
 [![OpenRouter](https://img.shields.io/badge/LLM-OpenRouter-purple.svg)](https://openrouter.ai)
 
@@ -447,14 +459,10 @@ Created by **Tom Sapletta** — [tom@sapletta.com](mailto:tom@sapletta.com)
 
 ## License
 
-Apache License 2.0 - see [LICENSE](LICENSE) for details.
-
+Licensed under Apache-2.0.
 ## Author
 
-Created by **Tom Sapletta** - [tom@sapletta.com](mailto:tom@sapletta.com)
-
-<!-- taskill:status:start -->
-
+Tom Sapletta
 ## Status
 
 _Last updated by [taskill](https://github.com/oqlos/taskill) at 2026-04-25 13:48 UTC_

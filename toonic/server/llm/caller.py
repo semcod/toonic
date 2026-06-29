@@ -159,7 +159,7 @@ class LLMCaller:
         if (
             "implement" in system.lower()
             or "autopilot" in system.lower()
-            or "files" in system.lower()
+            or '"files":' in system.lower()
         ):
             mock_content = json.dumps(
                 {

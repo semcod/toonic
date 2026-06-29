@@ -1,5 +1,19 @@
 ## [Unreleased]
 
+## [1.0.17] - 2026-06-29
+
+### Docs
+- Update README.md
+
+### Test
+- Update tests/test_watchers.py
+
+### Other
+- Update toonic/server/llm/caller.py
+- Update uv.lock
+
+## [Unreleased]
+
 ### Summary
 
 refactor(docs): code analysis engine
