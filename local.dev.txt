@@ -1,0 +1,11 @@
+# local.dev.txt — locally developed dependencies of this project (generated 2026-07-04)
+# by ~/github/local.dev.sh — DO NOT EDIT; see ~/github/local.dev.md
+# project: toonic dynamic (python) at /home/tom/github/semcod/toonic
+# deps declared: 17 | with local source: 3
+
+## LOCAL DEPS  (dep | required | local source (version) | installed | status)
+costs | >=0.1.20 | /home/tom/github/semcod/costs (0.1.53) | 0.1.51 non-editable | STALE-INSTALL (local 0.1.53) -> fix: pip install -e /home/tom/github/semcod/costs  [pyproject.toml[dev]]
+goal | >=2.1.0 | /home/tom/github/semcod/goal (2.1.266) | 2.1.231 non-editable | STALE-INSTALL (local 2.1.266) -> fix: pip install -e /home/tom/github/semcod/goal  [pyproject.toml[dev]]
+pfix | >=0.1.60 | /home/tom/github/semcod/pfix (0.1.76) | 0.1.73 non-editable | STALE-INSTALL (local 0.1.76) -> fix: pip install -e /home/tom/github/semcod/pfix  [pyproject.toml[dev]]
+
+## EXTERNAL DEPS (no local source, 14): anyio, fastapi, httpx, litellm, numpy, opencv-python, pytest, pytest-asyncio, pytest-cov, pyyaml, ultralytics, uvicorn, webrtcvad, websockets
