@@ -477,3 +477,7 @@ _Last updated by [taskill](https://github.com/oqlos/taskill) at 2026-04-25 13:48
 > Introduced a CLI interface for toonic with supporting modules, added a deep code analysis engine and a configuration management system, and applied related docs/tests improvements and refactors.
 
 <!-- taskill:status:end -->
+
+## Dependency maintenance
+
+See [internal dependency updates](docs/dependencies.md) for daily updates, locked tests and Python support.
