@@ -1,0 +1,36 @@
+name: Internal dependency freshness
+
+on:
+  schedule:
+    - cron: "47 5 * * *"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - pyproject.toml
+      - uv.lock
+      - .github/internal-dependencies.json
+      - .github/workflows/internal-dependency-freshness.yml
+
+permissions:
+  contents: read
+
+jobs:
+  freshness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install released checker
+        run: python -m pip install "goal==2.2.0"
+      - name: Verify published stable targets
+        run: goal dependencies --catalog .github/internal-dependencies.json --check > dependency-freshness.json
+      - name: Retain freshness evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-freshness
+          path: dependency-freshness.json
+          if-no-files-found: ignore
